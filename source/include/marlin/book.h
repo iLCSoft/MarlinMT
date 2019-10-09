@@ -20,47 +20,12 @@ using Flag_t = unsigned char;
 template<class HistT>
 class HistHnd {
 public:
-  using CoordArray_t = HistT::CoordArray_t;
-  using Weight_t = HistT::Weight_t;
-  using Uncertainty_t = double;
-  constexpr Weight_t OneWeight = static_cast<HistT>(1);
-
-  /** add one entrie to the histogram
-     */
-  void
-  Fill(const CoordArray_t& x, const Weight_t& weight = static_cast<Weight_t>(1)) noexcept;
-
-  /** add mutiple weighted entries to the histogram
-      */
-  void
-  FillN(const std::span<CoordArray_t>& xN, const std::span<Weight_t> weightN) noexcept;
-
-
-  /** added mutiple <b>one(1)</b> weighted entries to the histogram
-      */
-  void
-  FillN(const std::span<CoordArray_t>& xN) noexcept;
-
-  
-  /** \return number of entries histogramm is filled with.
-    * \throws ObjectNotFinalized when the function is called before the end of the Processors.
-    */
-  uint64_t
-  GetEntries() const;
-
-  /** \return the content of the Bin (sum of wheights)
-      * \throws ObjectNotFinalized when the function is called before the end of the Processors.
-    * \throws ExternelError when Root failed
-    */
-    Weight_t
-  GetBinContent(const CoordArray_t& x) const;
-
-  /** \return the uncertainty of the Bin
-      * \throws ObjectNotFinalized when function is called before the end of the Processors.
-      * \throws ExternelError when Root failed
-      */
-  Uncertainty_t
-  GetBinUncertainty(const CoordArray_t& x) const;
+  struct NullHnd {
+    template<typename ... Ts>
+    NullHnd(Ts ...) {}
+  };
+  using Type = NullHnd;
+  static constexpr bool valid = false;
 };
 
 
@@ -115,20 +80,19 @@ public:
     Default = 0b1
   };
 
+  template<class BookT>
+  typename Hnd<BookT>::Type
+  Book(
+    const std::string& path,
+    const Flags& flags = Flags::Default
+  );
+
   /** Book Object and return a Handle to it, 
      * if Object not alreadey exist, create a new one
    * \param path booking path for the Object
      * \param name of the instance
      * \param flags Flag to control the behavior
      */
-  template<class BookT>
-  typename Hnd<BookT>::Type
-  Book(
-    const std::string& path,
-    const Flags& flags = Flags::Default
-  ) {
-    static_assert(true, "Can't book object of this Type!");
-  }
 
 };
 
@@ -149,7 +113,59 @@ operator&(const BookStore::Flags& l, const BookStore::Flags& r) {
 
 }
 
-/*! \fn HisHnd<BookT> BookStore::Book(const std::filesystem::path& path, const std::string& name, const Flags& fglas = Flags::Default)
+template<class BookT>
+typename Hnd<BookT>::Type
+  BookStore::Book(
+  const std::string& path,
+  const Flags& flags
+) {
+  static_assert(Hnd<BookT>::valid, "Type is not Supported");
+
+  if(_state != State::Init)
+    MARLIN_THROW_T(BookException, "booking is only in init possible.");
+
+  std::shared_ptr<BookT> ptr;
+
+  auto itr =  _pathToHist.find(path);
+  if (itr == _pathToHist.end()) {
+    itr = AddEntrie(path, flags, typeid(BookT).hash_code());
+  }
+
+  if(itr->second.typeHash != typeid(BookT).hash_code()) {
+    MARLIN_THROW_T(BookException, "Allrdeady booked with other Type.");
+  }
+  if(itr->second.flags != flags) {
+    MARLIN_THROW_T(BookException, "Allready booked with other Flags.");
+  }
+
+  Count_t nr = itr->second.nrHistInstances ++;
+
+  if(static_cast<bool>(
+    itr->second.flags & Flags::MultiInstances)) {
+    if(nr >= _maxInstances) {
+      MARLIN_THROW_T(BookException, "created too many instances");
+    }
+
+    ptr = std::make_shared<BookT>();
+    _hists[itr->second.begin + nr] = ptr;
+
+  } else {
+
+    if(nr == 1) {
+      ptr = std::make_shared<BookT>();
+      _hists[itr->second.begin] = ptr;
+    } else {
+      ptr = std::static_pointer_cast<BookT>
+        (_hists[itr->second.begin]);
+      itr->second.nrHistInstances -= 1;
+    }
+  }
+
+  return typename Hnd<BookT>::Type(ptr, flags, itr->second, *this);
+
+}
+
+/*! \fn Hnd<BookT> BookStore::Book(const std::experimental::filesystem::path& path, const std::string& name, const Flags& fglas = Flags::Default)
  * \note <b>supported Types</b>
  *  - RH1D
  *  - RH1F

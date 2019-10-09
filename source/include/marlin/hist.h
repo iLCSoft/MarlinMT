@@ -83,4 +83,5 @@ template<>
 class Hnd<RH1D> {
 public:
   using Type = HistHnd<RH1D>;
+  static constexpr bool valid = true;
 };
