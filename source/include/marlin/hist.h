@@ -3,7 +3,6 @@
 #include <functional>
 #include "marlin/book.h"
 
-struct RH1D;
 struct Filler {
   void Fill(int x) {
     std::cout << "fill filler: " <<  x << '\n';
@@ -79,9 +78,8 @@ public:
 };
 
 
-template<>
-class Hnd<RH1D> {
-public:
-  using Type = HistHnd<RH1D>;
-  static constexpr bool valid = true;
-};
+class RH1D;
+template<> struct Hnd<RH1D> { using Type = HistHnd<RH1D>; };
+class RH2D;
+template<> struct Hnd<RH2D> { using Type = HistHnd<RH2D>; };
+

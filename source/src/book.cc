@@ -4,9 +4,6 @@
 #include <utility>
 #include "RHist.hxx"
 
-
-class RH1D;
-
 typename BookStore::EntrieMap::iterator
 BookStore::AddEntrie(
 	const std::string& path,

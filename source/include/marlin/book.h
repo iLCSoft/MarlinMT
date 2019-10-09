@@ -17,14 +17,25 @@ using Flag_t = unsigned char;
 //! \exception ObjectNotFinalized the object is not in a valid state to perform the action.
 //! \exception ExternelError the action results in an Exception from an extern lib.
 
-template<class HistT>
-class HistHnd {
-public:
-  struct NullHnd {
-    template<typename ... Ts>
-    NullHnd(Ts ...) {}
-  };
+struct ObjectNotFinalized {
+  const char* message;
+};
+
+/*! Maps BookT to Handle Type */
+struct NullHnd {
+  template<typename ... Ts>
+  NullHnd(Ts ...) {}
+};
+template<class BookT>
+struct Hnd {
   using Type = NullHnd;
+};
+template<class HndT>
+struct hnd_trait {
+  static constexpr bool valid = true;
+};
+template<>
+struct hnd_trait<NullHnd> {
   static constexpr bool valid = false;
 };
 
@@ -119,7 +130,7 @@ typename Hnd<BookT>::Type
   const std::string& path,
   const Flags& flags
 ) {
-  static_assert(Hnd<BookT>::valid, "Type is not Supported");
+  static_assert(hnd_trait<typename Hnd<BookT>::Type>::valid, "Type is not Supported");
 
   if(_state != State::Init)
     MARLIN_THROW_T(BookException, "booking is only in init possible.");
