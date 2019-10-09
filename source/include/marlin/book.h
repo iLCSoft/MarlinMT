@@ -97,7 +97,9 @@ private:
     std::size_t typeHash);
 
 public:
-  void Finalize(Entrie& entrie) {};
+  void Finalize(Entrie& entrie) {
+    entrie.finalized = true;
+  };
   BookStore(Count_t maxInstances)
     : _maxInstances{maxInstances},
       _state{State::Init}

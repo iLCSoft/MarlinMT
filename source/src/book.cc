@@ -26,6 +26,9 @@ BookStore::Book<RH1D>(
 	if(itr->second.typeHash != typeid(RH1D).hash_code()) {
 		MARLIN_THROW_T(BookException, "Allrdeady booked with other Type.");
 	}
+	if(itr->second.flags != flags) {
+		MARLIN_THROW_T(BookException, "Allready booked with other Flags.");
+	}
 
 	Count_t nr = itr->second.nrHistInstances ++;
 
