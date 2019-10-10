@@ -58,6 +58,12 @@ if(MARLIN_BOOK)
 endif()
 
 marlin_add_test (
+	test-book-store
+	BUILD_EXEC
+	REGEX_FAIL "TEST_FAILED"
+)
+
+marlin_add_test (
   marlinminusx
   COMMAND ${EXECUTABLE_OUTPUT_PATH}/Marlin
   EXEC_ARGS -x test_marlinminusx.xml

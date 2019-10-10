@@ -1,225 +1,45 @@
 
-#include <UnitTesting.h>
-#include <typeinfo>
-
-#include "marlin/book/Hist.h"
-#include "marlin/book/Handle.h"
-#include "marlin/book/BookStore.h"
-#include "marlin/book/Condition.h"
-#include "marlin/book/Selection.h"
-#include "ROOT/RHistData.hxx" 
-#include "ROOT/RHist.hxx"
-#include "marlin/book/ROOTAdapter.h"
-
 #include <memory>
-#include <string>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
+#include <chrono>
+#include <UnitTesting.h>
+#include "marlin/book/bookStore.h"
+#include "marlin/book/hist.h"
+#include "marlin/book/Flags.h"
+#include "ROOT/RHist.hxx"
 
-template<typename T>
-void MergeaHist(const std::shared_ptr<T>& dst, const std::shared_ptr<T>& src) {
-	ROOT::Experimental::Add(*dst, *src);
+
+std::mutex cv_m;
+std::condition_variable cv;
+void worker(int i) {
+	std::cout << "Wait ... id: " << i << '\n';
+	std::lock_guard<std::mutex> look(cv_m);
+	std::cout << "fin .... id: " << i << '\n';
 }
-
-std::string mergedUnicStr() {
-	static std::size_t num = 0;
-	return std::to_string(++num);
-}
-
-using namespace marlin::book;
-using namespace marlin::book::types;
-using namespace ROOT::Experimental;
-
-
-
 
 int main(int, char**) {
-	marlin::test::UnitTest test(" Memory Filler Test ");
-	BookStore store{};
+	marlin::test::UnitTest test (" BookStore ");
+
+	marlin::BookStore store{};
+	marlin::BookStore::histCtor_t<1, float> ctor_p{std::tuple(std::string("x"), 2, 1.0, 0.0)};
+
+	auto hnd1 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
+	auto hnd2 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
+	hnd1.Fill({1}, 1);
+	hnd2.Fill({1}, 1);
+	hnd1.Fill({0}, 1);
+	test.test("Concurrent Test", hnd1.GetMergedHist().GetEntries() == 3);
 	
-	auto helper = store.book<RH1F>("path", "name"); // TODO: forbid this!
-	auto h2 = helper.single();
-
-	{
-
-		// EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
-		// EntrySingle entry = BookHelper<RH1F>(store, Flags::Book::Single)({"a", 3, 1.0, 2.0});
-
-		EntrySingle entry = store.book<RH1F>("path", "name").single()({"a", 3, 1.0, 2.0});
-
-
-		// EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
-		auto hnd = entry.handle();
-		hnd.fill({0}, 1);
-		std::vector<typename decltype(hnd)::CoordArray_t> xs;
-		std::vector<typename decltype(hnd)::Weight_t> ws;
-		for(int i = 0; i < 10; ++i) {
-			xs.push_back({1});
-			ws.push_back(1);
-		}
-		hnd.fillN(xs, ws);
-
-		auto hist = hnd.merged();
-		test.test("Single Hist Filling", hist.GetEntries() == 11);
-
-	}{
-		// EntryMultiCopy entry = store.bookMultiCopy<RH1I, const RAxisConfig&>(2, "path2", "name", {"a", 2, -1, 2});
-		EntryMultiCopy entry = store.book<RH1I>("path2", "name").multiCopy(2)({"a", 2, -1, 2});
-		auto hnd = entry.handle(0);
-		hnd.fill({0}, 1);
-
-		auto hnd2 = entry.handle(1);
-		hnd2.fill({0}, 1);
-
-		auto hist = hnd.merged();
-		test.test("MultiCopd Hist Filling", hist.GetBinContent({0})== 2);
-
-	}{
-
-		auto selection = store.find(ConditionBuilder().setName("name"));
-		
-		auto selection1 = store.find(ConditionBuilder().setType<RH1I>());
-
-		auto selection2 = store.find(ConditionBuilder().setPath("path2"));
-
-		auto selection3 = store.find(ConditionBuilder().setPath(std::regex("path(|2)")));
-		
-		test.test("Basic find function BookStore",
-				selection.size() == 2
-				&& selection1.size() == 1
-				&& selection2.size() == 1
-				&& selection3.size() == 2
-				&& selection1.begin()->key().hash == selection2.begin()->key().hash);
-
-		auto subSelection = selection.find(ConditionBuilder().setPath("path"), Selection::ComposeStrategie::AND);
-		auto subSelection1 = store.find(subSelection.condition());
-
-		test.test("Subselection composing AND", 
-			subSelection.size() == 1
-			&& subSelection1.size() == 1
-			&& subSelection.begin()->key().hash == subSelection1.begin()->key().hash
-		);
-
-	} {
-	
-		EntryMultiShared entry = store.bookMultiShared<RH1I, const RAxisConfig&>("path3", "name", {"a", 3, 1.0, 2.0});
-		auto hnd = entry.handle();
-		hnd.fill({0}, 1);
-
-		auto hnd2 = entry.handle();
-		hnd2.fill({0}, 1);
-
-		auto hist = hnd.merged();
-		test.test("MultiShared Hist Filling", hist.GetBinContent({0}) == 2);
-
-	}{
-		
-		std::string path = mergedUnicStr();
-		for(int i = 0; i < 10; ++i) {
-			store.bookSingle<RH1I, const RAxisConfig&>(path, mergedUnicStr(), {"a", 2, 0.0, 2.0});
-		}
-		
-		Selection sel = store.find(ConditionBuilder().setPath(path));
-		std::size_t n = sel.size();
-
-		{
-			Condition all = ConditionBuilder();
-			Selection selC[] = {
-				sel.find(all),
-				sel.find(all),
-				sel.find(all),
-				sel.find(all)
-			};
-
-			auto itr = selC[2].begin() + 5;
-			for(int i = 5; i < 10; ++i, ++itr) {
-				selC[0].remove(i);
-				selC[2].remove(itr);
-			}
-			selC[1].remove(5, 5);
-			selC[3].remove(selC[3].begin() + 5, selC[3].end());
-
-			bool equal = true;
-			Selection::iterator aItr[] = {
-				selC[0].begin(),
-				selC[1].begin(),
-				selC[2].begin(),
-				selC[3].begin()};
-			for(;equal && aItr[0] != selC[0].end();) {
-				for(int i = 0; i < 4; ++aItr[i++]) {
-					if(
-						i < 3 &&
-						aItr[i]->key().hash != aItr[i + 1]->key().hash) {
-						equal = false;
-						break;
-					}
-				}
-			}
-			test.test("Remove Elements from selection",
-				selC[0].size() == selC[1].size()
-				&& selC[1].size() == selC[2].size()
-				&& selC[2].size() == selC[3].size()
-				&& equal);
-		} 	
-	}{
-
-			
-		Selection sel = store.find(ConditionBuilder().setName("name"));
-		Selection rem = store.find(sel.condition().Not());
-
-		store.remove(rem);
-
-		Selection sel2 = store.find(sel.condition());
-		Selection rem2 = store.find(rem.condition());
-
-		bool equal = true;
-		auto itr2 = sel2.begin();
-		for(auto itr = sel.begin(); itr != sel.end(); ++itr, ++itr2) {
-			if(itr->key().hash != itr2->key().hash) {
-				equal = false;
-				break;
-			}
-		}
-		if(sel2.size() != sel.size()) equal = false;
-
-		store.clear();
-		Selection selAll = store.find(ConditionBuilder());
-
-		test.test("Remove Elements from store", 
-					equal
-			&& 	rem2.size() == 0 
-			&& selAll.size() == 0);
-	
-	} {
-		std::size_t n = store.find(ConditionBuilder()).size();
-
-		RAxisConfig axis{"x", 2, 1.0, 2.0};
-		store.book<RH1F>("path", mergedUnicStr()).single()(axis);
-		store.book<RH2F>("path", mergedUnicStr()).single()(axis, axis);
-		store.book<RH3F>("path", mergedUnicStr()).single()(axis, axis, axis);
-		store.book<RH1I>("path", mergedUnicStr()).multiCopy(3)(axis);
-		store.book<RH1D>("path", mergedUnicStr()).multiShared()(axis);
-
-		std::size_t n2 = store.find(ConditionBuilder()).size();
-
-		test.test("BookHelper usage", n + 5 == n2);
-	} {
-		EntrySingle e = store.book<RH1F>("path", "my Name").single()({"x", 2, -1.0, 5.0});
-		e.handle().fill({0}, 1);
-
-
-		Selection sel = store.find(ConditionBuilder().setName("my Name"));
-		std::optional<Handle<RH1F>> oh = sel.begin()->handle<RH1F>();
-
-		
-		Handle<RH1F> h = oh.value();
-		h.fill({0}, 1);
-
-		test.test("Get booked entry from BookStore",
-			e.handle().merged().GetBinContent({0}) == 2
-			&& h.merged().GetBinContent({0}) == 2);		
-
-	}	
-
-
-
+	auto hnd3 = store.bookHist<1, float>("name2", "path", ctor_p);
+	auto hnd4 = store.bookHist<1, float>("name2", "path", ctor_p);
+	hnd3.Fill({1}, 1);
+	hnd3.Fill({1}, 1);
+	hnd4.Fill({0}, 1);
+	test.test("Parallel Test", 
+		hnd3.GetMergedHist().GetBinContent({0}) == 1
+		&& hnd4.GetMergedHist().GetBinContent({1}) == 2);
 	return 0;
 }
