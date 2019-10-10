@@ -72,6 +72,31 @@ namespace marlin {
     
     
 
+    static void
+    MergeConcurrent(std::shared_ptr<void>& filler, std::shared_ptr<void>) {
+      std::static_pointer_cast<Filler_t>(filler)
+        ->Flush();
+    }
+    static void
+    MergeParralel(std::shared_ptr<void>& partHist, std::shared_ptr<void> sumHist) {
+      // iterate through bin's
+      auto begin = 
+        std::static_pointer_cast<Hist_t>(partHist)
+          ->begin();
+      auto end = 
+        std::static_pointer_cast<Hist_t>(partHist)
+          ->end();
+      std::shared_ptr<Hist_t> dst = 
+        std::static_pointer_cast<Hist_t>(sumHist),
+        src =
+        std::static_pointer_cast<Hist_t>(partHist);
+      for(auto itr = begin; itr != end; ++itr) {
+        // TODO: check Math!!!
+        dst->Fill((*itr).GetCenter(), (*itr).GetContent());
+        src->Fill((*itr).GetCenter(), -(*itr).GetContent());
+      }
+    }
+    
   public:
     HistHnd() : _valid{false}{}
 

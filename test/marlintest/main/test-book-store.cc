@@ -28,13 +28,21 @@ int main(int, char**) {
 	marlin::BookStore store{};
 	std::cout << "store\n";
 	marlin::BookStore::histCtor_t<1, float> ctor_p{std::tuple(std::string("x"), 2, 1.0, 0.0)};
-	std::cout << "ctor_peai\n";
-	auto hnd = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
-	std::cout << "hnd\n";
-	hist1d.Fill({1}, 1);
-	std::cout << "fill dircet\n";
-	hnd.Fill({1}, 1);
-	std::cout << "fill\n";
-	test.test("success", true);
+
+	auto hnd1 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
+	auto hnd2 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
+	hnd1.Fill({1}, 1);
+	hnd2.Fill({1}, 1);
+	hnd1.Fill({0}, 1);
+	test.test("Concurrent Test", hnd1.GetMergedHist().GetEntries() == 3);
+	
+	auto hnd3 = store.bookHist<1, float>("name2", "path", ctor_p);
+	auto hnd4 = store.bookHist<1, float>("name2", "path", ctor_p);
+	hnd3.Fill({1}, 1);
+	hnd3.Fill({1}, 1);
+	hnd4.Fill({0}, 1);
+	test.test("Parallel Test", 
+		hnd3.GetMergedHist().GetBinContent({0}) == 1
+		&& hnd4.GetMergedHistHist().GetBinContent({1}) == 2);
 	return 0;
 }

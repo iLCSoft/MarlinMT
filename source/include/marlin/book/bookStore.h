@@ -81,19 +81,41 @@ namespace marlin {
           MARLIN_THROW_T(BookStoreException, "object already booked with other flags");
       }
       if (flags.Contains(BookFlags::MultiInstance)) {
-        return typename hnd_hist_trait<DIM, T>::Type(
-          flags,
+        void_ptr filler = 
           std::make_shared<Hist_t>(*
             std::static_pointer_cast<Hist_t>(
               obj.pObj
-            )),
-          obj.pObj);
-      } else {
-        return typename hnd_hist_trait<DIM, T>::Type(
+            ));
+        typename hnd_hist_trait<DIM, T>::Type res(
           flags,
+          filler,
+          obj.pObj,
+          _mergeMgr,
+          key);
+        MergeMgr::MergeObj mobj{};
+        mobj.src = filler;
+        mobj.dst = obj.pObj;
+        mobj.merge = res.GetMergeFunction();
+        _mergeMgr->insert(std::make_pair(key, std::move(mobj)));
+        return std::move(res);
+      } else {
+        std::shared_ptr<void> filler = 
           std::make_shared<Filler_t>(
-            std::static_pointer_cast<FillMgr_t>(obj.pFillManager)->MakeFiller()),
-          obj.pObj);
+            *std::static_pointer_cast<FillMgr_t>(
+              obj.pFillManager));
+
+        typename hnd_hist_trait<DIM, T>::Type res(
+          flags,
+          filler,
+          obj.pObj,
+          _mergeMgr,
+          key);
+        MergeMgr::MergeObj mobj{};
+        mobj.src = filler;
+        mobj.dst = obj.pObj;
+        mobj.merge = res.GetMergeFunction(); 
+        _mergeMgr->insert(std::make_pair(key, std::move(mobj)));
+        return std::move(res);
       }
     }
     
