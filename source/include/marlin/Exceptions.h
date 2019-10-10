@@ -137,5 +137,6 @@ namespace marlin {
   MARLIN_DEFINE_EXCEPTION( SkipEventException ) ;
   MARLIN_DEFINE_EXCEPTION( StopProcessingException ) ;
   MARLIN_DEFINE_EXCEPTION( ParseException ) ;
+  MARLIN_DEFINE_EXCEPTION( BookStoreException );
 
 } // end namespace
