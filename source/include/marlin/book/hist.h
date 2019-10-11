@@ -40,16 +40,31 @@ namespace marlin {
 
     std::shared_ptr<void> _filler;
     std::shared_ptr<Hist_t> _resHist;
+    std::shared_ptr<MergeMgr> _mergeMgr;
     
     std::function<
-      void(std::shared_ptr<void>&,const CoordArry_t&, const Weight_t&)>       _fnFill;
+      void(void_ptr&,
+        const CoordArry_t&, 
+        const Weight_t&
+      )>
+      _fnFill;
+
     static void
-    FillConcurrent(std::shared_ptr<void>& filler, const CoordArry_t& x, const Weight_t& w) {
+    FillConcurrent(
+      void_ptr& filler,
+      const CoordArry_t& x,
+      const Weight_t& w) 
+    {
       std::static_pointer_cast<Filler_t>
         (filler)->Fill(x, w);
     }
+
     static void
-    FillDirect(std::shared_ptr<void>& filler, const CoordArry_t& x, const Weight_t& w) {
+    FillDirect(
+      void_ptr& filler,
+      const CoordArry_t& x,
+      const Weight_t& w) 
+    {
       std::static_pointer_cast<Hist_t>
       (filler)->Fill(x, w);
     }
@@ -57,20 +72,28 @@ namespace marlin {
     HistHnd(
       const Flag_t& flags,
       const std::shared_ptr<void>& filler,
-      const std::shared_ptr<void>& resHist)
+      const std::shared_ptr<void>& resHist,
+      const std::shared_ptr<MergeMgr>& merge,
+      const Key_t& key)
       : _valid{true},
         _f{flags},
         _modified{false},
+        _key{key},
         _filler{filler},
         _resHist{std::static_pointer_cast<Hist_t>(resHist)},
-        _fnFill{[](std::shared_ptr<void>&, const CoordArry_t&, const Weight_t&){ throw "Bullshit";}}
-    {
-      _fnFill = flags.Contains(BookFlags::MultiInstance)
+        _mergeMgr{merge},
+        _fnFill{
+        flags.Contains(BookFlags::MultiInstance)
         ? FillDirect
-        : FillConcurrent;
+        : FillConcurrent}
+    {}
+    
+    std::function<void(std::shared_ptr<void>&, std::shared_ptr<void>&)>
+    GetMergeFunction() {
+      return _f.Contains(BookFlags::MultiInstance)
+        ? MergeParralel
+        : MergeConcurrent;
     }
-    
-    
 
     static void
     MergeConcurrent(std::shared_ptr<void>& filler, std::shared_ptr<void>) {

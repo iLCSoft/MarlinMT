@@ -18,6 +18,8 @@ namespace marlin {
     using map_t = std::unordered_multimap<Key_t, MergeObj>;
     map_t _merges;
   public:
+    MergeMgr() : _merges{} {}
+    MergeMgr(const MergeMgr&) = delete;
     void Merge(const Key_t& key) {
       std::pair<map_t::iterator, map_t::iterator>
         range = _merges.equal_range(key);

@@ -43,6 +43,6 @@ int main(int, char**) {
 	hnd4.Fill({0}, 1);
 	test.test("Parallel Test", 
 		hnd3.GetMergedHist().GetBinContent({0}) == 1
-		&& hnd4.GetMergedHistHist().GetBinContent({1}) == 2);
+		&& hnd4.GetMergedHist().GetBinContent({1}) == 2);
 	return 0;
 }

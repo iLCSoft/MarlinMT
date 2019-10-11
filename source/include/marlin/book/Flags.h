@@ -9,9 +9,9 @@ namespace marlin {
     std::bitset<AmtFlags> _val;
   protected:
   public:
-    Flag_t(unsigned long long val) : _val{val} {}
+    constexpr Flag_t(unsigned long long val) : _val{val} {}
     Flag_t(const std::bitset<AmtFlags>& val) : _val{val}{}
-    Flag_t() : _val{0} {}
+    constexpr Flag_t() : _val{0} {}
     Flag_t operator& (const Flag_t& f) const {
       return Flag_t(_val & f._val);
     }
@@ -36,8 +36,8 @@ namespace marlin {
   };
 
   namespace BookFlags {
-    const Flag_t MultiInstance(1);
-    const Flag_t Default(MultiInstance);
-
+    constexpr Flag_t MultiInstance(1);
+    constexpr Flag_t Default(MultiInstance);
   }
+  
 }
