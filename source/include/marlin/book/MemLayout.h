@@ -5,55 +5,79 @@
 #include <utility>
 #include <iostream>
 
+/*! MemLayout BaseClass to store booked objets in MarlinMT 
+ */
 class MemLayout {
 public:
 
-   template <typename T>
-   std::shared_ptr<const T> at( std::size_t idx ) const {
-     return std::static_pointer_cast<const T>( _at( idx ) ) ;
-   }
+    /*! get Resource for a instance
+   * \param idx instance id
+   * \return const ptr to Resource
+   */
+    template <typename T>
+    std::shared_ptr<const T> at( std::size_t idx ) const {
+      return std::static_pointer_cast<const T>( imp_at( idx ) ) ;
+    }
 
-   template <typename T>
-   std::shared_ptr<T> at( std::size_t idx ) {
-     return std::static_pointer_cast<T>( _at( idx ) ) ;
-   }
+  /*! get Resoucre for a instance
+     * \param idx instance id
+   * \return ptr to Resource
+   */
+    template <typename T>
+    std::shared_ptr<T> at( std::size_t idx ) {
+      return std::static_pointer_cast<T>( imp_at( idx ) ) ;
+    }
 
-   template <typename T>
-   std::shared_ptr<const T> merged() {
-     return std::static_pointer_cast<const T>( _merged() ) ;
-   }
+  /*! get Completed Resource. Same for every Instance
+   * \note may recalculation for every call
+   */
+    template <typename T>
+    std::shared_ptr<const T> merged() {
+      return std::static_pointer_cast<const T>( imp_merged() ) ;
+    }
   
-   virtual ~MemLayout() = default;
+    virtual ~MemLayout() = default;
 
 protected:
-   virtual std::shared_ptr<void> _at( std::size_t idx ) const= 0 ;
-   virtual std::shared_ptr<const void> _merged() = 0 ;
+  /*! implimentation from at */
+    virtual std::shared_ptr<void> imp_at( std::size_t idx ) const= 0 ;
+  /*! implimentation from merged */
+    virtual std::shared_ptr<const void> imp_merged() = 0 ;
 };
 
-
+/*! MemLayout for Mutible object instances.
+ * \tparam T stored Object Type
+ * \tparam MERGE function(to, from) wich merge to instances of Object
+ */
 template 
   <typename T,
   void(*MERGE)(std::shared_ptr<T>& /* dst */, std::shared_ptr<T>& /* src */),
   typename ... Args_t>
 class SharedMemLayout : public MemLayout {
 public:
+  /*! 
+   * \param num_instances amount of Resource Instances
+   * \param args Arguments for Object Construction 
+   */
   SharedMemLayout(std::size_t num_instances, Args_t ... args)
     : _objects{num_instances, nullptr},
         _ctor_p{args ...} 
   {
   }
+
   ~SharedMemLayout() override = default;
 
 private:
-  std::shared_ptr<void> _at(std::size_t idx) const override {
+    /*! get Rescource for Instance. lazy operation*/  
+  std::shared_ptr<void> imp_at(std::size_t idx) const override {
     if(!_objects[idx]) {
       _objects[idx] = std::make_shared<T>(std::make_from_tuple<T>(_ctor_p));
     }
 
     return _objects[idx];
   }
-
-  std::shared_ptr<const void> _merged() override {
+  
+  std::shared_ptr<const void> imp_merged() override {
     _mergedObj = std::make_shared<T>(std::make_from_tuple<T>(_ctor_p)); 
 
     for(std::shared_ptr<T>& pObj : _objects) {
@@ -63,17 +87,22 @@ private:
     return _mergedObj;
   }
 
-  mutable std::vector<std::shared_ptr<T>> _objects;
   std::shared_ptr<T> _mergedObj{nullptr};
   std::tuple<Args_t ...> _ctor_p;
+>>>>>>> Added RHist Test
 };
 
-template <typename T>
+/*! MemLayout for Single object instance.
+ * \tparam T stored Object Type
+ */
+template <typename T, typename ... Args_t>
 class SingleMemLayout : public MemLayout {
 public:
-   SingleMemLayout() {
-
-   }
+    SingleMemLayout(Args_t ... args) 
+    : _object{T(args ...)}
+  {
+    
+    }
    ~SingleMemLayout() override = default;
 
 private:
@@ -81,6 +110,7 @@ private:
      return _object ;
    }
 
+   ///\note cheap merge
    std::shared_ptr<const void> _merged() override {
      return _object ;
    }
