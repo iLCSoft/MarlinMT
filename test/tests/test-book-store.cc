@@ -1,4 +1,8 @@
 
+int main(int, char**) {
+	return 0;
+}
+/*
 #include <memory>
 #include <iostream>
 #include <mutex>
@@ -29,15 +33,15 @@ int main(int, char**) {
 	std::cout << "store\n";
 	marlin::BookStore::histCtor_t<1, float> ctor_p{std::tuple(std::string("x"), 2, 1.0, 0.0)};
 
-	auto hnd1 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
+	auto hnd1 = store.bookHist<1, float>("name", "path", {{"x", 2, 1.0, 0.0}}, marlin::Flag_t{});
 	auto hnd2 = store.bookHist<1, float>("name", "path", ctor_p, marlin::Flag_t{});
 	hnd1.Fill({1}, 1);
 	hnd2.Fill({1}, 1);
 	hnd1.Fill({0}, 1);
 	test.test("Concurrent Test", hnd1.GetMergedHist().GetEntries() == 3);
 	
-	auto hnd3 = store.bookHist<1, float>("name2", "path", ctor_p);
-	auto hnd4 = store.bookHist<1, float>("name2", "path", ctor_p);
+	auto hnd3 = store.bookHist<1, float>("name2", "path", ctor_p, marlin::BookFlags::MultiInstance);
+	auto hnd4 = store.bookHist<1, float>("name2", "path", ctor_p, marlin::BookFlags::MultiInstance);
 	hnd3.Fill({1}, 1);
 	hnd3.Fill({1}, 1);
 	hnd4.Fill({0}, 1);
@@ -45,4 +49,4 @@ int main(int, char**) {
 		hnd3.GetMergedHist().GetBinContent({0}) == 1
 		&& hnd4.GetMergedHist().GetBinContent({1}) == 2);
 	return 0;
-}
+}*/

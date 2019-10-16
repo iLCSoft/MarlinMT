@@ -1,11 +1,10 @@
 #include <bitset>
 #pragma once
 
-namespace marlin {
-
-  constexpr std::size_t AmtFlags = 8;
+namespace marlin::book {
 
   class Flag_t {
+    static constexpr std::size_t AmtFlags = 8;
     std::bitset<AmtFlags> _val;
   protected:
   public:
@@ -34,10 +33,16 @@ namespace marlin {
       return (_val & f._val) == f._val;
     }
   };
-
-  namespace BookFlags {
-    constexpr Flag_t MultiInstance(1);
-    constexpr Flag_t Default(MultiInstance);
+  namespace Flags { 
+    namespace Book {
+      static constexpr Flag_t MultiInstance(1);
+      static constexpr Flag_t Default(MultiInstance);
+    }
+    namespace Permission {
+      static constexpr Flag_t Booking{1 << 0};
+      static constexpr Flag_t Filling{1 << 0};
+      static constexpr Flag_t Merging{1 << 0};
+    }
   }
   
 }
