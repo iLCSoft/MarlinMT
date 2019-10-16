@@ -6,7 +6,6 @@
     }
 =======
 namespace marlin::book {
->>>>>>> new book store iteration
 
   /*! MemLayout BaseClass to store booked objets in MarlinMT 
    */
@@ -54,7 +53,7 @@ namespace marlin::book {
    */
   template 
     <typename T,
-    void(*MERGE)(std::shared_ptr<T>& /* dst */, std::shared_ptr<T>& /* src */),
+    void(*MERGE)(const std::shared_ptr<T>& /* dst */, const std::shared_ptr<T>& /* src */),
     typename ... Args_t>
   class SharedMemLayout : public MemLayout {
   public:
@@ -88,7 +87,6 @@ namespace marlin::book {
       return _mergedObj;
     }
 
-    std::vector<std::shared_ptr<T>> _objects; ///< mutable for lazy operation
     std::shared_ptr<T> _mergedObj{nullptr};
     std::tuple<Args_t ...> _ctor_p;
   };
@@ -117,4 +115,5 @@ namespace marlin::book {
 
      std::shared_ptr<T>          _object {nullptr};
   };
+>>>>>>> aded 2. iteraton of book store for histograms
 }

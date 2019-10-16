@@ -17,7 +17,7 @@ struct Type1 {
 		: bins{a0, a1, a2, a3, a4} {}
 };
 
-void MergeType1(std::shared_ptr<Type1>& p1, std::shared_ptr<Type1>& p2) {
+void MergeType1(const std::shared_ptr<Type1>& p1, const std::shared_ptr<Type1>& p2) {
 	for(int i = 0; i < 5; ++i) {
 		p1->bins[i] += p2->bins[i];
 	}
@@ -28,7 +28,7 @@ public:
 	SharedType1 (std::size_t num_inst, Args_t ... args) : SharedMemLayout<Type1, MergeType1, Args_t ... >{num_inst, args ...}{}
 };
 
-void MergeHist(std::shared_ptr<RH1D>& p1, std::shared_ptr<RH1D>& p2) {
+void MergeHist(const std::shared_ptr<RH1D>& p1, const std::shared_ptr<RH1D>& p2) {
 	ROOT::Experimental::Add(*p1, *p2);
 }
 
