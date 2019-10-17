@@ -118,91 +118,94 @@ namespace marlin {
     
     };
   } // end namespace book
-  } // end namespace marlin
+} // end namespace marlin
 
-  //----------------------------------------------------------------------------
-  //----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
-  template<typename T>
-  const T&
-  marlin::book::BookStore::Read( std::size_t hash ) {
-    bool modified = false ;
-    auto beItr = _modifiers.equal_range( hash ) ;
-    for ( auto itr = beItr.first; itr != beItr.second; ++itr ) {
-      if(itr->second->isModified()) {
-        itr->second->flush() ;
-        modified = true;
-      }
+/// @private
+template<typename T>
+const T&
+marlin::book::BookStore::Read( std::size_t hash ) {
+  bool modified = false ;
+  auto beItr = _modifiers.equal_range( hash ) ;
+  for ( auto itr = beItr.first; itr != beItr.second; ++itr ) {
+    if(itr->second->isModified()) {
+      itr->second->flush() ;
+      modified = true;
     }
-
-    // TODO: mod flag for MemLayer
-    return *_objs.find( hash )->second.memory->merged< T >() ;
   }
 
-  template<class T, typename ... Args_t>
-  marlin::book::Handle< marlin::book::book_trait< T > >
-    marlin::book::BookStore::book (
-    const std::string& name,
-    const std::string& path,
-    std::size_t idx,
-    std::size_t amt,
-    Flag_t flags,
-    Args_t ... ctor_p
-  ) { 
-    using ModMgr_t = typename book_trait< T >::ModifierManager ;
-    using Value_t = typename book_trait< T >::Type ;
+  // TODO: mod flag for MemLayer
+  return *_objs.find( hash )->second.memory->merged< T >() ;
+}
 
-    std::size_t hash = std::hash< std::string >{}( name + path ) ;
+/// @private
+template<class T, typename ... Args_t>
+marlin::book::Handle< marlin::book::book_trait< T > >
+  marlin::book::BookStore::book (
+  const std::string& name,
+  const std::string& path,
+  std::size_t idx,
+  std::size_t amt,
+  Flag_t flags,
+  Args_t ... ctor_p
+) { 
+  using ModMgr_t = typename book_trait< T >::ModifierManager ;
+  using Value_t = typename book_trait< T >::Type ;
+
+  std::size_t hash = std::hash< std::string >{}( name + path ) ;
+  
+  auto itrO = _objs.find( hash ) ;
+  if ( itrO == _objs.end() ) {
+    std::shared_ptr< ModMgr_t > modMgr( nullptr ) ;
+    std::shared_ptr< MemLayout > memLayout( nullptr );
     
-    auto itrO = _objs.find( hash ) ;
-    if ( itrO == _objs.end() ) {
-      std::shared_ptr< ModMgr_t > modMgr( nullptr ) ;
-      std::shared_ptr< MemLayout > memLayout( nullptr );
-      
-      // TODO: shift this to FillMgr
-      if ( flags.Contains( Flags::Book::MultiInstance ) ) {
-        memLayout
-          = std::make_shared<
-              SingleMemLayout<
-                Value_t,
-                Args_t ...
-              >
+    // TODO: shift this to FillMgr
+    if ( flags.Contains( Flags::Book::MultiInstance ) ) {
+      memLayout
+        = std::make_shared<
+            SingleMemLayout<
+              Value_t,
+              Args_t ...
             >
-            ( ctor_p ... ) ;
-      } else {
-        memLayout 
-          = std::make_shared<
-              SharedMemLayout<
-                Value_t,
-                book_trait<T>::merge,
-                Args_t ...
-              >
+          >
+          ( ctor_p ... ) ;
+    } else {
+      memLayout 
+        = std::make_shared<
+            SharedMemLayout<
+              Value_t,
+              book_trait<T>::merge,
+              Args_t ...
             >
-          ( amt, ctor_p ... ) ;
-      }
-      
-      modMgr = std::make_shared< ModMgr_t >(
-        memLayout,
-        flags
-      ) ;
-
-      itrO = _objs.insert( std::make_pair(
-        hash,
-        BookEntry(
-          modMgr,
-          memLayout
-        )
-      )).first ;
+          >
+        ( amt, ctor_p ... ) ;
     }
-
-    BookEntry& obj = itrO->second ;
-    std::shared_ptr< Modifier > modifier = obj.createModifier( idx ) ;
-    _modifiers.insert( std::make_pair( hash, modifier ) ) ;
     
-    auto finalFn = [ store = this ]( std::size_t idHash ) -> const T& {
-      return store->template Read<T>( idHash ) ;
-    } ;
+    modMgr = std::make_shared< ModMgr_t >(
+      memLayout,
+      flags
+    ) ;
 
-    return Handle< book_trait< T > >( modifier, hash, finalFn );
+    itrO = _objs.insert( std::make_pair(
+      hash,
+      BookEntry(
+        modMgr,
+        memLayout
+      )
+    )).first ;
+  }
+
+  BookEntry& obj = itrO->second ;
+  std::shared_ptr< Modifier > modifier = obj.createModifier( idx ) ;
+  _modifiers.insert( std::make_pair( hash, modifier ) ) ;
+  
+  auto finalFn = [ store = this ]( std::size_t idHash ) -> const T& {
+    return store->template Read<T>( idHash ) ;
+  } ;
+
+  return Handle< book_trait< T > >( modifier, hash, finalFn );
+>>>>>>> added some doxygen cosmetic
 }
 

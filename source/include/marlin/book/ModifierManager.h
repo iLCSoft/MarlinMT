@@ -65,7 +65,7 @@ namespace marlin {
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
-
+/// @private
 template<class T>
 marlin::book::ModifierManagerHist<T>::ModifierManagerHist(
   const std::shared_ptr<marlin::book::MemLayout>& layout,
@@ -84,6 +84,7 @@ marlin::book::ModifierManagerHist<T>::ModifierManagerHist(
   }
 }
 
+/// @private
 template<class T>
 std::shared_ptr<marlin::book::Modifier> 
 marlin::book::ModifierManagerHist<T>::createModifier( std::size_t idx ) {
