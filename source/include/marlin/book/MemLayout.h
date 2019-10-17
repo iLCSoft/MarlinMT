@@ -1,10 +1,3 @@
-   * \return ptr to Resource
-   */
-    template <typename T>
-    std::shared_ptr<T> at( std::size_t idx ) {
-      return std::static_pointer_cast<T>( imp_at( idx ) ) ;
-    }
-=======
 namespace marlin::book {
 
   /*! MemLayout BaseClass to store booked objets in MarlinMT 
@@ -115,5 +108,4 @@ namespace marlin::book {
 
      std::shared_ptr<T>          _object {nullptr};
   };
->>>>>>> aded 2. iteraton of book store for histograms
 }
