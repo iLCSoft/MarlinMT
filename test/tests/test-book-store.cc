@@ -1,17 +1,12 @@
-
-#include <memory>
-#include <iostream>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
-#include <chrono>
+// -- test include
 #include <UnitTesting.h>
+
+// -- marlin include
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Flags.h"
 #include "marlin/book/hist.h"
-#include "ROOT/RHist.hxx"
 
-using namespace ROOT::Experimental;
+using namespace marlin::book::Types;
 
 int main(int, char**) {
 	marlin::test::UnitTest test (" BookStore ");
@@ -22,6 +17,7 @@ int main(int, char**) {
 	hnd1->fill({1}, 1);
 	hnd2->fill({1}, 1);
 	hnd1->fill({0}, 1);
+	std::cout << hnd1.get().GetBinContent({1}) << " " << hnd2.get().GetBinContent({0}) << '\n';
 	test.test(
 		"Concurrent Test",
 		hnd1.get().GetBinContent({1}) == 2
