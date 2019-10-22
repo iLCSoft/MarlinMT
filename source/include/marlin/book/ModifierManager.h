@@ -32,6 +32,12 @@ namespace marlin {
       virtual std::shared_ptr< Modifier > createModifier( std::size_t idx )
         = 0 ;
 
+      /**
+       *  @brief flush and process every modifier.
+       *  call before mearging
+       */
+      virtual void finalize() = 0 ;
+
       virtual ~ModifierManager() = default ;
     };
 
@@ -53,11 +59,18 @@ namespace marlin {
       std::shared_ptr<Modifier> 
       createModifier( std::size_t idx ) override final ;
 
+      /**
+       *  @brief flush buffer when concurrent filling is used.
+       */
+      void finalize() override final ;
+
     private:
       /// Flags how to handle the object
-      Flag_t                _flags  ;
+      Flag_t                                                _flags ;
       /// FillerBase for creating Filler. 
-      std::shared_ptr<void> _fillerBase ;
+      std::shared_ptr<void>                                 _fillerBase ;
+      /// List of produced filler
+      std::vector<std::shared_ptr<marlin::book::Modifier>>  _producedFiller ;
     };
 
   } // end namespace book
@@ -70,7 +83,7 @@ template<class T>
 marlin::book::ModifierManagerHist<T>::ModifierManagerHist(
   const std::shared_ptr<marlin::book::MemLayout>& layout,
   const marlin::book::Flag_t& flags
-) : _flags{flags}, _fillerBase{nullptr} {
+) : _flags {flags}, _fillerBase {nullptr}, _producedFiller (0) {
 
   if ( flags.Contains( Flags::Book::MultiInstance ) ) {
     _fillerBase = layout;
@@ -90,7 +103,6 @@ std::shared_ptr<marlin::book::Modifier>
 marlin::book::ModifierManagerHist<T>::createModifier( std::size_t idx ) {
   if( !_flags.Contains( Flags::Book::MultiInstance ) ) {
     auto filler = std::make_shared<
-      ROOT::Experimental::RHistConcurrentFiller<T, BufferSize>>(
         *std::static_pointer_cast
           <ROOT::Experimental::RHistConcurrentFillManager
             <T, BufferSize
@@ -112,7 +124,11 @@ marlin::book::ModifierManagerHist<T>::createModifier( std::size_t idx ) {
         filler->Flush() ;
     } 
     ;
-    return std::make_shared< ModifierHist< T > >( fill, fillN, flush ) ;
+    _producedFiller.push_back(
+      std::make_shared< ModifierHist< T > >( fill, fillN, flush )
+    ) ;
+
+    return _producedFiller.back() ;
 
   } else {
     auto filler
@@ -133,5 +149,16 @@ marlin::book::ModifierManagerHist<T>::createModifier( std::size_t idx ) {
     auto flush = [ filler = filler ] () {} ; 
 
     return  std::make_shared< ModifierHist< T > >( fill, fillN, flush ) ;
+  }
+>>>>>>> moved modifier handling in ModifierManager
+}
+
+/// @private
+template<class T>
+void marlin::book::ModifierManagerHist<T>::finalize() {
+  for(auto& filler : _producedFiller) {
+    if ( filler->isModified() ) {
+      filler->flush();
+    }
   }
 }

@@ -16,6 +16,7 @@
 #include "ROOT/RHist.hxx"
 
 namespace marlin {
+  //! Namespace for the booking submodule
   namespace book {
 
     /**
@@ -58,13 +59,13 @@ namespace marlin {
         BookEntry(
           const std::shared_ptr<ModifierManager>& mgr,
           const std::shared_ptr<MemLayout>& mem
-        ) : modMgr {mgr}, memory {mem}
+        ) : memory {mem}, modMgr {mgr}
         {}      
         
-        /// An Manager which creates Modifier for the Object.
-        std::shared_ptr< ModifierManager >    modMgr {nullptr} ;
         /// Memory where the Object is stored.
         std::shared_ptr< MemLayout >          memory {nullptr} ;
+        /// An Manager which creates Modifier for the Object.
+        std::shared_ptr< ModifierManager >    modMgr {nullptr} ;
 
         /**
          *  @brief creates a Modifier for the Object.
@@ -78,7 +79,7 @@ namespace marlin {
       };
 
     public:
-      BookStore() : _objs{}, _modifiers{}
+      BookStore() : _objs {}
       {}
 
       /** 
@@ -101,6 +102,7 @@ namespace marlin {
        * @return handle for booked object
        */
       template<class T, typename ... Args_t>
+      Handle<book_trait<T>> book(
         const std::string& name,
         const std::string& path,
         std::size_t idx,
@@ -112,10 +114,6 @@ namespace marlin {
     private:
       /// Maps id to an BookEntry. 
       EntryMap        _objs       {} ;
-      /// Maps id to all created Filler for this Entry.
-      // TODO: move to FillMgr
-      ModifierMulMap  _modifiers  {} ;
-    
     };
   } // end namespace book
 } // end namespace marlin
@@ -128,16 +126,12 @@ template<typename T>
 const T&
 marlin::book::BookStore::Read( std::size_t hash ) {
   bool modified = false ;
-  auto beItr = _modifiers.equal_range( hash ) ;
-  for ( auto itr = beItr.first; itr != beItr.second; ++itr ) {
-    if(itr->second->isModified()) {
-      itr->second->flush() ;
-      modified = true;
-    }
-  }
+  
+  auto obj = _objs.find( hash )->second;
+  obj.modMgr->finalize();
 
   // TODO: mod flag for MemLayer
-  return *_objs.find( hash )->second.memory->merged< T >() ;
+  return *obj.memory->merged< T >() ;
 }
 
 /// @private
@@ -199,13 +193,11 @@ marlin::book::Handle< marlin::book::book_trait< T > >
 
   BookEntry& obj = itrO->second ;
   std::shared_ptr< Modifier > modifier = obj.createModifier( idx ) ;
-  _modifiers.insert( std::make_pair( hash, modifier ) ) ;
   
   auto finalFn = [ store = this ]( std::size_t idHash ) -> const T& {
     return store->template Read<T>( idHash ) ;
   } ;
 
   return Handle< book_trait< T > >( modifier, hash, finalFn );
->>>>>>> added some doxygen cosmetic
 }
 

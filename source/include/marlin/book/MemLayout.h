@@ -90,10 +90,11 @@ namespace marlin {
       }
       
       std::shared_ptr< void> imp_merged() override final {
-        _mergedObj = std::make_shared<T>(std::make_from_tuple<T>(_ctor_p)); 
+        _mergedObj = std::make_shared<T>(std::make_from_tuple<T>(_ctor_p)) ;  
         for(std::shared_ptr<T>& pObj : _objects) {
-          if(pObj)
+          if(pObj) {
             (*MERGE)(_mergedObj, pObj);
+          }
         }
         return _mergedObj;
       }
@@ -129,6 +130,7 @@ namespace marlin {
     };
 
   } // end namespace book
+>>>>>>> moved modifier handling in ModifierManager
 } // end namespace marlin
 
 >>>>>>> Formatted MemLayout.h
