@@ -28,13 +28,13 @@ public:
 	SharedType1 (std::size_t num_inst, Args_t ... args) : SharedMemLayout<Type1, MergeType1, Args_t ... >{num_inst, args ...}{}
 };
 
-void MergeHist(const std::shared_ptr<RH1D>& p1, const std::shared_ptr<RH1D>& p2) {
+void MergeHist(const std::shared_ptr<RH1I>& p1, const std::shared_ptr<RH1I>& p2) {
 	ROOT::Experimental::Add(*p1, *p2);
 }
 
-class SharedRH1D : public SharedMemLayout<RH1D, MergeHist, RAxisConfig> {
+class SharedRH1I : public SharedMemLayout<RH1I, MergeHist, RAxisConfig> {
 public:
-	SharedRH1D (std::size_t num_inst, RAxisConfig config) : SharedMemLayout<RH1D, MergeHist, RAxisConfig>{num_inst, config} {}
+	SharedRH1I (std::size_t num_inst, RAxisConfig config) : SharedMemLayout<RH1I, MergeHist, RAxisConfig>{num_inst, config} {}
 };
 
 int main (int, char**) {
@@ -47,26 +47,29 @@ int main (int, char**) {
 	ptr2->bins[0] += 2;
 	test.test("bin content test ", sMem.merged<Type1>()->bins[0] == 9);
 
-	std::cout << "test" << std::endl;
-	SharedRH1D sMemH(3, {"x", 2, 0, 1});
-	RH1D refHist({"x", 2, 0, 1});
-	auto ptrH1 = sMemH.at<RH1D>(0);
-	auto ptrH2 = sMemH.at<RH1D>(1);
+	SharedRH1I sMemH(3, {"x", 2, 0, RAND_MAX});
+	RH1D refHist({"x", 2, 0, RAND_MAX});
+	auto ptrH1 = sMemH.at<RH1I>(0);
+	auto ptrH2 = sMemH.at<RH1I>(1);
 
-	const double max = static_cast<double>(RAND_MAX);
 	for(int i = 0; i < 10; ++i) {
-		double x = static_cast<double>(std::rand()) / max;
-		double w = static_cast<double>(std::rand()) / max;
+		double x
+			= static_cast<double>(std::rand()) / static_cast<double>(RAND_MAX);
+		int w = std::rand() % 100;
+
 		if(std::rand() > RAND_MAX / 2) {
 			ptrH1->Fill({x}, w);
+			std::cout << ptrH1->GetBinContent({x});
 		} else {
 			ptrH2->Fill({x}, w);
+			std::cout << ptrH2->GetBinContent({x});
 		}
 		refHist.Fill({x}, w);
 	}
+
 	test.test("Test shared RH1D", 
-		std::abs(refHist.GetBinContent({0}) - sMemH.merged<RH1D>()->GetBinContent({0})) 
-			< std::numeric_limits<double>::epsilon());
+		refHist.GetBinContent({0}) == sMemH.merged<RH1I>()->GetBinContent({0})
+	) ;
 	return 0;
 }
 
