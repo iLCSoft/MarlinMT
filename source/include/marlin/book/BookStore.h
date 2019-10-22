@@ -146,41 +146,16 @@ marlin::book::Handle< marlin::book::book_trait< T > >
   Args_t ... ctor_p
 ) { 
   using ModMgr_t = typename book_trait< T >::ModifierManager ;
-  using Value_t = typename book_trait< T >::Type ;
 
   std::size_t hash = std::hash< std::string >{}( name + path ) ;
   
   auto itrO = _objs.find( hash ) ;
   if ( itrO == _objs.end() ) {
     std::shared_ptr< ModMgr_t > modMgr( nullptr ) ;
-    std::shared_ptr< MemLayout > memLayout( nullptr );
+    std::shared_ptr< MemLayout > memLayout( nullptr ) ;
     
-    // TODO: shift this to FillMgr
-    if ( flags.Contains( Flags::Book::MultiInstance ) ) {
-      memLayout
-        = std::make_shared<
-            SingleMemLayout<
-              Value_t,
-              Args_t ...
-            >
-          >
-          ( ctor_p ... ) ;
-    } else {
-      memLayout 
-        = std::make_shared<
-            SharedMemLayout<
-              Value_t,
-              book_trait<T>::merge,
-              Args_t ...
-            >
-          >
-        ( amt, ctor_p ... ) ;
-    }
-    
-    modMgr = std::make_shared< ModMgr_t >(
-      memLayout,
-      flags
-    ) ;
+    modMgr = std::make_shared< ModMgr_t >( flags ) ;
+    memLayout = modMgr->template constructLayer<Args_t ... >( amt, ctor_p ...);
 
     itrO = _objs.insert( std::make_pair(
       hash,

@@ -16,6 +16,8 @@ namespace marlin {
   namespace book {
 
     class BookStore;
+    template<class T>
+    struct book_trait;
     
     /**
      *  @brief Creates and manage Modifier.
@@ -46,10 +48,18 @@ namespace marlin {
 
     public:
     
-      ModifierManagerHist(
-        const std::shared_ptr<MemLayout>& layout,
-        const Flag_t& flags
-      ) ;
+      ModifierManagerHist( const Flag_t& flags ) ;
+      
+      /**
+       *  @brief constructs Memory layout for Manager.
+       *  @attention only use exactly once
+       *  @note used for easyer construction
+       *  @param amt amount of instances
+       *  @param ctor_p arguments to construct object
+       */
+      template<typename ... Args_t>
+      std::shared_ptr<MemLayout>
+      constructLayer(std::size_t amt, Args_t ... ctor_p) ;
 
       /**
        *  @brief creates a Filler for the histogramm.
@@ -81,20 +91,53 @@ namespace marlin {
 /// @private
 template<class T>
 marlin::book::ModifierManagerHist<T>::ModifierManagerHist(
-  const std::shared_ptr<marlin::book::MemLayout>& layout,
   const marlin::book::Flag_t& flags
 ) : _flags {flags}, _fillerBase {nullptr}, _producedFiller (0) {
 
-  if ( flags.Contains( Flags::Book::MultiInstance ) ) {
-    _fillerBase = layout;
+}
+/// @private
+template<class T>
+template<typename ... Args_t>
+std::shared_ptr<marlin::book::MemLayout>
+marlin::book::ModifierManagerHist<T>::constructLayer(
+  std::size_t amt,
+  Args_t ... ctor_p) {
+
+  std::shared_ptr<MemLayout> mem{nullptr};
+  if(!_flags.Contains(Flags::Book::MultiInstance)) {
+    mem
+      = std::make_shared<
+        SharedMemLayout<
+          typename book_trait< T >::Type,
+          book_trait< T >::merge,
+          Args_t ...
+        >
+      >( amt, ctor_p ... ) ;
   } else {
+    mem
+      = std::make_shared<
+        SingleMemLayout<
+          typename book_trait< T >::Type,
+          Args_t ...
+        >
+      >( ctor_p ... ) ;
+  }
+  
+  if ( _flags.Contains( Flags::Book::MultiInstance ) ) {
+
+    _fillerBase = mem;
+
+  } else {
+
     _fillerBase
       = std::make_shared<
           ROOT::Experimental::RHistConcurrentFillManager< T, BufferSize >
         > (
-      *(layout->template at<T>(0)) // FIXME: depends on implimentation
+      *(mem->template at<T>(0)) // FIXME: depends on implimentation
     ) ;
   }
+
+  return mem;
 }
 
 /// @private
