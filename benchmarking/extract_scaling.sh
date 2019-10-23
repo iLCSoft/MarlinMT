@@ -41,7 +41,7 @@ fi
 
 output="scaling_output_${lazyUnpackStr}_${triggerUnpackingStr}_${sigmapercent}.txt"
 
-if [ ! -z ${output} ]
+if [ -f ${output} ]
 then
   rm ${output}
 fi
