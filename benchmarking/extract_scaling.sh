@@ -19,41 +19,41 @@ sigmapercent=$2
 lazyUnpack="$3"
 triggerUnpacking="$4"
 inputfile="$5"
-cores=`seq 2 $maxcores`
+cores=`seq 2 ${maxcores}`
 crunchtimes=`seq 500 500 2500`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
 
-if [ "$lazyUnpack" == "true" ]
+if [ "${lazyUnpack}" == "true" ]
 then
   lazyUnpackStr="lazy"
 else
   lazyUnpackStr="nolazy"
 fi
 
-if [ "$triggerUnpacking" == "true" ]
+if [ "${triggerUnpacking}" == "true" ]
 then
   triggerUnpackingStr="trig"
 else
   triggerUnpackingStr="notrig"
 fi
 
-output="scaling_output_$lazyUnpackStr_$triggerUnpackingStr_$sigmapercent.txt"
+output="scaling_output_${lazyUnpackStr}_${triggerUnpackingStr}_${sigmapercent}.txt"
 
-if [ ! -z $output ]
+if [ ! -z ${output} ]
 then
-  rm $output
+  rm ${output}
 fi
 
 for c in ${cores}
 do
   for cr in ${crunchtimes}
   do
-    crunchSigma=`echo "($cr*$sigmapercent)" | bc`
+    crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
     MarlinMT \
     $MARLIN_DIR/benchmarking/cpu_crunching.xml \
-    --constant.TriggerUnpacking="$triggerUnpacking" \
+    --constant.TriggerUnpacking="${triggerUnpacking}" \
     --datasource.LCIOInputFiles="${inputfile}" \
     --datasource.LazyUnpack="${lazyUnpack}" \
     --CPUCrunch.CrunchTime=${cr} \
