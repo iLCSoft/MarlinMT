@@ -20,8 +20,11 @@ lazyUnpack="$3"
 triggerUnpacking="$4"
 inputfile="/home/eteremi/afs/ddsim-sv02-00-01-GILD_l5_v02-Zuds200_00_000.slcio"
 
-cores=`seq 2 $maxcores`
-crunchtimes=`seq 500 500 2500`
+# cores=`seq 2 $maxcores`
+# crunchtimes=`seq 500 500 2500`
+
+cores=10
+crunchtimes=50
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
@@ -54,6 +57,7 @@ do
     crunchSigma=`echo "($cr*$sigmapercent)" | bc`
     MarlinMT \
     $MARLIN_DIR/benchmarking/cpu_crunching.xml \
+    --constant.TriggerUnpacking="$triggerUnpacking" \
     --datasource.LCIOInputFiles="${inputfile}" \
     --datasource.LazyUnpack="${lazyUnpack}" \
     --CPUCrunch.CrunchTime=${cr} \
