@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if [ $# -neq 4 ]
+if [ ! "$#" == "4" ]
 then
   echo "Usage ./extract_scaling.sh <max-n-cores> <crunch-sigma-percent> <lazy-unpack> <trigger-unpacking>"
   echo "Example:  ./extract_scaling.sh 40 0.1 true true"
