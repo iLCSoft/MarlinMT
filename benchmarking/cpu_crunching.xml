@@ -2,7 +2,6 @@
 
 <marlin>
   <execute>
-    <processor name="Status"/>
     <processor name="CPUCrunch"/>
   </execute>
 
@@ -13,9 +12,7 @@
   </global>
 
   <datasource type="LCIO">
-    <parameter name="LCIOInputFiles">
-      
-    </parameter>
+    <parameter name="LCIOInputFiles">  </parameter>
     <parameter name="MaxRecordNumber" value="0"/>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="LazyUnpack" value="false"/>
@@ -28,10 +25,5 @@
     <parameter name="CrunchTime"> 200 </parameter>
     <parameter name="CrunchSigma"> 100 </parameter>
   </processor>
-
-  <processor name="Status" type="Statusmonitor" clone="false">
-    <parameter name="Verbosity"> MESSAGE </parameter>
-  </processor>
-
 
 </marlin>
