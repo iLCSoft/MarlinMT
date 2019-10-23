@@ -1,10 +1,10 @@
 #!/bin/bash
 
 
-if [ ! "$#" == "4" ]
+if [ ! "$#" == "5" ]
 then
-  echo "Usage ./extract_scaling.sh <max-n-cores> <crunch-sigma-percent> <lazy-unpack> <trigger-unpacking>"
-  echo "Example:  ./extract_scaling.sh 40 0.1 true true"
+  echo "Usage ./extract_scaling.sh <max-n-cores> <crunch-sigma-percent> <lazy-unpack> <trigger-unpacking> <input-file>"
+  echo "Example:  ./extract_scaling.sh 40 0.1 true true /path/to/lcio-file.slcio"
   exit 1
 fi
 
@@ -18,13 +18,9 @@ maxcores=$1
 sigmapercent=$2
 lazyUnpack="$3"
 triggerUnpacking="$4"
-inputfile="/home/eteremi/afs/ddsim-sv02-00-01-GILD_l5_v02-Zuds200_00_000.slcio"
-
-# cores=`seq 2 $maxcores`
-# crunchtimes=`seq 500 500 2500`
-
-cores=10
-crunchtimes=50
+inputfile="$5"
+cores=`seq 2 $maxcores`
+crunchtimes=`seq 500 500 2500`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
