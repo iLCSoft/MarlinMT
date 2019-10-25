@@ -23,6 +23,7 @@ IF( CMAKE_BUILD_TYPE STREQUAL "Debug" OR
     ADD_DEFINITIONS( "-DMARLINDEBUG" )
 ENDIF()
 
+OPTION( MARLIN_BOOK  "Set to ON to build Marlin with book store functionality (requires ROOT7 !)" OFF )
 
 AUX_SOURCE_DIRECTORY( ./src library_sources )
 AUX_SOURCE_DIRECTORY( ./src/plugins library_sources )
@@ -33,6 +34,9 @@ IF( NOT MARLIN_DD4HEP )
 ENDIF()
 IF( NOT MARLIN_GEAR )
     LIST( REMOVE_ITEM library_sources ./src/plugins/GearGeometry.cc )
+ENDIF()
+IF( MARLIN_BOOK )
+	AUX_SOURCE_DIRECTORY( ./src/book library_sources )
 ENDIF()
 INCLUDE_DIRECTORIES( SYSTEM tinyxml/include )
 
