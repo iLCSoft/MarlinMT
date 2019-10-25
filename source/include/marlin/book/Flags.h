@@ -90,7 +90,9 @@ namespace marlin {
       namespace Book {
 
         /// create mutible instances of booked object (if possible) to avoid sync points
-        constexpr Flag_t MultiInstance( 1 ) ;
+        constexpr Flag_t Single( 1 << 0 ) ;
+        constexpr Flag_t MultiShared( 1 << 1 );
+        constexpr Flag_t MultiCopy( 1 << 2 );
       }
 
       /// flags for Permission handling in booking System
