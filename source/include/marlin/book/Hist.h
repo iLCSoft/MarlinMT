@@ -1,9 +1,12 @@
 #pragma once
 
 #include <functional>
+#include <iostream>
 
 #include "marlin/book/EntryData.h"
 
+
+#include "ROOT/RHist.hxx"
 namespace ROOT::Experimental {
   class EntryBase;
   template<int, class>
@@ -24,14 +27,26 @@ namespace marlin::book {
   class Handle;
   template <typename T>
   class EntrySingle;
-
-
+  template <typename T>
+  class EntryMultiCopy;
+  template <typename T>
+  struct trait;
+  
   template<typename T, int D>
   using RH = ROOT::Experimental::RHist<
     D,
     T, 
     ROOT::Experimental::RHistStatContent,
     ROOT::Experimental::RHistStatUncertainty>;
+
+
+  template<typename T, int D>
+  struct trait<RH<T,D>> {
+  static void Merge(const std::shared_ptr<RH<T, D>>& dst, const std::shared_ptr<RH<T,D>>& src) {
+      ROOT::Experimental::Add(*dst, *src);
+  }
+  };
+
 
 
   template <typename T, int D>
@@ -63,6 +78,21 @@ namespace marlin::book {
     EntrySingle() = default;
 
     Handle<Type> handle();
+  
+  private:
+    Context _context;
+  };
+
+  template<typename T, int D>
+  class EntryMultiCopy<RH<T, D>> : public EntryBase {
+  public:
+    using Type = RH<T, D>;
+
+    EntryMultiCopy(const Context& context);
+
+    EntryMultiCopy() = default;
+
+    Handle<Type> handle(std::size_t idx);
   
   private:
     Context _context;

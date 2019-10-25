@@ -42,8 +42,28 @@ Handle<RH<T, D>> EntrySingle<RH<T,D>>::handle() {
 	);
 }
 
+template<typename T, int D>
+EntryMultiCopy<RH<T, D>>::EntryMultiCopy(const Context& context) : _context {context} {}
+
+template<typename T, int D>
+Handle<RH<T, D>> EntryMultiCopy<RH<T, D>>::handle(std::size_t idx) {
+	auto hist = _context.mem->at<Type>(idx);
+	return Handle<Type>(
+	_context.mem,
+	[hist = hist](
+		const typename Type::CoordArray_t& x,
+		const typename Type::Weight_t& w
+		) {
+			hist->Fill(x, w);
+		}
+	);
+}
+
 template class Handle<RH<float, 1>>;
 template class EntrySingle<RH<float, 1>>;
-
+template class EntryMultiCopy<RH<float, 1>>;
+template class Handle<RH<int, 1>>;
+template class EntrySingle<RH<int, 1>>;
+template class EntryMultiCopy<RH<int, 1>>;
 }
 

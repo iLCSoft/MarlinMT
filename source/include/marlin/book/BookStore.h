@@ -1,6 +1,5 @@
 #pragma once
 
-#include <variant>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -48,6 +47,7 @@ namespace marlin::book {
       key.path = path;
       key.amt = 1;
       key.flags = Flags::Book::Single;
+      key.hash = 1;
 
       auto entry = std::make_shared<EntrySingle<T>>(
           Context(
@@ -62,6 +62,34 @@ namespace marlin::book {
       return *std::static_pointer_cast<const EntrySingle<T>>(
         entry
       );
+    }
+    
+    template<class T, typename ... Args_t>
+    EntryMultiCopy<T>
+    bookMultiCopy(
+      std::size_t n,
+      const std::string_view& path,
+      const std::string_view& name,
+      Args_t ... ctor_p
+    ) {
+      EntryKey key{};
+      key.name = name;
+      key.path = path;
+      key.amt = n;
+      key.flags = Flags::Book::MultiCopy;
+      key.hash = 2;
+
+      auto entry = std::make_shared<EntryMultiCopy<T>>(
+        Context(
+          std::make_shared<SharedMemLayout<T, trait<T>::Merge, Args_t ...>>(
+            n, ctor_p ...
+          )
+        )
+      );
+
+      addEntry(entry, key);
+
+      return *std::static_pointer_cast<const EntryMultiCopy<T>>( entry );
     }
 
   private:
