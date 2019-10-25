@@ -1,61 +1,74 @@
-#pragma once
-
-// -- std heared
+// -- std includes
 #include <memory>
 #include <functional>
+#include <typeinfo>
+
+// #include "ROOT/RHist.hxx"
+#include "marlin/book/MemLayout.h"
+
+namespace ROOT::Experimental {
+  template<int, class>
+  class RHistStatContent;
+
+  template<int, class>
+  class RHistStatUncertainty;
+
+  template<int, class, template<int, class> class ...>
+  class RHist;
+}
+
+class BookStore {};
 
 
-namespace marlin {
-  namespace book {
+namespace marlin::book {
 
-    class Modifier;
+template<typename T, int D>
+using RH = ROOT::Experimental::RHist<
+  D,
+  T, 
+  ROOT::Experimental::RHistStatContent,
+  ROOT::Experimental::RHistStatUncertainty>;
 
-    /**
-     *  @brief Handle for objects stored in bookStore.
-     */
-    template<class T>
-    class Handle {
-    public:
-      using GetFn_t = std::function<const typename T::Type&(std::size_t)>;
 
-      /**
-       *  @brief Constructo.
-       *  @param id of the Entry in the BookStore
-       *  @param getFn functor to get the merged object.
-       */
-      Handle(
-        const std::shared_ptr<Modifier>& pModifier,
-        std::size_t id,
-        GetFn_t getFn
-      ) : _id {id},
-          _modifier 
-            {std::static_pointer_cast<typename T::Modifier>( pModifier )},
-          _getFn {getFn} 
-      {}
+template <typename T>
+class BaseHandle {
+  std::shared_ptr<MemLayout> _obj ;
 
-      /**
-       *  @brief Get Finalized object.
-       *  @returns const& to Final objet.
-       */
-      const typename T::Type& get() {
-        return _getFn( _id ) ;
-      };
+protected:
+  BaseHandle(const std::shared_ptr<MemLayout>& obj) : _obj{obj}{}
 
-      /**
-       *  @brief Returns Modifier.
-       */
-      std::shared_ptr< typename T::Modifier > operator->() {
-        return _modifier ;
-      }
+public:
 
-    private:
-      /// id from entry in BookStrore.
-      std::size_t                           _id       {0}       ;
-      /// Modifier to modifie object. 
-      std::shared_ptr<typename T::Modifier> _modifier {nullptr} ;
-      /// Functor to get merged object.
-      GetFn_t                               _getFn    {}        ;
-    };
+  const T& get() {
+    return _obj->merged<T>();
+  }
+};
 
-  } // end namespace book
-} // end namespace marlin
+template <typename T>
+class Handle : public BaseHandle<T> {
+};
+
+
+template <typename T, int D>
+class Handle<
+  RH<T, D>> : public BaseHandle<RH<T, D>> {
+  friend BookStore;
+
+public:
+  using Type = RH<T, D>;
+  using CoordArray_t = typename Type::CoordArray_t;
+  using Weight_t = typename Type::Weight_t;
+  using FillFn_t = std::function<void(const CoordArray_t&, const Weight_t&)>;
+
+public:
+  Handle(std::shared_ptr<MemLayout> obj, const FillFn_t& fillFn)
+    :  BaseHandle<RH<T,D>>{obj}, _fillFn{fillFn}
+  {}
+  void fill(const CoordArray_t& x, const Weight_t& w) {
+    _fillFn(x, w);
+  }
+
+private:
+  FillFn_t _fillFn;
+};
+}
