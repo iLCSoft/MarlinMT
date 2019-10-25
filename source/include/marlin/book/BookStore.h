@@ -11,9 +11,30 @@
 
 namespace marlin::book {
 
+  class MemLayout;
+  template<typename, typename ...>
+  class SingleMemLayout;
+  template<typename T,
+    void(const std::shared_ptr<T>&,
+      const std::shared_ptr<T>&),
+    typename ...>
+  class SharedMemLayout;
+
   class BookStore {
 
-    void addEntry(const Entry& entry) {
+    void addEntry(
+      const std::shared_ptr<EntryBase>& entry,
+      const EntryKey& key) {
+        bool newEntry = _entries.insert(
+          std::make_pair(
+            key.hash,
+            Entry(entry, key)
+          )
+        ).second;
+
+        if(!newEntry) {
+          throw "no double booking !";
+        }
     }
   public:
     template<class T, typename ... Args_t>
@@ -28,21 +49,18 @@ namespace marlin::book {
       key.amt = 1;
       key.flags = Flags::Book::Single;
 
-      Entry entry{key};
-      entry.setEntry(
-        std::make_shared<EntrySingle<T>>(
+      auto entry = std::make_shared<EntrySingle<T>>(
           Context(
             std::make_shared<SingleMemLayout<T, Args_t ...>>(
               ctor_p ...
             )
           )
-        )
-      );
+        );
 
-      addEntry(entry);
+      addEntry(entry, key);
 
       return *std::static_pointer_cast<const EntrySingle<T>>(
-        entry.entry() 
+        entry
       );
     }
 

@@ -2,11 +2,11 @@
 #include <UnitTesting.h>
 #include <typeinfo>
 
+#include "marlin/book/Hist.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/BookStore.h"
 #include "ROOT/RHistData.hxx" 
 #include "ROOT/RHist.hxx"
-#include "marlin/book/MemLayout.h"
 
 #include <memory>
 
