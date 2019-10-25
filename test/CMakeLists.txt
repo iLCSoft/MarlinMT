@@ -55,11 +55,6 @@ if(MARLIN_BOOK)
 		REGEX_FAIL "TEST_FAILED"
 	)
 	
-	marlin_add_test (
-		test-filler
-		BUILD_EXEC
-		REGEX_FAIL "TEST_FAILED"
-	)
 endif()
 
 marlin_add_test (
