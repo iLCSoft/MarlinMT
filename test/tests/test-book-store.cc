@@ -1,6 +1,6 @@
 // -- test include
 #include <UnitTesting.h>
-
+/*
 // -- marlin include
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Flags.h"
@@ -33,4 +33,11 @@ int main(int, char**) {
 		hnd3.get().GetBinContent({0}) == 1
 		&& hnd4.get().GetBinContent({1}) == 2); 
 	return 0;
+}*/
+
+int main(int, char**) {
+	marlin::test::UnitTest test( " EmptyTest " );	
+	return 0;
 }
+
+

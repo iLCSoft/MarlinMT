@@ -25,6 +25,7 @@ int main(int, char**) {
 	EntrySingle entry = store.book<RH<float, 1>, RAxisConfig>("test", "path", {"a", 3, 1.0, 2.0}) ;	
 	auto hnd = entry.handle();
 	hnd.fill({0}, 1);
-	std::cout << hnd.get().GetEntries() << '\n';
+	auto hist = hnd.get();
+	test.test("Single Hist Filling", hist.GetEntries() == 1);
 	return 0;
 }
