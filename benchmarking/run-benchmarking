@@ -1,0 +1,142 @@
+#!/bin/bash
+
+
+# if [ ! "$#" == "5" ]
+# then
+#   echo "Usage ./extract_scaling.sh <max-n-cores> <crunch-sigma-percent> <lazy-unpack> <trigger-unpacking> <input-file>"
+#   echo "Example:  ./extract_scaling.sh 40 0.1 true true /path/to/lcio-file.slcio"
+#   exit 1
+# fi
+
+function printUsage() {
+  echo "Usage:"
+  echo "run-benchmarking [options] --inputfile <slcio-file>"
+  echo ""
+  echo "Run MarlinMT for multi-core benchmarking"
+  echo ""
+  echo "Options:"
+  echo "  --mincores <int>           The start number of cores [default=2]"
+  echo "  --maxcores <int>           The end number of cores [default=2]"
+  echo "  --mincrunch <int>          The start crunch time (ms) [default=500]"
+  echo "  --maxcrunch <int>          The end crunch time (ms) [default=1000]"
+  echo "  --crunchstep <int>         The step in crunch time numbers [default=500]"
+  echo "  --sigmacrunch <float>      Introduce an event-by-event gaussian random"
+  echo "                             fluctuation in the crunch time [default=0]"
+  echo "  --inputfile <slcio-file>   The LCIO input file. Mandatory parameter !"
+  echo "  --lazy                     Whether use option LazyUnpack for LCIO reading [default=false]"
+  echo "  --trigger                  Whether to trigger the event unpacking in worker threads [default=false]"
+  echo "  -h --help                  Print help and exit"
+  echo ""
+}
+
+
+if [ -z "$MARLIN_DIR" ]
+then
+  echo "MARLIN_DIR not set. Please setup your environment!"
+  exit 1
+fi
+
+OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,lazy,trigger,help -n 'parse-options' -- "$@"`
+eval set -- "$OPTS"
+
+mincores=2
+maxcores=2
+mincrunch=500
+maxcrunch=1000
+crunchstep=500
+sigmapercent=0
+lazyUnpack="false"
+triggerUnpacking="false"
+inputfile=""
+steeringfile=${MARLIN_DIR}/benchmarking/cpu_crunching.xml
+
+while true; do
+  case "$1" in
+    --mincores ) mincores=$2; shift; shift ;;
+    --maxcores ) maxcores=$2; shift; shift ;;
+    --mincrunch ) mincrunch=$2; shift; shift ;;
+    --maxcrunch ) maxcrunch=$2; shift; shift ;;
+    --crunchstep ) crunchstep=$2; shift; shift ;;
+    --sigmacrunch ) sigmacrunch=$2; shift; shift ;;
+    --inputfile ) inputfile=$2; shift; shift ;;
+    --lazy ) lazyUnpack="true"; shift ;;
+    --trigger ) triggerUnpacking="true"; shift ;;
+    -h | --help )  printUsage; exit 0 ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+if [ "$inputfile" == "" ]
+then
+  echo "ERROR: --inputfile argument is mandatory"
+  printUsage
+  exit 1
+fi
+
+cores=`seq ${mincores} ${maxcores} | tr '\n' ' '`
+crunchtimes=`seq ${crunchstep} ${mincrunch} ${maxcrunch} | tr '\n' ' '`
+
+lazyUnpackStr=""
+triggerUnpackingStr=""
+
+if [ "${lazyUnpack}" == "true" ]
+then
+  lazyUnpackStr="lazy"
+else
+  lazyUnpackStr="nolazy"
+fi
+
+if [ "${triggerUnpacking}" == "true" ]
+then
+  triggerUnpackingStr="trig"
+else
+  triggerUnpackingStr="notrig"
+fi
+
+output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}.txt"
+
+if [ -f ${output} ]
+then
+  rm ${output}
+fi
+
+echo "Running with following settings:"
+echo "  - n cores: ${cores}"
+echo "  - crunch times: ${crunchtimes}"
+echo "  - crunch sigma percentage: $sigmapercent"
+echo "  - lazy unpacking ? $lazyUnpack"
+echo "  - trigger unpacking ? $triggerUnpacking"
+echo "  - LCIO input file: $inputfile"
+echo "  - Marlin steering file: $steeringfile"
+echo "  - Benchmark output file: $output"
+
+for c in ${cores}
+do
+  for cr in ${crunchtimes}
+  do
+    crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
+    echo "Running MarlinMT with:"
+    echo "-- N cores:            ${c}"
+    echo "-- Crunch time:        ${cr}"
+    echo "-- Crunch sigma:       ${crunchSigma}"
+    echo "-- Scaling:            ${scaling}"
+    echo "-- Lazy unpacking:     ${lazyUnpack}"
+    echo "-- Trigger unpacking:  ${lazyUnpack}"
+    MarlinMT \
+    ${steeringfile} \
+    --constant.TriggerUnpacking="${triggerUnpacking}" \
+    --datasource.LCIOInputFiles="${inputfile}" \
+    --datasource.LazyUnpack="${lazyUnpack}" \
+    --CPUCrunch.CrunchTime=${cr} \
+    --CPUCrunch.CrunchSigma=${crunchSigma} \
+    --global.Verbosity=MESSAGE \
+    --global.Concurrency=${c} > scaling_temp_$$.log 
+    serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
+    parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
+    scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )
+    echo "Result: ${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}"
+    echo "${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}" >> ${output}
+    echo ""
+  done
+done
