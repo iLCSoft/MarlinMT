@@ -120,9 +120,8 @@ do
     echo "-- N cores:            ${c}"
     echo "-- Crunch time:        ${cr}"
     echo "-- Crunch sigma:       ${crunchSigma}"
-    echo "-- Scaling:            ${scaling}"
     echo "-- Lazy unpacking:     ${lazyUnpack}"
-    echo "-- Trigger unpacking:  ${lazyUnpack}"
+    echo "-- Trigger unpacking:  ${triggerUnpacking}"
     MarlinMT \
     ${steeringfile} \
     --constant.TriggerUnpacking="${triggerUnpacking}" \
