@@ -36,9 +36,9 @@ then
   exit 1
 fi
 
-if [ -z "$LCIO" ]
+if [ -z "$LCIO_DIR" ]
 then
-  echo "LCIO not set. Please setup your environment!"
+  echo "LCIO_DIR not set. Please setup your environment!"
   exit 1
 fi
 
