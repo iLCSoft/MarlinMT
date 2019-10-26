@@ -81,7 +81,7 @@ then
 fi
 
 cores=`seq ${mincores} ${maxcores} | tr '\n' ' '`
-crunchtimes=`seq ${crunchstep} ${mincrunch} ${maxcrunch} | tr '\n' ' '`
+crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
