@@ -36,6 +36,12 @@ then
   exit 1
 fi
 
+if [ -z "$LCIO" ]
+then
+  echo "LCIO not set. Please setup your environment!"
+  exit 1
+fi
+
 OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,lazy,trigger,help -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
@@ -110,6 +116,9 @@ echo "  - trigger unpacking ? $triggerUnpacking"
 echo "  - LCIO input file: $inputfile"
 echo "  - Marlin steering file: $steeringfile"
 echo "  - Benchmark output file: $output"
+
+# load the file in the cache for next  
+anajob ${inputfile} >> /dev/null
 
 for c in ${cores}
 do
