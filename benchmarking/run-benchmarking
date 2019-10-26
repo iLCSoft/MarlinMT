@@ -117,9 +117,11 @@ echo "  - LCIO input file: $inputfile"
 echo "  - Marlin steering file: $steeringfile"
 echo "  - Benchmark output file: $output"
 
-# load the file in the cache for next  
+# load the file in the cache for next
+echo "Loading input file into cache: ${inputfile}"
 anajob ${inputfile} >> /dev/null
 
+echo "Start benchmarking ..."
 for c in ${cores}
 do
   for cr in ${crunchtimes}
