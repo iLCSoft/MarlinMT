@@ -8,8 +8,16 @@ struct Entry {
   double          _speedup {0.} ;
 };
 
+static const std::vector<int> plotColors = { kGray, kBlue, kRed, kViolet, kOrange, kGreen, kOrange, kAzure } ; 
 
-void PlotScaling( const std::string &fname, const std::string &title = "", bool save = true ) {
+int getColor( int index ) {
+  int trueIndex = index % plotColors.size() ;
+  int colorShift = (index / plotColors.size() ) + 1 ;
+  return plotColors[ trueIndex ] + colorShift ;
+}
+
+
+void PlotScaling( const std::string &fname, const std::string &title = "", bool save = false ) {
 
 
   std::ifstream file ( fname ) ;
@@ -18,10 +26,8 @@ void PlotScaling( const std::string &fname, const std::string &title = "", bool 
     throw std::runtime_error( "Input file is invalid" ) ;
   }
 
-
   std::map<std::size_t, std::vector<Entry>>   coreToEntryMap ;
   std::map<std::size_t, std::vector<Entry>>   crunchTimeToEntryMap ;
-
 
   while( not file.eof() ) {
 
@@ -42,26 +48,28 @@ void PlotScaling( const std::string &fname, const std::string &title = "", bool 
     crunchTimeToEntryMap[ entry._crunchTime ].push_back( entry ) ;
   }
 
-  TCanvas *speedupVsCoreCanvas = TCanvas::MakeDefCanvas() ;
-  // TCanvas *speedupVsCrunchTimeCanvas = TCanvas::MakeDefCanvas() ;
-  
+  TCanvas *speedupVsCoreCanvas = new TCanvas( "speedupVsCoreCanvas", "Speedup Vs #Core", 800, 800 ) ;
+  speedupVsCoreCanvas->SetMargin( 0.130326, 0.0538847, 0.130491, 0.0917313 ) ;
   TMultiGraph *speedupVsCoreMultiGraph = new TMultiGraph() ;
-  // TMultiGraph *speedupVsCrunchTimeMultiGraph = new TMultiGraph() ;
   
   // loop over crunch times
-  int color = 1 ;
+  int color = 0 ;
   size_t maxCores = 0 ;
   for( auto ctIter : crunchTimeToEntryMap ) {
     
     auto crunchTime = ctIter.first ;
-    std::stringstream title ; title << "Crunch time = " << crunchTime << " ms" ;
+    std::stringstream title ; title << crunchTime ;
+    if( ctIter.second.at(0)._crunchSigma != 0. ) {
+      title << " #pm " << ctIter.second.at(0)._crunchSigma ;
+    }
+    title << " ms" ;
 
     TGraph *crunchTimeGraph = new TGraph( ctIter.second.size() ) ;
     crunchTimeGraph->SetName( title.str().c_str() ) ;
     crunchTimeGraph->SetTitle( title.str().c_str() ) ;
     speedupVsCoreMultiGraph->Add( crunchTimeGraph ) ;
-    crunchTimeGraph->SetLineWidth( 2 ) ;
-    crunchTimeGraph->SetLineColor( color ) ;
+    crunchTimeGraph->SetLineWidth( 3 ) ;
+    crunchTimeGraph->SetLineColor( getColor(color) ) ;
     crunchTimeGraph->SetMarkerStyle( 0 ) ;
 
     // loop over ncores for a given crunch time
@@ -72,31 +80,6 @@ void PlotScaling( const std::string &fname, const std::string &title = "", bool 
     }
     color++ ;
   }
-
-  // // loop over ncores
-  // color = 1 ;
-  // size_t maxCrunchTime = 0 ;
-  // for( auto coreIter : coreToEntryMap ) {
-    
-  //   auto ncores = coreIter.first ;
-  //   std::stringstream title ; title << "# Cores = " << ncores ;
-
-  //   TGraph *coreGraph = new TGraph( coreIter.second.size() ) ;
-  //   coreGraph->SetName( title.str().c_str() ) ;
-  //   coreGraph->SetTitle( title.str().c_str() ) ;
-  //   coreGraph->SetLineWidth( 2 ) ;
-  //   coreGraph->SetLineColor( color ) ;
-  //   coreGraph->SetMarkerStyle( 0 ) ;
-  //   speedupVsCrunchTimeMultiGraph->Add( coreGraph ) ;
-
-  //   // loop over crunch time for a given number of core in use
-  //   for( unsigned int i=0 ; i<coreIter.second.size() ; i++ ) {
-  //     auto &entry = coreIter.second.at( i ) ;
-  //     coreGraph->SetPoint( i, entry._crunchTime, entry._speedup ) ;
-  //     maxCrunchTime = std::max( maxCrunchTime, entry._crunchTime ) ;
-  //   }
-  //   color++ ;
-  // }
 
   speedupVsCoreCanvas->cd() ;
   speedupVsCoreCanvas->SetGridx();
@@ -109,31 +92,35 @@ void PlotScaling( const std::string &fname, const std::string &title = "", bool 
   speedupVsCoreMultiGraph->Draw( "alp" ) ;
   speedupVsCoreMultiGraph->GetXaxis()->SetTitle( "# Cores" ) ;
   speedupVsCoreMultiGraph->GetYaxis()->SetTitle( "Speedup" ) ;
+  speedupVsCoreMultiGraph->GetXaxis()->SetTitleSize( 0.05 ) ;
+  speedupVsCoreMultiGraph->GetYaxis()->SetTitleSize( 0.05 ) ;
+  speedupVsCoreMultiGraph->GetXaxis()->SetRangeUser( 0, maxCores+1 ) ;
+  speedupVsCoreMultiGraph->GetYaxis()->SetRangeUser( 0, maxCores+1 ) ;
   
-  auto legend = speedupVsCoreCanvas->BuildLegend() ;
-  legend->SetBorderSize( 0 ) ;
+  auto legend = speedupVsCoreCanvas->BuildLegend( 0.15, 0.47, 0.47, 0.89, "" ) ;
+  legend->SetTextSize( 0.035 ) ;
+  legend->SetHeader( "Crunch times", "C" ) ;
+  legend->SetBorderSize( 1 ) ;
   
-  TF1 *xyline = new TF1( "y=x", "x", 0., static_cast<float>( maxCores ) ) ;
+  TF1 *xyline = new TF1( "y=x", "x", 0., static_cast<float>( maxCores+1 ) ) ;
   xyline->SetLineColor( kBlack ) ;
   xyline->SetLineStyle( 7 ) ;
-  xyline->SetLineWidth( 1 ) ;
+  xyline->SetLineWidth( 2 ) ;
   xyline->Draw( "same" ) ;
-
-  // speedupVsCrunchTimeCanvas->cd() ;
-  // speedupVsCrunchTimeCanvas->SetGridx();
-  // speedupVsCrunchTimeCanvas->SetGridy();  
-  // speedupVsCrunchTimeMultiGraph->Draw( "alp" ) ;
-  // speedupVsCrunchTimeMultiGraph->GetXaxis()->SetTitle( "Crunch time [ms]" ) ;
-  // speedupVsCrunchTimeMultiGraph->GetYaxis()->SetTitle( "Speedup" ) ;
   
-  // legend = speedupVsCrunchTimeCanvas->BuildLegend() ;
-  // legend->SetBorderSize( 0 ) ;
-
+  TText *t = new TText( 0.7, 0.72, "Perfect scaling" ) ;
+  t->SetNDC() ;
+  t->SetTextAlign(22);
+  t->SetTextColor(kGray+1);
+  t->SetTextFont(43);
+  t->SetTextSize(38);
+  t->SetTextAngle(45);
+  t->Draw();
+  
+  speedupVsCoreCanvas->GetFrame()->SetFillColor( 19 ) ;
 
   if( save ) {
     speedupVsCoreCanvas->SaveAs( (fname + "SpeedupVSNCores.pdf").c_str() ) ;
-    // speedupVsCrunchTimeCanvas->SaveAs( (fname + "SpeedupVSCrunchTime.pdf").c_str() ) ;
-
   }
 
 }
