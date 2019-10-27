@@ -92,3 +92,5 @@ IF( MARLIN_GUI )
     ADD_SUBDIRECTORY( ./gui )
 ENDIF()
 # ----------------------------------------------------------------------------
+
+install( FILES scripts/marlin-completion.bash TYPE BIN )
