@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# thismarlin.sh setup environment for this MarlinMT installation
+# Generated from build directory: @CMAKE_BINARY_DIR@
+# Installation directory: @CMAKE_INSTALL_PREFIX@
+#
+# @author: Remi Ete, DESY
+#
+
+export MARLIN_DIR=@CMAKE_INSTALL_PREFIX@
+export LD_LIBRARY_PATH=$MARLIN_DIR/lib:$LD_LIBRARY_PATH
+export PATH=$MARLIN_DIR/bin:$PATH
+
+if [ -f $MARLIN_DIR/bin/marlin-completion.bash ]
+then
+  source $MARLIN_DIR/bin/marlin-completion.bash
+fi
+
+#
