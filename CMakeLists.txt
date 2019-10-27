@@ -128,6 +128,12 @@ ENDIF()
 CONFIGURE_FILE( "${PROJECT_SOURCE_DIR}/cmake/MarlinConfig.h.cmake.in"
     "${PROJECT_BINARY_DIR}/marlin/MarlinConfig.h" @ONLY )
 
+# -------- generate thismarlin.sh --------------------------------------------
+CONFIGURE_FILE( "${PROJECT_SOURCE_DIR}/cmake/thismarlin.sh.in"
+    "${PROJECT_BINARY_DIR}/thismarlin.sh" @ONLY )
+
+INSTALL( FILES "${PROJECT_BINARY_DIR}/thismarlin.sh" DESTINATION ${CMAKE_INSTALL_BINDIR} )
+
 INSTALL( FILES "${PROJECT_BINARY_DIR}/marlin/MarlinConfig.h" DESTINATION "include/marlin/" )
 INSTALL( FILES "${PROJECT_SOURCE_DIR}/source/python/compareMarlinSteeringFiles.py" DESTINATION "bin"
   PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE
