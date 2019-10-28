@@ -67,6 +67,8 @@ namespace marlin::book {
       {}
 
   public:
+    Entry() = default;
+
     std::shared_ptr<const EntryBase> entry() const {
       return _entry;
     }
@@ -76,7 +78,7 @@ namespace marlin::book {
     }
 
   private:
-    EntryKey _key;
+    EntryKey _key {std::type_index(typeid(void))};
     std::shared_ptr<EntryBase> _entry {nullptr};
   };
 

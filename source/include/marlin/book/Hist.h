@@ -39,6 +39,9 @@ namespace marlin::book {
     ROOT::Experimental::RHistStatContent,
     ROOT::Experimental::RHistStatUncertainty>;
 
+  using H1F = RH<float, 1>;
+  using H1I = RH<int, 1>;
+
 
   template<typename T, int D>
   struct trait<RH<T,D>> {
