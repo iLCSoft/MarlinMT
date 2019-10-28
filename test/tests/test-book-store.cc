@@ -5,6 +5,8 @@
 #include "marlin/book/Hist.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/BookStore.h"
+#include "marlin/book/Condition.h"
+#include "marlin/book/Selection.h"
 #include "ROOT/RHistData.hxx" 
 #include "ROOT/RHist.hxx"
 
@@ -24,7 +26,8 @@ int main(int, char**) {
 
 	{
 
-		EntrySingle entry = store.book<RH<float, 1>, RAxisConfig>("test", "path", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = store.book<RH<float, 1>, RAxisConfig>("test", "path", {"a", 3, 1.0, 2.0}) ;	
+		EntrySingle entry = store.bookH1<float>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
 		auto hist = hnd.get();
@@ -32,7 +35,7 @@ int main(int, char**) {
 
 	}{
 
-		EntryMultiCopy entry = store.bookMultiCopy<RH<int, 1>, RAxisConfig>(2, "test", "path", {"a", 3, 1.0, 2.0});
+		EntryMultiCopy entry = store.bookMultiCopy<RH<int, 1>, RAxisConfig>(2, "path2", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle(0);
 		hnd.fill({0}, 1);
 
@@ -42,6 +45,28 @@ int main(int, char**) {
 		auto hist = hnd.get();
 		test.test("MultiCopd Hist Filling", hist.GetBinContent({0})== 2);
 
+	}{
+
+		auto selection = store.find(ConditionBuilder().setName("name"));
+		
+		auto selection1 = store.find(ConditionBuilder().setType<RH<int, 1>>());
+
+		auto selection2 = store.find(ConditionBuilder().setPath("path2"));
+	
+		test.test("Basic find function BookStore",
+				selection.size() == 2
+				&& selection1.size() == 1
+				&& selection2.size() == 1
+				&& selection1.begin()->key().hash == selection2.begin()->key().hash);
+
+		auto subSelection = selection.find(ConditionBuilder().setPath("path"), Selection::ComposeStrategie::AND);
+		auto subSelection1 = store.find(subSelection.condition());
+
+		test.test("Subselection composing AND", 
+			subSelection.size() == 1
+			&& subSelection1.size() == 1
+			&& subSelection.begin()->key().hash == subSelection1.begin()->key().hash
+		);
 	}
 
 	return 0;

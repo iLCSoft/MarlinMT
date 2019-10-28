@@ -59,11 +59,12 @@ Handle<RH<T, D>> EntryMultiCopy<RH<T, D>>::handle(std::size_t idx) {
 	);
 }
 
-template class Handle<RH<float, 1>>;
-template class EntrySingle<RH<float, 1>>;
-template class EntryMultiCopy<RH<float, 1>>;
-template class Handle<RH<int, 1>>;
-template class EntrySingle<RH<int, 1>>;
-template class EntryMultiCopy<RH<int, 1>>;
+#define LinkType( TYPE ) \
+	template class Handle< TYPE >; 				\
+	template class EntrySingle< TYPE >;		\
+	template class EntryMultiCopy< TYPE > \
+
+LinkType(H1F);
+LinkType(H1I);
 }
 
