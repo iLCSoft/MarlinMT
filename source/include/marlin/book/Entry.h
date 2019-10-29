@@ -66,6 +66,11 @@ namespace marlin::book {
       : _key {key}, _entry{entry}
       {}
 
+    void clear() {
+      _key = EntryKey{};
+      _entry.reset();
+    }
+
   public:
     Entry() = default;
 

@@ -1,9 +1,9 @@
 #include <typeinfo>
 #include <typeindex>
 
+#include "marlin/book/ROOTAdapter.h"
+
 #include "marlin/book/MemLayout.h"
-#include "ROOT/RHist.hxx"
-#include "ROOT/RHistData.hxx"
 #include "marlin/book/Hist.h"
 #include "marlin/book/Selection.h"
 #include "marlin/book/Condition.h"
@@ -70,19 +70,31 @@ namespace marlin::book {
 		return Selection::find(_entries.cbegin(), _entries.cend(), cond);
 	}
 
+	void BookStore::remove(const Entry& e) {
+		get(e.key()).clear();
+	}
 
-	template EntryMultiCopy<RH<float, 1>>
-	BookStore::bookMultiCopy<RH<float,1>, BookStore::AxisConfig>
-	(std::size_t n, const std::string_view& path, const std::string_view& name, BookStore::AxisConfig axis);
-	template EntryMultiCopy<RH<int, 1>>
-	BookStore::bookMultiCopy<RH<int, 1>, BookStore::AxisConfig>
-	(std::size_t, const std::string_view&, const std::string_view&, BookStore::AxisConfig);
+	void BookStore::remove(const Selection& selection) {
+		for(const Entry& e : selection) {
+			remove(e);
+		}
+	}
 
-	template EntrySingle<RH<float, 1>>
-	BookStore::book<RH<float,1>, BookStore::AxisConfig>
-	(const std::string_view&, const std::string_view&, BookStore::AxisConfig);
-	template EntrySingle<RH<int, 1>>
-	BookStore::book<RH<int, 1>, BookStore::AxisConfig>
-	(const std::string_view&, const std::string_view
-	&, BookStore::AxisConfig);
+	// invalidates all Entryes and handles !!
+	void BookStore::clear() {
+		_entries.resize(0);
+	}
+
+
+#define LinkTypeHist1( TYPE ) \
+	template EntryMultiCopy<TYPE> \
+	BookStore::bookMultiCopy<TYPE, BookStore::AxisConfig> \
+	(std::size_t n, const std::string_view& path, const std::string_view& name, BookStore::AxisConfig axis); \
+	template EntrySingle<TYPE> \
+	BookStore::book<TYPE, BookStore::AxisConfig> \
+	(const std::string_view&, const std::string_view&, BookStore::AxisConfig)
+
+LinkTypeHist1(RH1F);
+LinkTypeHist1(RH1I);
+LinkTypeHist1(RH1D);
 }

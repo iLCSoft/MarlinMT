@@ -5,19 +5,7 @@
 
 #include "marlin/book/EntryData.h"
 
-
-#include "ROOT/RHist.hxx"
-namespace ROOT::Experimental {
-  class EntryBase;
-  template<int, class>
-  class RHistStatContent;
-
-  template<int, class>
-  class RHistStatUncertainty;
-
-  template<int, class, template<int, class> class ...>
-  class RHist;
-}
+#include "marlin/book/ROOTAdapter.h"
 
 namespace marlin::book {
   class BookStore;
@@ -32,33 +20,25 @@ namespace marlin::book {
   template <typename T>
   struct trait;
   
-  template<typename T, int D>
-  using RH = ROOT::Experimental::RHist<
-    D,
-    T, 
-    ROOT::Experimental::RHistStatContent,
-    ROOT::Experimental::RHistStatUncertainty>;
 
-  using H1F = RH<float, 1>;
-  using H1I = RH<int, 1>;
-
-
-  template<typename T, int D>
-  struct trait<RH<T,D>> {
-  static void Merge(const std::shared_ptr<RH<T, D>>& dst, const std::shared_ptr<RH<T,D>>& src) {
-      ROOT::Experimental::Add(*dst, *src);
+  template<int D, typename T, template<int, class>class ... STAT>
+  struct trait<RH<D, T, STAT ... >> {
+  static void Merge(
+      const std::shared_ptr<RH<D, T, STAT ...>>& dst,
+      const std::shared_ptr<RH<D, T, STAT ...>>& src) {
+      Add(*dst, *src);
   }
   };
 
 
 
-  template <typename T, int D>
+  template <int D, typename T, template<int, class>class ... STAT>
   class Handle<
-    RH<T, D>> : public BaseHandle<RH<T, D>> {
+    RH<D, T, STAT ...>> : public BaseHandle<RH<D, T, STAT ...>> {
     friend BookStore;
 
   public:
-    using Type = RH<T, D>;
+    using Type = RH<D, T, STAT ...>;
     using CoordArray_t = typename Type::CoordArray_t;
     using Weight_t = typename Type::Weight_t;
     using FillFn_t = std::function<void(const CoordArray_t&, const Weight_t&)>;
@@ -71,10 +51,10 @@ namespace marlin::book {
     FillFn_t _fillFn;
   };
 
-  template<typename T, int D>
-  class EntrySingle<RH<T, D>> : public EntryBase {  
+  template<int D, typename T, template<int, class>class ... STAT>
+  class EntrySingle<RH<D, T, STAT ... >> : public EntryBase { 
   public:
-    using Type = RH<T, D>;
+    using Type = RH<D, T, STAT ... >;
 
     EntrySingle(const Context& context);
 
@@ -86,10 +66,10 @@ namespace marlin::book {
     Context _context;
   };
 
-  template<typename T, int D>
-  class EntryMultiCopy<RH<T, D>> : public EntryBase {
+  template<int D, typename T, template<int, class>class ... STAT>
+  class EntryMultiCopy<RH<D, T, STAT ... >> : public EntryBase {
   public:
-    using Type = RH<T, D>;
+    using Type = RH<D, T, STAT...>;
 
     EntryMultiCopy(const Context& context);
 

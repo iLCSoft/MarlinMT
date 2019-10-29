@@ -13,6 +13,8 @@ struct EntryKey {
     // TODO: clean solution
     EntryKey(const std::type_index& t)
     : type{t}{}
+    EntryKey()
+    : type{std::type_index(typeid(void))}{}
 
     std::string path{""}, name{""};
     std::size_t amt{0};

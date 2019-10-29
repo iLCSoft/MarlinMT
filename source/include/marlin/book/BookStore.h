@@ -36,6 +36,10 @@ namespace marlin::book {
           Entry(entry, k)
         );
     }
+
+  Entry& get(const EntryKey& key) {
+    return _entries[key.hash];
+  }
   public:
     using AxisConfig = ROOT::Experimental::RAxisConfig;
 
@@ -53,7 +57,7 @@ namespace marlin::book {
       const std::string_view& name,
       AxisConfig axis
     ) {
-      return book<RH<T, 1>, AxisConfig>(path, name, axis);
+      return book<T, AxisConfig>(path, name, axis);
     }
     
     template<class T, typename ... Args_t>
@@ -65,6 +69,16 @@ namespace marlin::book {
       Args_t ... ctor_p);
 
     Selection find(const Condition& cond);
+
+
+    void remove(const Entry& e);
+    void remove(const Selection& selection);
+
+    /**
+     *  @brief clears the store.
+     *  @attention invalidates all Handle and entries.
+     */
+    void clear();
 
   private:
     // std::unordered_map<std::size_t, Entry> _entries{};
