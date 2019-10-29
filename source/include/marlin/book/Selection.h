@@ -40,6 +40,12 @@ public:
 
   Selection find(const Condition& cond, ComposeStrategie strategie = ComposeStrategie::AND);
 
+  const Entry& get(std::size_t i) { return _entries[i]; }
+  void remove(std::size_t id);
+  void remove(std::size_t id, std::size_t n);
+  void remove(iterator itr);
+  void remove(iterator begin, iterator end);
+
 private:
   std::vector<Entry> _entries{};
   Condition _condition{};
