@@ -68,6 +68,13 @@ namespace marlin::book {
       const std::string_view& name,
       Args_t ... ctor_p);
 
+    template<class T, typename ... Args_t>
+    EntryMultiShared<T>
+    bookMultiShared(
+      const std::string_view& path,
+      const std::string_view& name,
+      Args_t ... ctor_p);
+
     Selection find(const Condition& cond);
 
 

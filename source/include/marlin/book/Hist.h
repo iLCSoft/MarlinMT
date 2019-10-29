@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <iostream>
+#include <vector>
 
 #include "marlin/book/EntryData.h"
 
@@ -17,6 +18,8 @@ namespace marlin::book {
   class EntrySingle;
   template <typename T>
   class EntryMultiCopy;
+  template <typename T>
+  class EntryMultiShared;
   template <typename T>
   struct trait;
   
@@ -34,7 +37,7 @@ namespace marlin::book {
 
   template <int D, typename T, template<int, class>class ... STAT>
   class Handle<
-    RH<D, T, STAT ...>> : public BaseHandle<RH<D, T, STAT ...>> {
+    RH<D, T, STAT ...>> : private BaseHandle<RH<D, T, STAT ...>> {
     friend BookStore;
 
   public:
@@ -42,16 +45,28 @@ namespace marlin::book {
     using CoordArray_t = typename Type::CoordArray_t;
     using Weight_t = typename Type::Weight_t;
     using FillFn_t = std::function<void(const CoordArray_t&, const Weight_t&)>;
+    using FillNFn_t = std::function<void(
+      const std::span<CoordArray_t>&,
+      const std::span<Weight_t>&)>;
+    using FinalizeFn_t = std::function<void()>;
 
   public:
     Handle(
       const std::shared_ptr<MemLayout>& mem,
       const std::shared_ptr<Type>& obj,
-      const FillFn_t& fillFn );
+      const FillFn_t& fillFn,
+      const FillNFn_t& fillNFn,
+      const FinalizeFn_t& finalFn);
     void fill(const CoordArray_t& x, const Weight_t& w);
+    void fillN(
+      const std::span<CoordArray_t>& x,
+      const std::span<Weight_t>& w);
+    const Type& merged();
 
   private:
     FillFn_t _fillFn;
+    FillNFn_t _fillNFn;
+    FinalizeFn_t _finalFn;
   };
 
   template<int D, typename T, template<int, class>class ... STAT>
@@ -85,8 +100,31 @@ namespace marlin::book {
     EntryMultiCopy() = default;
 
     Handle<Type> handle(std::size_t idx);
+    
   
   private:
     Context _context;
+  };
+
+  template<int D, typename T, template<int, class>class ... STAT>
+  class EntryMultiShared<RH<D, T, STAT ...>> : public EntryBase {
+    friend BookStore;
+
+  public:
+    using Type = RH<D, T, STAT ...>;
+
+    EntryMultiShared(const Context& context);
+
+    // EntryMultiShared() = default;
+
+    Handle<Type> handle();
+
+    void flush();
+  
+  private:
+    Context _context;
+    std::shared_ptr<RHistConcurrentFillManager<Type>> _fillMgr; 
+    std::vector<
+      std::shared_ptr<RHistConcurrentFiller<Type>>> _fillers;
   };
 }

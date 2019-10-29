@@ -29,7 +29,7 @@ namespace marlin::book {
   public:
     EntrySingle() = default;
     Handle<T> handle() {
-      return Handle(_context.mem->at<T>(0));
+      return Handle(_context.mem, _context.mem->at<T>(0));
     }
 
   private:
@@ -46,11 +46,28 @@ namespace marlin::book {
   public:
     EntryMultiCopy() = default;
     Handle<T> handle(std::size_t idx) {
-      return Handle(_context.mem->at<T>(idx));
+      return Handle(_context.mem, _context.mem->at<T>(idx));
     }
 
   private:
     Context _context;
+  };
+
+  template<typename T>
+  class EntryMultiShared : public EntryBase {
+    friend BookStore;
+
+    EntryMultiShared(const Context& context)
+    : _context{context}{}
+  
+  public:
+    EntryMultiShared() = default;
+    Handle<T> handle() {
+      return Handle(_context.mem, _context.mem->at<T>(0));
+    }
+  private:
+    Context _context;
+
   };
 
 
@@ -81,6 +98,7 @@ namespace marlin::book {
     const EntryKey& key() const {
       return _key;
     }
+
 
   private:
     EntryKey _key {std::type_index(typeid(void))};

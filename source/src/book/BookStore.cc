@@ -85,6 +85,32 @@ namespace marlin::book {
 		_entries.resize(0);
 	}
 
+	template<class T, typename ... Args_t>
+	EntryMultiShared<T>
+	BookStore::bookMultiShared(
+		const std::string_view& path,
+		const std::string_view& name,
+		Args_t ... ctor_p
+	) {
+		EntryKey key{std::type_index(typeid(T))};
+		key.name = name;
+		key.path = path;
+		key.amt = 1;
+		key.flags = Flags::Book::MultiShared;
+
+		auto entry = std::make_shared<EntryMultiShared<T>>(
+			Context(
+				std::make_shared<SingleMemLayout<T, Args_t ...>>(
+					ctor_p ...
+				)
+			)
+		);
+
+		addEntry(entry, key);
+
+		return *std::static_pointer_cast<const EntryMultiShared<T>>( entry );
+	}
+
 
 #define LinkTypeHist1( TYPE ) \
 	template EntryMultiCopy<TYPE> \
@@ -92,6 +118,9 @@ namespace marlin::book {
 	(std::size_t n, const std::string_view& path, const std::string_view& name, BookStore::AxisConfig axis); \
 	template EntrySingle<TYPE> \
 	BookStore::book<TYPE, BookStore::AxisConfig> \
+	(const std::string_view&, const std::string_view&, BookStore::AxisConfig); \
+	template EntryMultiShared<TYPE> \
+	BookStore::bookMultiShared<TYPE, BookStore::AxisConfig> \
 	(const std::string_view&, const std::string_view&, BookStore::AxisConfig)
 
 LinkTypeHist1(RH1F);

@@ -37,8 +37,16 @@ int main(int, char**) {
 		EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
+		std::vector<typename decltype(hnd)::CoordArray_t> xs;
+		std::vector<typename decltype(hnd)::Weight_t> ws;
+		for(int i = 0; i < 10; ++i) {
+			xs.push_back({1});
+			ws.push_back(1);
+		}
+		hnd.fillN(xs, ws);
+
 		auto hist = hnd.merged();
-		test.test("Single Hist Filling", hist.GetEntries() == 1);
+		test.test("Single Hist Filling", hist.GetEntries() == 11);
 
 	}{
 
@@ -76,6 +84,18 @@ int main(int, char**) {
 		);
 
 	} {
+	
+		EntryMultiShared entry = store.bookMultiShared<RH1I, RAxisConfig>("path3", "name", {"a", 3, 1.0, 2.0});
+		auto hnd = entry.handle();
+		hnd.fill({0}, 1);
+
+		auto hnd2 = entry.handle();
+		hnd2.fill({0}, 1);
+
+		auto hist = hnd.merged();
+		test.test("MultiShared Hist Filling", hist.GetBinContent({0}) == 2);
+
+	}{
 		
 		std::string path = mergedUnicStr();
 		for(int i = 0; i < 10; ++i) {
