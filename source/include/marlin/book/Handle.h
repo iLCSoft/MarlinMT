@@ -18,23 +18,31 @@ namespace marlin::book {
 
   template <typename T>
   class BaseHandle {
-    std::shared_ptr<MemLayout> _obj ;
+    std::shared_ptr<MemLayout> _mem ;
+    std::shared_ptr<T> _obj ; 
 
   protected:
-    BaseHandle(const std::shared_ptr<MemLayout>& obj) : _obj{obj}{}
-
+    BaseHandle(
+      const std::shared_ptr<MemLayout>& mem,
+      const std::shared_ptr<T>& obj) 
+        : _mem{mem},
+          _obj{obj}{}
+  
+    T& get() { return *_obj; }
   public:
 
-    const T& get() {
-      return *_obj->merged<T>();
+    const T& merged() {
+      return *_mem->template merged<T>();
     }
   };
 
   template <typename T>
   class Handle : public BaseHandle<T> {
   public:
-    Handle(const std::shared_ptr<MemLayout>& obj)
-    : BaseHandle<T>(obj){}
+    Handle(
+      const std::shared_ptr<T>& obj, 
+      const std::shared_ptr<MemLayout>& mem)
+    : BaseHandle<T>(obj, mem){}
   };
 
 

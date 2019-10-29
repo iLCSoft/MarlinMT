@@ -9,9 +9,10 @@ namespace marlin::book {
 
 template<int D, typename T, template<int, class>class ... STAT>
 Handle<RH<D, T, STAT ...>>::Handle(
-	std::shared_ptr<MemLayout> obj,
+	const std::shared_ptr<MemLayout>& mem,
+	const std::shared_ptr<RH<D, T, STAT ...>>& obj,
 	const typename Handle<RH<D, T, STAT ...>>::FillFn_t& fillFn
-	) : BaseHandle<RH<D, T, STAT ...>>{obj}, _fillFn{fillFn}
+	) : BaseHandle<RH<D, T, STAT ...>>{mem, obj}, _fillFn{fillFn}
 	{}
 
 template<int D, typename T, template<int, class>class ... STAT>
@@ -32,6 +33,7 @@ Handle<RH<D, T, STAT ...>> EntrySingle<RH<D, T, STAT ...>>::handle() {
 	auto hist = _context.mem->at<Type>(0); 
 	return Handle<Type>(
 		_context.mem,
+		hist,
 		[hist = hist](
 		const typename Type::CoordArray_t& x,
 		const typename Type::Weight_t& w) 
@@ -51,6 +53,7 @@ EntryMultiCopy<RH<D, T, STAT ...>>::handle(std::size_t idx) {
 	auto hist = _context.mem->at<Type>(idx);
 	return Handle<Type>(
 	_context.mem,
+	hist,
 	[hist = hist](
 		const typename Type::CoordArray_t& x,
 		const typename Type::Weight_t& w

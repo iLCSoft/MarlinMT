@@ -19,7 +19,7 @@ void MergeaHist(const std::shared_ptr<T>& dst, const std::shared_ptr<T>& src) {
 	ROOT::Experimental::Add(*dst, *src);
 }
 
-std::string getUnicStr() {
+std::string mergedUnicStr() {
 	static std::size_t num = 0;
 	return std::to_string(++num);
 }
@@ -37,7 +37,7 @@ int main(int, char**) {
 		EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
-		auto hist = hnd.get();
+		auto hist = hnd.merged();
 		test.test("Single Hist Filling", hist.GetEntries() == 1);
 
 	}{
@@ -49,7 +49,7 @@ int main(int, char**) {
 		auto hnd2 = entry.handle(1);
 		hnd2.fill({0}, 1);
 
-		auto hist = hnd.get();
+		auto hist = hnd.merged();
 		test.test("MultiCopd Hist Filling", hist.GetBinContent({0})== 2);
 
 	}{
@@ -77,9 +77,9 @@ int main(int, char**) {
 
 	} {
 		
-		std::string path = getUnicStr();
+		std::string path = mergedUnicStr();
 		for(int i = 0; i < 10; ++i) {
-			store.book<RH1I, RAxisConfig>(path, getUnicStr(), {"a", 2, 0.0, 2.0});
+			store.book<RH1I, RAxisConfig>(path, mergedUnicStr(), {"a", 2, 0.0, 2.0});
 		}
 		
 		Selection sel = store.find(ConditionBuilder().setPath(path));

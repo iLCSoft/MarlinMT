@@ -44,7 +44,10 @@ namespace marlin::book {
     using FillFn_t = std::function<void(const CoordArray_t&, const Weight_t&)>;
 
   public:
-    Handle(std::shared_ptr<MemLayout> obj, const FillFn_t& fillFn);
+    Handle(
+      const std::shared_ptr<MemLayout>& mem,
+      const std::shared_ptr<Type>& obj,
+      const FillFn_t& fillFn );
     void fill(const CoordArray_t& x, const Weight_t& w);
 
   private:
@@ -53,6 +56,9 @@ namespace marlin::book {
 
   template<int D, typename T, template<int, class>class ... STAT>
   class EntrySingle<RH<D, T, STAT ... >> : public EntryBase { 
+    
+    friend BookStore;
+
   public:
     using Type = RH<D, T, STAT ... >;
 
@@ -68,6 +74,9 @@ namespace marlin::book {
 
   template<int D, typename T, template<int, class>class ... STAT>
   class EntryMultiCopy<RH<D, T, STAT ... >> : public EntryBase {
+
+    friend BookStore;
+
   public:
     using Type = RH<D, T, STAT...>;
 
