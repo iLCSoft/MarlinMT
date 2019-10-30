@@ -34,8 +34,8 @@ int main(int, char**) {
 
 	{
 
-		// EntrySingle entry = store.book<RH<float, 1>, RAxisConfig>("test", "path", {"a", 3, 1.0, 2.0}) ;	
-		EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
+		EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
 		std::vector<typename decltype(hnd)::CoordArray_t> xs;
@@ -177,8 +177,7 @@ int main(int, char**) {
 			&& 	rem2.size() == 0 
 			&& selAll.size() == 0);
 	
-	}	
-		
+	} 		
 
 
 
