@@ -147,14 +147,40 @@ int main(int, char**) {
 				&& selC[1].size() == selC[2].size()
 				&& selC[2].size() == selC[3].size()
 				&& equal);
-		} {
-		
-		}	
-		//test.test("Remove Elements from store",
-		//	);
+		} 	
+	}{
+
+			
+		Selection sel = store.find(ConditionBuilder().setName("name"));
+		Selection rem = store.find(sel.condition().Not());
+
+		store.remove(rem);
+
+		Selection sel2 = store.find(sel.condition());
+		Selection rem2 = store.find(rem.condition());
+
+		bool equal = true;
+		auto itr2 = sel2.begin();
+		for(auto itr = sel.begin(); itr != sel.end(); ++itr, ++itr2) {
+			if(itr->key().hash != itr2->key().hash) {
+				equal = false;
+				break;
+			}
+		}
+		if(sel2.size() != sel.size()) equal = false;
+
+		store.clear();
+		Selection selAll = store.find(ConditionBuilder());
+
+		test.test("Remove Elements from store", 
+					equal
+			&& 	rem2.size() == 0 
+			&& selAll.size() == 0);
+	
+	}	
 		
 
-	}
+
 
 	return 0;
 }

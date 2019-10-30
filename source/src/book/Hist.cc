@@ -106,6 +106,11 @@ EntryMultiShared<RH<D, T, STAT ...>>::EntryMultiShared(const Context& context)
 		_fillers ( 0 )
 		{}
 
+template<int  D, typename T, template<int, class>class ... STAT>
+EntryMultiShared<RH<D, T, STAT ...>>::~EntryMultiShared() {
+	flush();	
+}
+
 template<int D, typename T, template<int, class>class ... STAT>
 Handle<RH<D, T, STAT ...>>
 EntryMultiShared<RH<D, T, STAT ...>>::handle() {

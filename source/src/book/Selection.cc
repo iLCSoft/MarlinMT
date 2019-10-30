@@ -36,8 +36,8 @@ namespace marlin::book {
 
 		std::copy_if(begin, end,
 			std::back_inserter(res._entries),
-			[&c = cond](const Entry& itr) -> bool{ 
-					return c(itr.key());
+			[&c = cond](const Entry& e) -> bool{ 
+					return e.valid() && c(e.key());
 			}
 		);
 		return res;

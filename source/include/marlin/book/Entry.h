@@ -99,7 +99,7 @@ namespace marlin::book {
       return _key;
     }
 
-
+    bool valid() const { return static_cast<bool>(_entry); }
   private:
     EntryKey _key {std::type_index(typeid(void))};
     std::shared_ptr<EntryBase> _entry {nullptr};

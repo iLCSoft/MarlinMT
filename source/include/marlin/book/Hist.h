@@ -116,6 +116,7 @@ namespace marlin::book {
     EntryMultiShared(const Context& context);
 
     // EntryMultiShared() = default;
+    ~EntryMultiShared();
 
     Handle<Type> handle();
 
