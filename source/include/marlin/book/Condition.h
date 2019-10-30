@@ -4,8 +4,10 @@
 #include <typeindex>
 #include <string_view>
 #include <optional>
+#include <regex>
 
 #include "marlin/book/EntryData.h"
+
 
 namespace marlin::book {
   class EntryKey;
@@ -64,9 +66,11 @@ namespace marlin::book {
 
     Condition condition() const;
     
-    ConditionBuilder& setName(const std::string_view& rgx);
+    ConditionBuilder& setName(const std::string_view& name);
+    ConditionBuilder& setName(const std::basic_regex<char>& rgx);
 
-    ConditionBuilder& setPath(const std::string_view& rgx);
+    ConditionBuilder& setPath(const std::string_view& path);
+    ConditionBuilder& setPath(const std::basic_regex<char>& rgx);
 
     ConditionBuilder& setType(const std::type_index& type);
     
@@ -78,8 +82,11 @@ namespace marlin::book {
   private:
 
     std::optional<std::string> _name{};
+    std::basic_regex<char> _rgxName {".*"};
     std::optional<std::string> _path{};
+    std::basic_regex<char> _rgxPath {".*"};
     std::optional<std::type_index> _type{};
+  
   };
 
 }

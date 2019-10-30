@@ -68,11 +68,14 @@ int main(int, char**) {
 		auto selection1 = store.find(ConditionBuilder().setType<RH1I>());
 
 		auto selection2 = store.find(ConditionBuilder().setPath("path2"));
+
+		auto selection3 = store.find(ConditionBuilder().setPath(std::regex("path(|2)")));
 	
 		test.test("Basic find function BookStore",
 				selection.size() == 2
 				&& selection1.size() == 1
 				&& selection2.size() == 1
+				&& selection3.size() == 2
 				&& selection1.begin()->key().hash == selection2.begin()->key().hash);
 
 		auto subSelection = selection.find(ConditionBuilder().setPath("path"), Selection::ComposeStrategie::AND);
@@ -144,8 +147,9 @@ int main(int, char**) {
 				&& selC[1].size() == selC[2].size()
 				&& selC[2].size() == selC[3].size()
 				&& equal);
-		}
+		} {
 		
+		}	
 		//test.test("Remove Elements from store",
 		//	);
 		
