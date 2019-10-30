@@ -115,17 +115,18 @@ template<int D, typename T, template<int, class>class ... STAT>
 Handle<RH<D, T, STAT ...>>
 EntryMultiShared<RH<D, T, STAT ...>>::handle() {
 	using Hnd_t = RH<D, T, STAT ...>;
-	_fillers.push_back(std::make_shared<RHistConcurrentFiller<RH<D, T, STAT...>>>(*_fillMgr));
+	auto pFiller  = std::make_shared<RHistConcurrentFiller<RH<D, T, STAT...>>>(*_fillMgr);
+	_fillers.push_back(pFiller);
 	return Handle<Type>(
 		_context.mem,
 		_context.mem->at<Type>(0),
-		[pFiller = _fillers.back()](
+		[pFiller = pFiller](
 			const typename Hnd_t::CoordArray_t& x,
 			const typename Hnd_t::Weight_t& w
 		) {
 			pFiller->Fill(x, w);
 		},
-		[pFiller = _fillers.back()](
+		[pFiller = pFiller](
 			const std::span<typename Hnd_t::CoordArray_t>& x,
 			const std::span<typename Hnd_t::Weight_t>& w
 		) {
@@ -140,7 +141,9 @@ EntryMultiShared<RH<D, T, STAT ...>>::handle() {
 template<int D, typename T, template<int, class>class ... STAT>
 void EntryMultiShared<RH<D, T, STAT ...>>::flush() {
 	for(auto& filler : _fillers)	 {
-		filler->Flush();
+		if(auto ptr = filler.lock()) {
+			ptr->Flush();
+		}
 	}
 }
 

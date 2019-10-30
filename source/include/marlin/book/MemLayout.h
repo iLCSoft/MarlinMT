@@ -9,15 +9,15 @@ namespace marlin {
   namespace book {
 
     /**
-     *  @brief MemLayout BaseClass to store booked objets in MarlinMT 
+     *  @brief MemLayout base class to store booked objects in MarlinMT 
      */
     class MemLayout {
     public:
 
       /**
-       *  @brief Get Resource for a instance.
+       *  @brief Get Resource for an instance.
        *  @param idx instance id
-       *  @return const ptr to Resource
+       *  @return const pointer to Resource
        */
       template <typename T>
       std::shared_ptr<const T> at( std::size_t idx ) const {
@@ -25,9 +25,9 @@ namespace marlin {
       }
 
       /**
-       *  @brief Get Resoucre for a instance.
+       *  @brief Get Resource for an instance.
        *  @param idx instance id
-       *  @return ptr to Resource
+       *  @return pointer to Resource
        */
       template <typename T>
       std::shared_ptr<T> at( std::size_t idx ) {
@@ -46,16 +46,16 @@ namespace marlin {
       virtual ~MemLayout() = default;
 
     protected:
-      /// implimentation from at
+      /// implementation from at
       virtual std::shared_ptr<void> imp_at( std::size_t idx ) const= 0 ;
-      /// implimentation from merged
+      /// implementation from merged
       virtual std::shared_ptr<void> imp_merged() = 0 ;
     };
 
     /**
-     *  @brief MemLayout for Mutible object instances.
+     *  @brief MemLayout for mutable object instances.
      *  @tparam T stored Object Type
-     *  @tparam MERGE function(to, from) wich merge to instances of Object
+     *  @tparam MERGE function(to, from) which merge to instances of Object
      */
     template 
       <typename T,
@@ -68,8 +68,8 @@ namespace marlin {
 
     public:
       /** 
-       *  @brief Consturctor.
-       *  @param num_instances amount of Resource Instances
+       *  @brief Constructor.
+       *  @param amount of instances amount of Resource Instances
        *  @param args Arguments for Object Construction 
        */
       SharedMemLayout(std::size_t num_instances, Args_t ... args)
@@ -84,7 +84,7 @@ namespace marlin {
       ~SharedMemLayout() override = default;
 
     private:
-      /// Get Rescource for Instance. lazy operation.
+      /// Get Resource for Instance. Lazy operation.
       std::shared_ptr<void> imp_at(std::size_t idx) const override final {
         return _objects[idx];
       }
@@ -99,6 +99,7 @@ namespace marlin {
         return _mergedObj;
       }
 
+      std::vector<std::shared_ptr<T>> _objects; ///< mutable for lazy operation
       std::shared_ptr<T> _mergedObj{nullptr};
       std::tuple<Args_t ...> _ctor_p;
     };
@@ -130,7 +131,5 @@ namespace marlin {
     };
 
   } // end namespace book
->>>>>>> moved modifier handling in ModifierManager
 } // end namespace marlin
 
->>>>>>> Formatted MemLayout.h

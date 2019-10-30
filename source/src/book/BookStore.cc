@@ -13,6 +13,14 @@
 namespace marlin::book {
 	using namespace types;
 
+	void BookStore::addEntry(
+		const std::shared_ptr< EntryBase > &entry,
+		EntryKey & key) {
+		EntryKey k = key;
+		k.hash = _entries.size();
+		_entries.push_back(Entry(entry, k));
+	}
+
 	template<class T, typename ... Args_t>
 	EntrySingle<T>
 	BookStore::book(
@@ -115,14 +123,14 @@ namespace marlin::book {
 
 #define LinkTypeHist1( TYPE ) \
 	template EntryMultiCopy<TYPE> \
-	BookStore::bookMultiCopy<TYPE, BookStore::AxisConfig> \
-	(std::size_t n, const std::string_view& path, const std::string_view& name, BookStore::AxisConfig axis); \
+	BookStore::bookMultiCopy<TYPE, types::RAxisConfig> \
+	(std::size_t n, const std::string_view& path, const std::string_view& name, types::RAxisConfig axis); \
 	template EntrySingle<TYPE> \
-	BookStore::book<TYPE, BookStore::AxisConfig> \
-	(const std::string_view&, const std::string_view&, BookStore::AxisConfig); \
+	BookStore::book<TYPE, types::RAxisConfig> \
+	(const std::string_view&, const std::string_view&, types::RAxisConfig); \
 	template EntryMultiShared<TYPE> \
-	BookStore::bookMultiShared<TYPE, BookStore::AxisConfig> \
-	(const std::string_view&, const std::string_view&, BookStore::AxisConfig)
+	BookStore::bookMultiShared<TYPE, types::RAxisConfig> \
+	(const std::string_view&, const std::string_view&, types::RAxisConfig)
 
 LinkTypeHist1(RH1F);
 LinkTypeHist1(RH1I);

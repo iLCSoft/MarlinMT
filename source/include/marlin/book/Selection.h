@@ -1,55 +1,123 @@
-#include <vector>
-#include <unordered_map>
+#pragma once
 
+// -- std includes
+#include <vector>
+
+// -- MarlinBook includes
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
 
-namespace marlin::book {
-  
-  class BookStore;
-  
-class Selection {
-  friend BookStore;
+namespace marlin {
+  namespace book {
 
-  template<typename T>
-  static 
-  Selection find(T begin, T end, const Condition& cond);
-  
-public:
-  using iterator = typename std::vector<Entry>::const_iterator;
-  enum struct ComposeStrategie {
-    AND,
-    ONLY_CHILD,
-    ONLY_PARENT
-  };
+    // -- MarlinBook forward declaration
+    class BookStore ;
 
-  Selection() = default;
-  Selection(const Selection&) = delete;
-  Selection(Selection&&) = default;
+    /**
+     *  @brief Contains references to entries.
+     *  Which satisfy the condition. 
+     *  Used to doing action on a range of entries.
+     */
+    class Selection {
+      friend BookStore ;
 
-  Selection(
-    const Selection& sel,
-    const Condition& cond,
-    ComposeStrategie strategie = ComposeStrategie::AND);
+      /**
+       *  @brief Construct Selection from range of Entries.
+       *  @param begin,end range of Entries
+       *  @param cond Condition to filter Entries.
+       */
+      template < typename T >
+      static Selection find( T begin, T end, const Condition &cond ) ;
 
-  const Condition& condition() const { return _condition; }
+    public:
+      /// type for iteration through a Selection.
+      using iterator = typename std::vector< Entry >::const_iterator ;
 
-  iterator begin() const { return _entries.cbegin(); }
-  iterator end() const { return _entries.cend(); }
-  std::size_t size() const { return _entries.size(); }
+      /// Possibilities to compose Conditions when creating sub selections.
+      /// Composed the new condition with the condition from the super selection.
+      enum struct ComposeStrategie { 
+        AND,
+        ONLY_CHILD,
+        ONLY_PARENT
+      } ;
 
-  Selection find(const Condition& cond, ComposeStrategie strategie = ComposeStrategie::AND);
+      /// default constructor. Construct empty selection.
+      Selection()                    = default ;
 
-  const Entry& get(std::size_t i) { return _entries[i]; }
-  void remove(std::size_t id);
-  void remove(std::size_t id, std::size_t n);
-  void remove(iterator itr);
-  void remove(iterator begin, iterator end);
+      Selection( const Selection & ) = delete ;
 
-private:
-  std::vector<Entry> _entries{};
-  Condition _condition{};
-};
+      /// move constructor. Default 
+      Selection( Selection && )      = default ;
 
-  
-}
+      /**
+       *  @brief construct sub selection.
+       *  @param sel super selection
+       *  @param cond condition for promotion in sub selection
+       *  @param strategy to compose selection with sub selection condition.
+       */
+      Selection( const Selection &sel,
+                 const Condition &cond,
+                 ComposeStrategie strategy = ComposeStrategie::AND ) ;
+
+      /// getter for Condition which every Entry full fill.
+      const Condition &condition() const { return _condition; }
+
+      /// begin iterator to iterate through entries.
+      iterator    begin() const { return _entries.cbegin(); }
+
+      /// end iterator for entries. First not valid iterator.
+      iterator    end() const { return _entries.cend(); }
+
+      /// @return number of entries included in the selection.
+      std::size_t size() const { return _entries.size(); }
+
+      /**
+       *  @brief construct sub selection.
+       *  @param cond condition for promotion in sub selection.
+       *  @param strategy to compos selection with sub selection condition.
+       */
+      Selection find( const Condition &cond,
+                      ComposeStrategie strategie = ComposeStrategie::AND ) ;
+
+      /**
+       *  @brief get entry at position.
+       *  @param i position of entry of interest.
+       */
+      const Entry &get( std::size_t i ) { return _entries[i]; }
+
+      /**
+       *  @brief remove entry at position.
+       *  @param i position of entry to remove.
+       */
+      void         remove( std::size_t i ) ;
+
+      /**
+       *  @brief remove entry range.
+       *  @param i position of first entry to remove.
+       *  @param n number of entries to remove.
+       */
+      void         remove( std::size_t i, std::size_t n ) ;
+
+      /**
+       *  @brief remove entry.
+       *  @param itr iterator from entry which should be removed. 
+       */
+      void         remove( iterator itr ) ;
+
+      /**
+       *  @brief remove entry range.
+       *  remove entries from begin to end, including begin, excluding end.
+       *  @param begin first entry which should be removed.
+       *  @param end first entry which should not be removed.
+       */
+      void         remove( iterator begin, iterator end ) ;
+
+    private:
+      /// entries which included in selection. 
+      std::vector< Entry > _entries{} ; // FIXME: no key copying
+      /// condition which every entry full fill.
+      Condition            _condition{} ;
+    } ;
+
+  } // end namespace book
+} // end namespace marlin
