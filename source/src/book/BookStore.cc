@@ -11,6 +11,7 @@
 #include "marlin/book/BookStore.h"
 
 namespace marlin::book {
+	using namespace types;
 
 	template<class T, typename ... Args_t>
 	EntrySingle<T>

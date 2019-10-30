@@ -6,6 +6,7 @@
 
 
 namespace marlin::book {
+using namespace types;
 
 template<int D, typename T, template<int, class>class ... STAT>
 Handle<RH<D, T, STAT ...>>::Handle(

@@ -25,10 +25,10 @@ namespace marlin::book {
   
 
   template<int D, typename T, template<int, class>class ... STAT>
-  struct trait<RH<D, T, STAT ... >> {
+  struct trait<types::RH<D, T, STAT ... >> {
   static void Merge(
-      const std::shared_ptr<RH<D, T, STAT ...>>& dst,
-      const std::shared_ptr<RH<D, T, STAT ...>>& src) {
+      const std::shared_ptr<types::RH<D, T, STAT ...>>& dst,
+      const std::shared_ptr<types::RH<D, T, STAT ...>>& src) {
       Add(*dst, *src);
   }
   };
@@ -37,11 +37,11 @@ namespace marlin::book {
 
   template <int D, typename T, template<int, class>class ... STAT>
   class Handle<
-    RH<D, T, STAT ...>> : private BaseHandle<RH<D, T, STAT ...>> {
+    types::RH<D, T, STAT ...>> : private BaseHandle<types::RH<D, T, STAT ...>> {
     friend BookStore;
 
   public:
-    using Type = RH<D, T, STAT ...>;
+    using Type = types::RH<D, T, STAT ...>;
     using CoordArray_t = typename Type::CoordArray_t;
     using Weight_t = typename Type::Weight_t;
     using FillFn_t = std::function<void(const CoordArray_t&, const Weight_t&)>;
@@ -70,12 +70,12 @@ namespace marlin::book {
   };
 
   template<int D, typename T, template<int, class>class ... STAT>
-  class EntrySingle<RH<D, T, STAT ... >> : public EntryBase { 
+  class EntrySingle<types::RH<D, T, STAT ... >> : public EntryBase {  
     
     friend BookStore;
 
   public:
-    using Type = RH<D, T, STAT ... >;
+    using Type = types::RH<D, T, STAT ... >;
 
     EntrySingle(const Context& context);
 
@@ -88,12 +88,12 @@ namespace marlin::book {
   };
 
   template<int D, typename T, template<int, class>class ... STAT>
-  class EntryMultiCopy<RH<D, T, STAT ... >> : public EntryBase {
+  class EntryMultiCopy<types::RH<D, T, STAT ... >> : public EntryBase {
 
     friend BookStore;
 
   public:
-    using Type = RH<D, T, STAT...>;
+    using Type = types::RH<D, T, STAT...>;
 
     EntryMultiCopy(const Context& context);
 
@@ -107,11 +107,11 @@ namespace marlin::book {
   };
 
   template<int D, typename T, template<int, class>class ... STAT>
-  class EntryMultiShared<RH<D, T, STAT ...>> : public EntryBase {
+  class EntryMultiShared<types::RH<D, T, STAT ...>> : public EntryBase {
     friend BookStore;
 
   public:
-    using Type = RH<D, T, STAT ...>;
+    using Type = types::RH<D, T, STAT ...>;
 
     EntryMultiShared(const Context& context);
 
@@ -123,8 +123,8 @@ namespace marlin::book {
   
   private:
     Context _context;
-    std::shared_ptr<RHistConcurrentFillManager<Type>> _fillMgr; 
+    std::shared_ptr<types::RHistConcurrentFillManager<Type>> _fillMgr;  
     std::vector<
-      std::shared_ptr<RHistConcurrentFiller<Type>>> _fillers;
+      std::shared_ptr<types::RHistConcurrentFiller<Type>>> _fillers;
   };
 }

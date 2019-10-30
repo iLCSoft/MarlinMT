@@ -25,6 +25,7 @@ std::string mergedUnicStr() {
 }
 
 using namespace marlin::book;
+using namespace marlin::book::types;
 using namespace ROOT::Experimental;
 
 int main(int, char**) {
