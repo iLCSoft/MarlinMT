@@ -101,7 +101,7 @@ namespace marlin {
        *  @brief only accept when key.name includes a match.
        *  @param rgx regular expression.
        *  @note only used when no prefect match for name is set.
-       *  \see {ConditionBuilder::setName(const std::string_view &name)}
+       *  \see ConditionBuilder::setName(const std::string_view &name)
        */
       ConditionBuilder &setName( const std::basic_regex< char > &rgx ) ;
 
@@ -116,7 +116,7 @@ namespace marlin {
        *  @brief only accept when key.path includes a match.
        *  @param rgx regular expression.
        *  @note only used when no perfect match for path is set.
-       *  \see {ConditionBuilder::setPath(const std::string_view &name)}
+       *  \see ConditionBuilder::setPath(const std::string_view &name)
        */
       ConditionBuilder &setPath( const std::basic_regex< char > &rgx ) ;
   

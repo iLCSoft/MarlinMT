@@ -51,23 +51,24 @@ namespace marlin {
 
       /**
        *  @brief creates an Entry for a default Object.
+       *  @tparam T object which should be booked.
+       *  @tparam Args_t types of parameters to construct T.
+       *  @param path location to store the Entry.
+       *  @param name name of the Entry.
+       *  @param ctor_p parameters to construct the object.
        */
       template < class T, typename... Args_t >
       EntrySingle< T > book( const std::string_view &path,
                              const std::string_view &name,
                              Args_t... ctor_p ) ;
 
-      template < typename T >
-      const auto bookH1( const std::string_view &path,
-                         const std::string_view &name,
-                         types::RAxisConfig      axis ) {
-        return book< T, types::RAxisConfig >( path, name, axis ) ;
-      }
-
       /**
        *  @brief creates an Entry for parallel access.
        *  Creates Multiple copy's of the object to avoid locks.
+       *  \see BookStore::book
        *  @note getting the results is triggers a merging →  expensive.
+       *  @param n number of instances which should be created.
+       *  (max level of pluralism)
        */
       template < class T, typename... Args_t >
       EntryMultiCopy< T > bookMultiCopy( std::size_t             n,
@@ -78,6 +79,7 @@ namespace marlin {
       /**
        *  @brief creates an Entry for parallel access.
        *  Creates one object in Memory and modifiers.
+       *  \see BookStore::book
        */
       template < class T, typename... Args_t >
       EntryMultiShared< T > bookMultiShared( const std::string_view &path,
@@ -98,7 +100,7 @@ namespace marlin {
 
       /**
        *  @brief removes every Entry from the selection from the BookStore.
-       *  calls \see {BookStore::remove(const Entry &e)} 
+       *  calls BookStore::remove(const Entry &e)
        *  for every Entry in Selection.
        */
       void remove( const Selection &selection ) ;

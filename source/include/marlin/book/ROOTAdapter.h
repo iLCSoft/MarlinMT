@@ -34,6 +34,12 @@ namespace marlin {
       using RH1F = ROOT::Experimental::RH1F ;
       /// often used Histogram Instance
       using RH1I = ROOT::Experimental::RH1I ;
+      /// often used Histograms Instance
+      using RH2D = ROOT::Experimental::RH2D ;
+      /// often used Histograms Instance.
+      using RH2F = ROOT::Experimental::RH2F ;
+      /// often used Histograms Instance.
+      using RH2I = ROOT::Experimental::RH2I ;
 
       /**
        *  @brief Buffer size for Histograms used in Shared mode.

@@ -192,5 +192,6 @@ namespace marlin {
       std::vector< std::weak_ptr< types::RHistConcurrentFiller< Type > > >
         _fillers ;
     } ;
+    
   } // end namespace book
 } // end namespace marlin

@@ -27,7 +27,7 @@ namespace marlin {
 					_condition = sel.condition() ;
 					break ;
 				default:
-					throw "Strategie not definet!" ;
+					throw "Strategy not defined!" ;
 			}
 		}
 
@@ -78,11 +78,13 @@ namespace marlin {
 		}
 
 		//--------------------------------------------------------------------------
-
+		
+		///	@cond INTERNAL
 		template Selection
 		Selection::find< Selection::iterator >( Selection::iterator begin,
 		                                        Selection::iterator end,
 		                                        const Condition &   cond ) ;
+		///	@endcond
 
 	} // end namespace book
 } // end namespace marlin
