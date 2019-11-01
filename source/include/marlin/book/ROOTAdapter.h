@@ -41,7 +41,7 @@ namespace marlin {
        *  - larger →  more memory consumption.
        *  @note can set with the CMAKE  Variable \cod {NAME}
        */
-      constexpr std::size_tHistogramFillerBufferSize
+      constexpr std::size_t HistogramFillerBufferSize
 #       ifdef HISTOGRAM_FILLER_BUFFER_SIZE
           = HISTOGRAM_FILLER_BUFFER_SIZE;
 #       else

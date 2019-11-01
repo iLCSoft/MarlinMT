@@ -8,13 +8,13 @@
 
 // -- MarlinBook includes
 #include "marlin/book/EntryData.h"
+#include "marlin/book/MemLayout.h"
 
 namespace marlin {
   namespace book {
 
     // -- MarlinBook forward declarations
     class BookStore ;
-    class MemLayout ;
     template < typename T >
     class Handle ;
 
