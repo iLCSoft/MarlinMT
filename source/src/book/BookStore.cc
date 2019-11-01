@@ -106,7 +106,6 @@ namespace marlin {
 		}
 
 		//--------------------------------------------------------------------------
-/// @cond INTERNAL
 #define LinkTypeHist1( TYPE )                                                  \
 	template EntryMultiCopy< TYPE >                                              \
 	BookStore::bookMultiCopy< TYPE, types::RAxisConfig >(                        \
@@ -123,7 +122,6 @@ namespace marlin {
 		LinkTypeHist1( RH1I ) ;
 		LinkTypeHist1( RH1F ) ;
 		LinkTypeHist1( RH1D ) ;
-///	@endcond
 
 	} // end namespace book
 } // end namespace marlin

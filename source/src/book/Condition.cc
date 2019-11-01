@@ -10,7 +10,7 @@
 
 namespace marlin {
 	namespace book {
-		///	@cond INTERNAL
+
 		bool rgxEvaluation( const std::string_view &match,
 		                    const std::string_view &str ) {
 			return match == str ;
@@ -22,7 +22,6 @@ namespace marlin {
 		                    const std::string_view &        str ) {
 			return std::regex_search( str.begin(), str.end(), rgx ) ;
 		}
-		///	@endcond
 
 		//--------------------------------------------------------------------------
 

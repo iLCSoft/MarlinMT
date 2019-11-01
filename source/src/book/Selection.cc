@@ -79,12 +79,10 @@ namespace marlin {
 
 		//--------------------------------------------------------------------------
 		
-		///	@cond INTERNAL
 		template Selection
 		Selection::find< Selection::iterator >( Selection::iterator begin,
 		                                        Selection::iterator end,
 		                                        const Condition &   cond ) ;
-		///	@endcond
 
 	} // end namespace book
 } // end namespace marlin

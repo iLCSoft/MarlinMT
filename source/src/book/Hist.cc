@@ -16,12 +16,8 @@ namespace marlin {
 		  const typename Handle< RH< D, T, STAT... > >::FillFn_t &    fillFn,
 		  const typename Handle< RH< D, T, STAT... > >::FillNFn_t &   fillNFn,
 		  const typename Handle< RH< D, T, STAT... > >::FinalizeFn_t &finalFn )
-		  : BaseHandle< RH< D, T, STAT... > >{mem, obj},
-			///	@cond INTERNAL		
-				_fillFn{fillFn},
-		    _fillNFn{fillNFn}, _finalFn{finalFn}
-			/// @endcond
-			{}
+		  : BaseHandle< RH< D, T, STAT... > >{mem, obj}, _fillFn{fillFn},
+		    _fillNFn{fillNFn}, _finalFn{finalFn} {}
 
 		//--------------------------------------------------------------------------
 
@@ -102,13 +98,10 @@ namespace marlin {
 		EntryMultiShared< RH< D, T, STAT... > >::EntryMultiShared(
 		  const Context &context )
 		  : _context{context},
-			/// @cond INTERNAL
 		    _fillMgr{
 		      std::make_shared< RHistConcurrentFillManager< RH< D, T, STAT... > > >(
 		        *context.mem->at< RH< D, T, STAT... > >( 0 ) )},
-		    _fillers( 0 ) 
-			///	@endcond
-			{}
+		    _fillers( 0 ) {}
 
 		//--------------------------------------------------------------------------
 
@@ -151,8 +144,7 @@ namespace marlin {
 				}
 			}
 		}
-		
-///	@cond INTERNAL
+
 #define LinkType( TYPE )                                                       \
 	template class Handle< TYPE >;                                               \
 	template class EntrySingle< TYPE >;                                          \
@@ -162,7 +154,6 @@ namespace marlin {
 		LinkType( RH1D ) ;
 		LinkType( RH1F ) ;
 		LinkType( RH1I ) ;
-/// @endcond
 
 	} // end namespace book
 } // end namespace marlin
