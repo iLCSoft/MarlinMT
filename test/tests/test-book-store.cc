@@ -28,13 +28,21 @@ using namespace marlin::book;
 using namespace marlin::book::types;
 using namespace ROOT::Experimental;
 
+
+
+
 int main(int, char**) {
 	marlin::test::UnitTest test(" MemFillerTest ");
 	BookStore store{};
+	
+	auto helper = store.book<RH1F>("path", "name"); // TODO: forbid this!
+	auto h2 = helper.single();
 
 	{
 
-		EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = BookHelper<RH1F>(store, Flags::Book::Single)({"a", 3, 1.0, 2.0});
+		EntrySingle entry = store.book<RH1F>("path", "name").single()({"a", 3, 1.0, 2.0});
 		// EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
@@ -50,8 +58,8 @@ int main(int, char**) {
 		test.test("Single Hist Filling", hist.GetEntries() == 11);
 
 	}{
-
-		EntryMultiCopy entry = store.bookMultiCopy<RH1I, RAxisConfig>(2, "path2", "name", {"a", 3, 1.0, 2.0});
+		// EntryMultiCopy entry = store.bookMultiCopy<RH1I, const RAxisConfig&>(2, "path2", "name", {"a", 2, -1, 2});
+		EntryMultiCopy entry = store.book<RH1I>("path2", "name").multiCopy(2)({"a", 2, -1, 2});
 		auto hnd = entry.handle(0);
 		hnd.fill({0}, 1);
 
@@ -70,7 +78,7 @@ int main(int, char**) {
 		auto selection2 = store.find(ConditionBuilder().setPath("path2"));
 
 		auto selection3 = store.find(ConditionBuilder().setPath(std::regex("path(|2)")));
-	
+		
 		test.test("Basic find function BookStore",
 				selection.size() == 2
 				&& selection1.size() == 1
@@ -89,7 +97,7 @@ int main(int, char**) {
 
 	} {
 	
-		EntryMultiShared entry = store.bookMultiShared<RH1I, RAxisConfig>("path3", "name", {"a", 3, 1.0, 2.0});
+		EntryMultiShared entry = store.bookMultiShared<RH1I, const RAxisConfig&>("path3", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
 
@@ -103,7 +111,7 @@ int main(int, char**) {
 		
 		std::string path = mergedUnicStr();
 		for(int i = 0; i < 10; ++i) {
-			store.book<RH1I, RAxisConfig>(path, mergedUnicStr(), {"a", 2, 0.0, 2.0});
+			store.bookSingle<RH1I, const RAxisConfig&>(path, mergedUnicStr(), {"a", 2, 0.0, 2.0});
 		}
 		
 		Selection sel = store.find(ConditionBuilder().setPath(path));
@@ -177,7 +185,18 @@ int main(int, char**) {
 			&& 	rem2.size() == 0 
 			&& selAll.size() == 0);
 	
-	} 		
+	} {
+		std::size_t n = store.find(ConditionBuilder()).size();
+
+		RAxisConfig axis{"x", 2, 1.0, 2.0};
+		store.book<RH1F>("path", mergedUnicStr()).single()(axis);
+		store.book<RH2F>("path", mergedUnicStr()).single()(axis, axis);
+		store.book<RH3F>("path", mergedUnicStr()).single()(axis, axis, axis);
+
+		std::size_t n2 = store.find(ConditionBuilder()).size();
+
+		test.test("BookHelper usage", n + 3 == n2);
+	}	
 
 
 
