@@ -8,6 +8,7 @@
 // -- MarlinBook includes
 #include "marlin/book/EntryData.h"
 #include "marlin/book/ROOTAdapter.h"
+#include "marlin/book/BookStore.h"
 
 namespace marlin {
   namespace book {
@@ -26,6 +27,8 @@ namespace marlin {
     class EntryMultiShared ;
     template < typename T >
     struct trait ;
+    template < typename,unsigned long long>
+    class BookHelper ;
 
     /// trait specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >
@@ -39,6 +42,79 @@ namespace marlin {
              const std::shared_ptr< types::RH< D, T, STAT... > > &src ) {
         Add( *dst, *src ) ;
       }
+    } ;
+
+    template < typename T, template < int, class > class... STAT >
+    class BookHelper<types::RH< 1,T,STAT...>, Flags::Book::Single.VAL_INIT> {
+      friend BookStore;
+      BookHelper(
+        BookStore &store,
+        const std::string_view &path,
+        const std::string_view &name
+      ) : _name {name},
+          _path {path},
+          _store {store} {}
+      void setN(std::size_t n) {
+        _amt = n;
+      }
+
+    public:
+      EntrySingle<types::RH<1, T, STAT ...>>
+      operator()(const types::RAxisConfig& axis) {
+        return _store.book<
+          types::RH<1,T,STAT...>,
+          types::RAxisConfig
+        >(_path, _name, axis);
+      }
+      BookHelper<types::RH<1,T,STAT...>,Flags::Book::Single.VAL_INIT>
+      single() { return *this; }
+      BookHelper<types::RH<1,T,STAT...>,Flags::Book::MultiCopy.VAL_INIT>
+      multiCopy(std::size_t n) {
+        BookHelper<types::RH<1, T, STAT...>, Flags::Book::MultiCopy.VAL_INIT> res(
+          _store,
+          _path,
+          _name);
+        res.setN(n);
+        return res;
+      }
+
+    private:
+      std::size_t _amt = 0;
+      const std::string_view &_name;
+      const std::string_view &_path;
+      BookStore &_store;
+    } ;
+    
+    template < typename T, template < int, class > class... STAT >
+    class BookHelper<types::RH< 1,T,STAT...>, Flags::Book::MultiCopy.VAL_INIT> {
+      friend BookHelper<types::RH<1,T,STAT...>,Flags::Book::Single.VAL_INIT>;
+
+      BookHelper(
+        BookStore &store,
+        const std::string_view &path,
+        const std::string_view &name
+      ) : _name {name},
+          _path {path},
+          _store {store} {}
+      void setN(std::size_t n) {
+        _amt = n;
+      }
+
+    public:
+      EntryMultiCopy<types::RH<1, T, STAT ...>>
+      operator()(const types::RAxisConfig& axis) {
+        return _store.bookMultiCopy<
+          types::RH<1,T,STAT...>,
+          types::RAxisConfig
+        >(_amt, _path, _name, axis);
+
+      }
+
+    private:
+      std::size_t _amt = 0;
+      const std::string_view &_name;
+      const std::string_view &_path;
+      BookStore &_store;
     } ;
 
     /// Handle specialisation for Histograms.

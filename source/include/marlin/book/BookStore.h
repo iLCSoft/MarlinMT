@@ -17,6 +17,7 @@ namespace marlin {
   namespace book {
 
     // -- MarlinBook forward declaration
+    template<unsigned long long>
     class Flag_t ;
     class MemLayout ;
     template < typename, typename... >
@@ -28,6 +29,31 @@ namespace marlin {
     class SharedMemLayout ;
     class Condition ;
     class Selection ;
+
+    template< class T , unsigned long long>
+    class BookHelper {
+      friend BookStore;
+      BookHelper( 
+        BookStore &store,
+        const std::string_view &path,
+        const std::string_view &name
+        ):
+          _name {name},
+          _path {path},
+          _store {store} {}
+      void setN(std::size_t n) {
+        _amt = n;
+      }
+    public:
+      void operator()() {
+        throw "not supported with this type";
+      } 
+    private:
+      std::size_t              _amt = 0 ;
+      const std::string_view  &_name ;
+      const std::string_view  &_path ;
+      BookStore               &_store ;
+    } ;
 
     /**
      *  @brief Managed Access and creation to Objects.
@@ -62,6 +88,15 @@ namespace marlin {
                              const std::string_view &name,
                              Args_t... ctor_p ) ;
 
+
+      template < class T >
+      BookHelper< T, Flags::Book::Single.VAL_INIT> book( const std::string_view &path,
+                            const std::string_view &name) {
+         return BookHelper< T , Flags::Book::Single.VAL_INIT>(
+          *this,
+          path,
+          name);
+      }
       /**
        *  @brief creates an Entry for parallel access.
        *  Creates Multiple copy's of the object to avoid locks.

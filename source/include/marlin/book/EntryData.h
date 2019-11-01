@@ -34,7 +34,7 @@ namespace marlin {
       /// Type of object stored in Entry.
       std::type_index type ;
       /// Status flags from Entry.
-      Flag_t          flags{0} ;
+      Flag_t<0>          flags{} ;
       /// unique number for Entry
       std::size_t     hash{0} ;
     } ;

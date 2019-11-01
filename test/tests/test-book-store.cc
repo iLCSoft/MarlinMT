@@ -28,13 +28,20 @@ using namespace marlin::book;
 using namespace marlin::book::types;
 using namespace ROOT::Experimental;
 
+
+
+
 int main(int, char**) {
 	marlin::test::UnitTest test(" MemFillerTest ");
 	BookStore store{};
+	
+
 
 	{
 
-		EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+		// EntrySingle entry = BookHelper<RH1F>(store, Flags::Book::Single)({"a", 3, 1.0, 2.0});
+		EntrySingle entry = store.book<RH1F>("path", "name").single()({"a", 3, 1.0, 2.0});
 		// EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
@@ -51,7 +58,8 @@ int main(int, char**) {
 
 	}{
 
-		EntryMultiCopy entry = store.bookMultiCopy<RH1I, RAxisConfig>(2, "path2", "name", {"a", 3, 1.0, 2.0});
+		// EntryMultiCopy entry = store.bookMultiCopy<RH1I, RAxisConfig>(2, "path2", "name", {"a", 3, 1.0, 2.0});
+		EntryMultiCopy entry = store.book<RH1I>("path2", "name").multiCopy(2)({"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle(0);
 		hnd.fill({0}, 1);
 
@@ -70,7 +78,7 @@ int main(int, char**) {
 		auto selection2 = store.find(ConditionBuilder().setPath("path2"));
 
 		auto selection3 = store.find(ConditionBuilder().setPath(std::regex("path(|2)")));
-	
+		
 		test.test("Basic find function BookStore",
 				selection.size() == 2
 				&& selection1.size() == 1

@@ -7,14 +7,20 @@ namespace marlin {
   namespace book {
 
     /** Flag type for flags in marlin::book */
+    template<unsigned long long INIT = 0>
     class Flag_t {
       static constexpr std::size_t AmtFlags = 8 ;
+      template<unsigned long long>
+      friend class Flag_t;
 
     public:
+      static constexpr unsigned long long VAL_INIT = INIT;
+
       /**
        *  @brief constructor flag from number.
        */
       constexpr Flag_t( unsigned long long val ) : _val{val} {}
+
 
       /**
        *  @brief Construct flag from bitset.
@@ -24,18 +30,20 @@ namespace marlin {
       /**
        *  @brief Default Constructor ;
        */
-      constexpr Flag_t() : _val{0} {} ;
+      constexpr Flag_t() : _val{INIT} {} ;
       /**
        *  @brief logical  AND on tow set of Flags.
        */
-      Flag_t operator&( const Flag_t &f ) const {
+      template<unsigned long long I>
+      Flag_t operator&( const Flag_t<I> &f ) const {
         return Flag_t( _val & f._val ) ;
       }
 
       /**
        *  @brief logical OR on tow set of Flags.
        */
-      Flag_t operator|( const Flag_t &f ) const {
+      template<unsigned long long I>
+      Flag_t operator|( const Flag_t<I> &f ) const {
         return Flag_t( _val & f._val ) ;
       }
 
@@ -53,20 +61,29 @@ namespace marlin {
       /**
        *  @brief check for equality.
        */
-      bool operator==( const Flag_t &f ) const { return _val == f._val; }
+      template<unsigned long long I>
+      bool operator==( const Flag_t<I> &f ) const { return _val == f._val; }
 
       /**
        *  @brief check for inequality.
        */
-      bool operator!=( const Flag_t &f ) const { return _val != f._val; }
+      template<unsigned long long I>
+      bool operator!=( const Flag_t<I> &f ) const { return _val != f._val; }
 
       /**
        *  @brief check if the flags is a subset of the other.
        *  @param flag which is may/mayn't the subset
        *  @return true if f is a subset of this
        */
-      bool Contains( const Flag_t &f ) const {
+      template<unsigned long long I>
+      bool Contains( const Flag_t<I> &f ) const {
         return ( _val & f._val ) == f._val ;
+      }
+
+      template<unsigned long long I>
+      Flag_t<INIT>& operator=(const Flag_t<I> &f) {
+        _val = f._val;
+        return *this;
       }
 
     private:
@@ -82,9 +99,9 @@ namespace marlin {
 
         /// create multiple instances of booked object (if possible) to avoid
         /// sync points
-        constexpr Flag_t Single( 1 << 0 ) ;
-        constexpr Flag_t MultiShared( 1 << 1 ) ;
-        constexpr Flag_t MultiCopy( 1 << 2 ) ;
+        constexpr Flag_t<(1<<0)> Single{} ;
+        constexpr Flag_t<(1<<1)> MultiShared{} ;
+        constexpr Flag_t<(1<<2)> MultiCopy{} ;
       } // namespace Book
 
       /// flags for Permission handling in booking System

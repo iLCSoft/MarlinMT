@@ -145,6 +145,8 @@ namespace marlin {
 			}
 		}
 
+		
+
 #define LinkType( TYPE )                                                       \
 	template class Handle< TYPE >;                                               \
 	template class EntrySingle< TYPE >;                                          \
