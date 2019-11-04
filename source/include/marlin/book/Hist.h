@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include <vector>
+#include <type_traits>
 
 // -- MarlinBook includes
 #include "marlin/book/EntryData.h"
@@ -29,6 +30,7 @@ namespace marlin {
     struct trait ;
     template < typename,unsigned long long>
     class BookHelper ;
+    class BookHelperBase;
 
     /// trait specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >
@@ -41,81 +43,148 @@ namespace marlin {
       Merge( const std::shared_ptr< types::RH< D, T, STAT... > > &dst,
              const std::shared_ptr< types::RH< D, T, STAT... > > &src ) {
         Add( *dst, *src ) ;
-      }
+        }
     } ;
 
-    template < typename T, template < int, class > class... STAT >
-    class BookHelper<types::RH< 1,T,STAT...>, Flags::Book::Single.VAL_INIT> {
+
+
+    template < int D, typename T, template < int, class > class... STAT >
+    class BookHelper<types::RH< D,T,STAT...>, 0> : public BookHelperBase{
       friend BookStore;
       BookHelper(
         BookStore &store,
         const std::string_view &path,
         const std::string_view &name
-      ) : _name {name},
-          _path {path},
-          _store {store} {}
-      void setN(std::size_t n) {
-        _amt = n;
-      }
+      );
 
     public:
-      EntrySingle<types::RH<1, T, STAT ...>>
-      operator()(const types::RAxisConfig& axis) {
-        return _store.book<
-          types::RH<1,T,STAT...>,
-          types::RAxisConfig
-        >(_path, _name, axis);
-      }
-      BookHelper<types::RH<1,T,STAT...>,Flags::Book::Single.VAL_INIT>
-      single() { return *this; }
-      BookHelper<types::RH<1,T,STAT...>,Flags::Book::MultiCopy.VAL_INIT>
-      multiCopy(std::size_t n) {
-        BookHelper<types::RH<1, T, STAT...>, Flags::Book::MultiCopy.VAL_INIT> res(
-          _store,
-          _path,
-          _name);
-        res.setN(n);
-        return res;
+      const BookHelper<types::RH<D,T,STAT...>,Flags::Book::Single.VAL_INIT>
+      single() const ;      
+      
+      const BookHelper<types::RH<D,T,STAT...>,Flags::Book::MultiCopy.VAL_INIT>
+      multiCopy(std::size_t n) const ;
+    } ;
+
+    template < int D, typename T, template<int, class> class ... STAT>
+    class BookHelper<types::RH<D, T, STAT...>, Flags::Book::Single.VAL_INIT>  : public BookHelperBase{
+      friend BookHelper<types::RH<D,T,STAT...>,0>;
+      using Object_t = types::RH<D, T, STAT...>;
+      
+      BookHelper(
+        BookStore& store,
+        const std::string_view& path,
+        const std::string_view& name
+      ) ;     
+
+      template<typename ... Args_t>
+      EntrySingle<Object_t> construct (Args_t ... args) const {
+        return _store.bookSingle<Object_t, Args_t ...>(_path, _name, args...);
       }
 
-    private:
-      std::size_t _amt = 0;
-      const std::string_view &_name;
-      const std::string_view &_path;
-      BookStore &_store;
-    } ;
-    
-    template < typename T, template < int, class > class... STAT >
-    class BookHelper<types::RH< 1,T,STAT...>, Flags::Book::MultiCopy.VAL_INIT> {
-      friend BookHelper<types::RH<1,T,STAT...>,Flags::Book::Single.VAL_INIT>;
+      public:
+        template<int d = D>
+        std::enable_if_t<d == 1, EntrySingle<Object_t>>
+        operator()(const types::RAxisConfig& axis) const {
+          return this->template construct<const types::RAxisConfig&>(axis);
+        }
+
+        template<int d = D>
+        std::enable_if_t<d == 2, EntrySingle<Object_t>>
+        operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2) const{
+          return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2);
+        }
+
+        template<int d = D>
+        std::enable_if_t<d == 3, EntrySingle<Object_t>>
+        operator()(
+          const types::RAxisConfig& ax1,
+          const types::RAxisConfig& ax2,
+          const types::RAxisConfig& ax3
+        ) const {
+          return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2, ax3);
+        }
+    };
+
+    template <int D, typename T, template<int,class>class...STAT>
+    class BookHelper<types::RH<D,T,STAT...>, Flags::Book::MultiShared.VAL_INIT> : public BookHelperBase {
+      using Object_t = types::RH<D,T,STAT...>;
+      friend BookHelper<Object_t,0>;
 
       BookHelper(
         BookStore &store,
         const std::string_view &path,
         const std::string_view &name
-      ) : _name {name},
-          _path {path},
-          _store {store} {}
-      void setN(std::size_t n) {
-        _amt = n;
+      );
+
+      template<typename ... Args_t>
+      EntryMultiShared<Object_t> construct(Args_t ... args) const {
+        return _store.bookMultiShared<Object_t, Args_t...>(_path, _name, args...);
       }
 
     public:
-      EntryMultiCopy<types::RH<1, T, STAT ...>>
-      operator()(const types::RAxisConfig& axis) {
-        return _store.bookMultiCopy<
-          types::RH<1,T,STAT...>,
-          types::RAxisConfig
-        >(_amt, _path, _name, axis);
-
+      template<int d = D>
+      std::enable_if_t<d == 1, EntryMultiShared<Object_t>>
+      operator()(const types::RAxisConfig& axis) const {
+        return this->template construct<const types::RAxisConfig&>(axis);
       }
 
+      template<int d = D>
+      std::enable_if_t<d == 2, EntryMultiShared<Object_t>>
+      operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2) const {
+        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2);
+      }
+
+      template<int d = D>
+      std::enable_if_t<d == 3, EntryMultiShared<Object_t>>
+      operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2, const types::RAxisConfig& ax3) const {
+        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2, ax3);
+      }
+    };
+    
+    template < int D, typename T, template < int, class > class... STAT >
+    class BookHelper<types::RH< D ,T,STAT...>, Flags::Book::MultiCopy.VAL_INIT> : public BookHelperBase{
+      using Object_t = types::RH<D,T,STAT...>;
+      friend BookHelper<Object_t,0>;
+
+      BookHelper(
+        BookStore &store,
+        const std::string_view &path,
+        const std::string_view &name, const std::size_t amt);
+
+      template<typename ... Args_t>
+      EntryMultiCopy<Object_t> construct (Args_t ... args) const {
+        return _store.bookMultiCopy<Object_t, Args_t ...>(_amt, _path,_name,args...);
+      }
+    public:
+      template<int d = D> 
+      std::enable_if_t<d == 1, EntryMultiCopy<Object_t>>
+      operator()(const types::RAxisConfig& axis) const {
+        return this->template construct<const types::RAxisConfig&>(axis);
+      }
+
+      template<int d = D>
+      std::enable_if_t<d == 2, EntryMultiCopy<Object_t>>
+      operator()(
+        const types::RAxisConfig& ax1,
+        const types::RAxisConfig& ax2
+      ) const {
+        return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2);
+      }
+
+      template<int d = D>
+      std::enable_if_t<d == 3, EntryMultiCopy<Object_t>>
+      operator()(
+        const types::RAxisConfig& ax1,
+        const types::RAxisConfig& ax2,
+        const types::RAxisConfig& ax3
+      ) const {
+        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2, ax3);
+      }
+    
     private:
-      std::size_t _amt = 0;
-      const std::string_view &_name;
-      const std::string_view &_path;
-      BookStore &_store;
+      const std::size_t _amt;
     } ;
+
 
     /// Handle specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >

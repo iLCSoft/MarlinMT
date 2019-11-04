@@ -29,31 +29,25 @@ namespace marlin {
     class SharedMemLayout ;
     class Condition ;
     class Selection ;
+    
+    class BookHelperBase {
+    public:
+      BookHelperBase(const BookHelperBase&) = delete;
+      BookHelperBase(BookHelperBase&&) = delete;
+      BookHelperBase() = delete;
+      BookHelperBase& operator=(const BookHelperBase&) = delete;
+      BookHelperBase& operator=(BookHelperBase&&) = delete;
+
+    protected:
+      const std::string_view& _name;
+      const std::string_view& _path;
+      BookStore& _store;
+      BookHelperBase(BookStore& store, const std::string_view& path, const std::string_view& name) 
+      : _name{name},_path{path}, _store{store} {}
+    };
 
     template< class T , unsigned long long>
-    class BookHelper {
-      friend BookStore;
-      BookHelper( 
-        BookStore &store,
-        const std::string_view &path,
-        const std::string_view &name
-        ):
-          _name {name},
-          _path {path},
-          _store {store} {}
-      void setN(std::size_t n) {
-        _amt = n;
-      }
-    public:
-      void operator()() {
-        throw "not supported with this type";
-      } 
-    private:
-      std::size_t              _amt = 0 ;
-      const std::string_view  &_name ;
-      const std::string_view  &_path ;
-      BookStore               &_store ;
-    } ;
+    class BookHelper : public BookHelperBase{} ;
 
     /**
      *  @brief Managed Access and creation to Objects.
@@ -74,6 +68,8 @@ namespace marlin {
       Entry &get( const EntryKey &key ) { return _entries[key.hash]; }
 
     public:
+      template < class T >
+      const BookHelper< T, 0>  book( const std::string_view &path, const std::string_view &name);
 
       /**
        *  @brief creates an Entry for a default Object.
@@ -84,19 +80,11 @@ namespace marlin {
        *  @param ctor_p parameters to construct the object.
        */
       template < class T, typename... Args_t >
-      EntrySingle< T > book( const std::string_view &path,
+      EntrySingle< T > bookSingle( const std::string_view &path,
                              const std::string_view &name,
                              Args_t... ctor_p ) ;
 
 
-      template < class T >
-      BookHelper< T, Flags::Book::Single.VAL_INIT> book( const std::string_view &path,
-                            const std::string_view &name) {
-         return BookHelper< T , Flags::Book::Single.VAL_INIT>(
-          *this,
-          path,
-          name);
-      }
       /**
        *  @brief creates an Entry for parallel access.
        *  Creates Multiple copy's of the object to avoid locks.
