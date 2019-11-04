@@ -13,16 +13,6 @@ namespace EVENT {
   class LCRunHeader ;
 }
 
-// dd4hep forward declarations
-namespace dd4hep {
-  class Detector ;
-}
-
-// gear forward declarations
-namespace gear {
-  class GearMgr ;
-}
-
 namespace marlin {
 
   class Processor ;
@@ -90,27 +80,13 @@ namespace marlin {
      */
     static bool isFirstEvent( EVENT::LCEvent *event ) ;
 
-#ifdef MARLIN_DD4HEP
     /**
-     *  @brief  Get the geometry instance as dd4hep geometry.
-     *  WARNING: The geometry must be initialized with the dedicated dd4hep
-     *  plugin, else the geometry cast will fail and an exception is thrown
+     *  @brief  Get the geometry handle as a given type
      *
-     *  @param  proc the processor accessing the geometry
+     *  @param  proc the processor instance initiating the call
      */
-    static const dd4hep::Detector* dd4hepDetector( const Processor *const proc ) ;
-#endif
-
-#ifdef MARLIN_GEAR
-    /**
-     *  @brief  Get the geometry instance as gear geometry.
-     *  WARNING: The geometry must be initialized with the dedicated gear
-     *  plugin, else the geometry cast will fail and an exception is thrown
-     *
-     *  @param  proc the processor accessing the geometry
-     */
-    static const gear::GearMgr* gearDetector( const Processor *const proc ) ;
-#endif
+    template <typename T>
+    static T *geometry( const Processor *const proc ) ;
 
     /**
      *  @brief  Notify the application to skip the current event processing
@@ -128,6 +104,14 @@ namespace marlin {
      */
     static void abort( const Processor *const proc, const std::string &reason ) ;
   };
+
+  //--------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
+
+  template <typename T>
+  inline T *ProcessorApi::geometry( const Processor *const proc ) {
+    return proc->app().geometryManager().geometry<T>() ;
+  }
 
 }
 

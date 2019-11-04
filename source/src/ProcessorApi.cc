@@ -9,16 +9,6 @@
 // -- lcio headers
 #include <EVENT/LCEvent.h>
 
-// -- dd4hep headers
-#ifdef MARLIN_DD4HEP
-#include <DD4hep/Detector.h>
-#endif
-
-// -- gear headers
-#ifdef MARLIN_GEAR
-#include <gear/GearMgr.h>
-#endif
-
 namespace marlin {
 
   void ProcessorApi::registerForRandomSeeds( Processor *const proc ) {
@@ -61,18 +51,6 @@ namespace marlin {
     return event->runtime().ext<IsFirstEvent>() ;
   }
 
-  //--------------------------------------------------------------------------
-#ifdef MARLIN_DD4HEP
-  const dd4hep::Detector* ProcessorApi::dd4hepDetector( const Processor *const proc ) {
-    return proc->app().geometryManager().geometry<dd4hep::Detector>() ;
-  }
-#endif
-  //--------------------------------------------------------------------------
-#ifdef MARLIN_GEAR
-  const gear::GearMgr* ProcessorApi::gearDetector( const Processor *const proc ) {
-    return proc->app().geometryManager().geometry<gear::GearMgr>() ;
-  }
-#endif
   //--------------------------------------------------------------------------
 
   void ProcessorApi::skipCurrentEvent( const Processor *const proc ) {
