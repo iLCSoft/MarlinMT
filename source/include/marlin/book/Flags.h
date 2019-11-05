@@ -97,7 +97,6 @@ namespace marlin {
 
 		/// Flags for different purposes in marlin::book
 		namespace Flags {
-a
 			/// flags for booking
 			namespace Book {
 

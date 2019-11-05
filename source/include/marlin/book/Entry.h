@@ -136,7 +136,7 @@ namespace marlin {
       Entry() = default ;
 
       /// access actual entry.
-      std::shared_ptr< const EntryBase > entry() const { return _entry; }
+      std::shared_ptr< EntryBase > entry() const { return _entry; }
 
       /// access key data from entry.
       const EntryKey &key() const { return _key; }

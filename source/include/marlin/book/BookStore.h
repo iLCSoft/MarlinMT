@@ -63,9 +63,9 @@ namespace marlin {
 		} ;
 		
 		/**
-		 *	@brief Helper class for easier usage.
+		 *	@brief Helper class for easier booking.
 		 *	Specialisation for each object type, so there is no need 
-		 *	to specify the constructor by ourself.
+		 *	to specify the book function arguments by ourself.
 		 */
 		template < class T, unsigned long long >
 		class BookHelper : public BookHelperBase {} ;

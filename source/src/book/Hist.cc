@@ -37,10 +37,10 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 
 		template < int D, typename T, template < int, class > class... STAT >
-		const BookHelper< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+		const BookHelper< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
 		BookHelper< RH< D, T, STAT... >, 0 >::multiShared() const {
-			return BookHelper< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >(
-			  _store, _path, _name, ) ;
+			return BookHelper< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >(
+			  _store, _path, _name ) ;
 		}
 
 		//--------------------------------------------------------------------------
