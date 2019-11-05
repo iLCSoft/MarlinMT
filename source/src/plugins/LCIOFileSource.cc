@@ -6,6 +6,9 @@
 #include <marlin/ReaderListener.h>
 #include <marlin/PluginManager.h>
 #include <marlin/Logging.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
+#include <jenkinsHash.h>
 
 // -- lcio headers
 #include <EVENT/LCEvent.h>
@@ -36,21 +39,25 @@ namespace marlin {
     bool readOne() ;
 
   private:
+    void onLCEventRead( std::shared_ptr<EVENT::LCEvent> event ) ;
+    void onLCRunHeaderRead( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
+
+  private:
     Property<std::vector<std::string>> _inputFileNames {this, "LCIOInputFiles",
                 "The list of LCIO input files" } ;
 
     Property<int> _maxRecordNumber {this, "MaxRecordNumber",
                 "The maximum number of records to read", 0 } ;
-      
+
     Property<int> _skipNEvents {this, "SkipNEvents",
                 "The number of events to skip on file open", 0 } ;
-                
+
     Property<std::vector<std::string>> _readCollectionNames {this, "LCIOReadCollectionNames",
                 "An optional list of LCIO collections to read from event" } ;
-                
+
     Property<bool> _lazyUnpack {this, "LazyUnpack",
                 "Set to true to perform a lazy unpacking after reading out an event", false } ;
-    
+
     ///< The LCIO file listener
     ReaderListener              _listener {} ;
     ///< The LCIO file reader

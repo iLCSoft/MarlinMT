@@ -17,8 +17,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  unsigned int ProcessorApi::getRandomSeed( const Processor *const proc, EVENT::LCEvent *event ) {
-    auto randomSeeds = event->runtime().ext<RandomSeed>() ;
+  unsigned int ProcessorApi::getRandomSeed( const Processor *const proc, EventStore *event ) {
+    auto randomSeeds = event->extensions().get<extensions::RandomSeed, RandomSeedExtension>() ;
     if( nullptr == randomSeeds ) {
       MARLIN_THROW( "No random seed extension in event" ) ;
     }
@@ -27,8 +27,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void ProcessorApi::setReturnValue( const Processor *const proc, EVENT::LCEvent *event, bool value ) {
-    auto procConds = event->runtime().ext<ProcessorConditions>() ;
+  void ProcessorApi::setReturnValue( const Processor *const proc, EventStore *event, bool value ) {
+    auto procConds = event->extensions().get<extensions::ProcessorConditions, ProcessorConditionsExtension>() ;
     if( nullptr == procConds ) {
       MARLIN_THROW( "No processor conditions extension in event" ) ;
     }
@@ -37,8 +37,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void ProcessorApi::setReturnValue( const Processor *const proc, EVENT::LCEvent *event, const std::string &name, bool value ) {
-    auto procConds = event->runtime().ext<ProcessorConditions>() ;
+  void ProcessorApi::setReturnValue( const Processor *const proc, EventStore *event, const std::string &name, bool value ) {
+    auto procConds = event->extensions().get<extensions::ProcessorConditions, ProcessorConditionsExtension>() ;
     if( nullptr == procConds ) {
       MARLIN_THROW( "No processor conditions extension in event" ) ;
     }
@@ -47,8 +47,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  bool ProcessorApi::isFirstEvent( EVENT::LCEvent *event ) {
-    return event->runtime().ext<IsFirstEvent>() ;
+  bool ProcessorApi::isFirstEvent( EventStore *event ) {
+    return *event->extensions().get<extensions::IsFirstEvent, bool>() ;
   }
 
   //--------------------------------------------------------------------------

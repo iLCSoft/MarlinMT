@@ -30,7 +30,7 @@ namespace marlin {
    public:
     CPUCrunchingProcessor() ;
     void init() ;
-    void processEvent( EVENT::LCEvent * evt ) ;
+    void processEvent( EventStore * evt ) ;
 
   private:
     Property<int> _crunchTime {this, "CrunchTime",
@@ -43,7 +43,7 @@ namespace marlin {
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  CPUCrunchingProcessor::CPUCrunchingProcessor() : 
+  CPUCrunchingProcessor::CPUCrunchingProcessor() :
     Processor("CPUCrunching") {
     // modify processor description
     _description = "CPUCrunchingProcessor crunch CPU time for n milliseconds" ;
@@ -60,7 +60,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void CPUCrunchingProcessor::processEvent( EVENT::LCEvent *event ) {
+  void CPUCrunchingProcessor::processEvent( EventStore *event ) {
     auto randomSeed = ProcessorApi::getRandomSeed( this, event ) ;
     std::default_random_engine generator( randomSeed );
     std::normal_distribution<clock::duration_rep> distribution(0, _crunchSigma);

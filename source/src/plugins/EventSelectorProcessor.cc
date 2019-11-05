@@ -1,6 +1,7 @@
 
 // -- marlin headers
 #include <marlin/Processor.h>
+#include <marlin/ProcessorApi.h>
 #include <marlin/PluginManager.h>
 #include <marlin/EventExtensions.h>
 
@@ -35,7 +36,7 @@ namespace marlin {
 
     // from Processor
     void init() ;
-    void processEvent( EVENT::LCEvent * evt ) ;
+    void processEvent( EventStore * evt ) ;
 
    protected:
      Property<std::vector<int>> _evtList {this, "EventList",
@@ -69,21 +70,21 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void EventSelectorProcessor::processEvent( EVENT::LCEvent * evt ) {
-    auto conditions = evt->runtime().ext<ProcessorConditions>() ;
+  void EventSelectorProcessor::processEvent( EventStore * evt ) {
+    auto lcevent = evt->event<EVENT::LCEvent>() ;
     // if no events specified - always return true
     if( _evtList.size() == 0 ) {
-      conditions->set( this, true ) ;
+      ProcessorApi::setReturnValue( this, evt, true ) ;
       return ;
     }
-    auto iter = _evtSet.find( std::make_pair( evt->getEventNumber() , evt->getRunNumber() ) ) ;
+    auto iter = _evtSet.find( std::make_pair( lcevent->getEventNumber() , lcevent->getRunNumber() ) ) ;
     const bool isInList = (iter != _evtSet.end() ) ;
     //-- note: this will not be printed if compiled w/o MARLINDEBUG=1 !
-    log<DEBUG>() << "   processing event: " << evt->getEventNumber()
-  		       << "   in run:  " << evt->getRunNumber()
+    log<DEBUG>() << "   processing event: " << lcevent->getEventNumber()
+  		       << "   in run:  " << lcevent->getRunNumber()
   		       << " - in event list : " << isInList
   		       << std::endl ;
-    conditions->set( this, isInList ) ;
+    ProcessorApi::setReturnValue( this, evt, isInList ) ;
   }
 
   // plugin declaration

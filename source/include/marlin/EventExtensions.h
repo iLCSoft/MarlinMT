@@ -4,18 +4,12 @@
 // -- marlin headers
 #include <marlin/RandomSeedManager.h>
 #include <marlin/LogicalExpressions.h>
-
-// -- lcio headers
-#include <LCRTRelations.h>
+#include <marlin/Extensions.h>
 
 // -- std headers
 #include <memory>
 #include <thread>
 #include <string>
-
-namespace EVENT {
-  class LCEvent ;
-}
 
 namespace marlin {
 
@@ -114,10 +108,13 @@ namespace marlin {
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  // LCEvent runtime extension declaration in Marlin
-  struct ProcessorConditions : public lcrtrel::LCOwnedExtension<ProcessorConditions, ProcessorConditionsExtension> {} ;
-  struct RandomSeed : public lcrtrel::LCOwnedExtension<RandomSeed, RandomSeedExtension> {} ;
-  struct IsFirstEvent : public lcrtrel::LCBoolExtension<IsFirstEvent> {} ;
+  // extension mapping types
+  namespace extensions {
+    struct ProcessorConditions {} ;
+    struct RandomSeed {} ;
+    struct IsFirstEvent {} ;
+  }
+
 }
 
 #endif

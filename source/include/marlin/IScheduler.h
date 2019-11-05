@@ -5,15 +5,11 @@
 #include <memory>
 #include <vector>
 
-// lcio forward declaration
-namespace EVENT {
-  class LCEvent ;
-  class LCRunHeader ;
-}
-
 namespace marlin {
 
   class Application ;
+  class EventStore ;
+  class RunHeader ;
 
   /**
    *  @brief  IScheduler interface
@@ -31,33 +27,33 @@ namespace marlin {
      *  @param  app the application in which the scheduler runs
      */
     virtual void init( Application *app ) = 0 ;
-    
+
     /**
      *  @brief  Terminate the scheduler activites
      *  Cleanup memory, etc ...
      */
     virtual void end() = 0 ;
-    
+
     /**
      *  @brief  Process a run header
      *
      *  @param  rhdr the run header to process
      */
-    virtual void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) = 0 ;    
+    virtual void processRunHeader( std::shared_ptr<RunHeader> rhdr ) = 0 ;
 
     /**
      *  @brief  Push a new event to the scheduler for processing
      *
      *  @param  event the event to push
      */
-    virtual void pushEvent( std::shared_ptr<EVENT::LCEvent> event ) = 0 ;
+    virtual void pushEvent( std::shared_ptr<EventStore> event ) = 0 ;
 
     /**
      *  @brief  Retrieve finished events from the scheduler
      *
      *  @param  events the list of event to retrieve
      */
-    virtual void popFinishedEvents( std::vector<std::shared_ptr<EVENT::LCEvent>> &events ) = 0 ;
+    virtual void popFinishedEvents( std::vector<std::shared_ptr<EventStore>> &events ) = 0 ;
 
     /**
      *  @brief  Get the number of free event slots

@@ -3,9 +3,8 @@
 // -- marlin headers
 #include <jenkinsHash.h>
 #include <marlin/Exceptions.h>
+#include <marlin/EventStore.h>
 
-// -- lcio headers
-#include <EVENT/LCEvent.h>
 
 namespace marlin {
 
@@ -34,16 +33,17 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   std::unique_ptr<RandomSeedManager::RandomSeedMap>
-  RandomSeedManager::generateRandomSeeds( const EVENT::LCEvent * const evt ) {
+  RandomSeedManager::generateRandomSeeds( const EventStore * const evt ) {
     // get hashed seed using jenkins_hash
     unsigned int seed = 0 ; // initial state
-    unsigned int eventNumber = evt->getEventNumber() ;
-    unsigned int runNumber = evt->getRunNumber() ;
-    unsigned char * c = (unsigned char *) &eventNumber ;
-    seed = jenkins_hash( c, sizeof eventNumber, seed) ;
-    c = (unsigned char *) &runNumber ;
-    seed = jenkins_hash( c, sizeof runNumber, seed) ;
-    c = (unsigned char *) &_globalSeed ;
+    // unsigned int eventNumber = evt->getEventNumber() ;
+    // unsigned int runNumber = evt->getRunNumber() ;
+    auto uid = evt->uid() ;
+    unsigned char * c = (unsigned char *) &uid ;
+    // seed = jenkins_hash( c, sizeof eventNumber, seed) ;
+    // c = (unsigned char *) &runNumber ;
+    // seed = jenkins_hash( c, sizeof runNumber, seed) ;
+    // c = (unsigned char *) &uid ;
     seed = jenkins_hash( c, sizeof _globalSeed, seed) ;
     // refresh the seed
     _generator.seed( seed ) ;

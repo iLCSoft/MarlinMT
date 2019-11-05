@@ -24,13 +24,13 @@ namespace marlin {
    public:
     LCIOEventUnpackingProcessor() ;
     void init() ;
-    void processEvent( EVENT::LCEvent * evt ) ;
+    void processEvent( EventStore * evt ) ;
   };
 
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  LCIOEventUnpackingProcessor::LCIOEventUnpackingProcessor() : 
+  LCIOEventUnpackingProcessor::LCIOEventUnpackingProcessor() :
     Processor("LCIOEventUnpacking") {
     // modify processor description
     _description = "LCIOEventUnpackingProcessor unpacks LCIO event" ;
@@ -44,11 +44,12 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void LCIOEventUnpackingProcessor::processEvent( EVENT::LCEvent *event ) {
-    auto colnames = event->getCollectionNames() ;
+  void LCIOEventUnpackingProcessor::processEvent( EventStore *event ) {
+    auto lcevent = event->event<EVENT::LCEvent>() ;
+    auto colnames = lcevent->getCollectionNames() ;
     if( not colnames->empty() ) {
       auto colname = colnames->at(0) ;
-      event->getCollection( colname ) ;
+      lcevent->getCollection( colname ) ;
     }
   }
 

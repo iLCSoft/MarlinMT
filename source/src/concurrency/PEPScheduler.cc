@@ -6,16 +6,14 @@
 #include <marlin/Sequence.h>
 #include <marlin/Processor.h>
 #include <marlin/PluginManager.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
 
 // -- std headers
 #include <exception>
 #include <algorithm>
 #include <iomanip>
 #include <set>
-
-// -- lcio headers
-#include <EVENT/LCEvent.h>
-#include <EVENT/LCRunHeader.h>
 
 namespace marlin {
 
@@ -209,7 +207,7 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void PEPScheduler::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+    void PEPScheduler::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
       // Current way to process run header:
       //  - Stop accepting event in thread pool
       //  - Wait for current events processing to finish
@@ -230,7 +228,7 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void PEPScheduler::pushEvent( std::shared_ptr<EVENT::LCEvent> event ) {
+    void PEPScheduler::pushEvent( std::shared_ptr<EventStore> event ) {
       // push event to thread pool queue. It might throw !
       auto start = clock::now() ;
       _pushResults.push_back( _pool.push( WorkerPool::PushPolicy::ThrowIfFull, std::move(event) ) ) ;
@@ -239,7 +237,7 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void PEPScheduler::popFinishedEvents( std::vector<std::shared_ptr<EVENT::LCEvent>> &events ) {
+    void PEPScheduler::popFinishedEvents( std::vector<std::shared_ptr<EventStore>> &events ) {
       auto start = clock::now() ;
       auto iter = _pushResults.begin() ;
       while( iter != _pushResults.end() ) {
@@ -250,7 +248,7 @@ namespace marlin {
           if( nullptr != output._exception ) {
             std::rethrow_exception( output._exception ) ;
           }
-          _logger->log<MESSAGE>() << "Finished event " << output._event->getEventNumber() << ", run " << output._event->getRunNumber() << std::endl ;
+          _logger->log<MESSAGE>() << "Finished event uid " << output._event->uid() << std::endl ;
           events.push_back( output._event ) ;
           iter = _pushResults.erase( iter ) ;
           continue;

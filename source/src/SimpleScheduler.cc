@@ -58,13 +58,13 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void SimpleScheduler::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+  void SimpleScheduler::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
     _superSequence->processRunHeader( rhdr ) ;
   }
 
   //--------------------------------------------------------------------------
 
-  void SimpleScheduler::pushEvent( std::shared_ptr<EVENT::LCEvent> event ) {
+  void SimpleScheduler::pushEvent( std::shared_ptr<EventStore> event ) {
     _currentEvent = event ;
     auto sequence = _superSequence->sequence(0) ;
     sequence->processEvent( _currentEvent ) ;
@@ -72,7 +72,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void SimpleScheduler::popFinishedEvents( std::vector<std::shared_ptr<EVENT::LCEvent>> &events ) {
+  void SimpleScheduler::popFinishedEvents( std::vector<std::shared_ptr<EventStore>> &events ) {
     if( nullptr != _currentEvent ) {
       events.push_back( _currentEvent ) ;
       _currentEvent = nullptr ;

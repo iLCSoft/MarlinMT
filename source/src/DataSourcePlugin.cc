@@ -2,6 +2,8 @@
 
 // -- marlin headers
 #include <marlin/Application.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
 
 namespace marlin {
 
@@ -61,7 +63,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void DataSourcePlugin::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+  void DataSourcePlugin::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
     if( nullptr == _onRunHeaderRead ) {
       throw Exception( "DataSourcePlugin::processRunHeader: no callback function available" ) ;
     }
@@ -70,7 +72,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void DataSourcePlugin::processEvent( std::shared_ptr<EVENT::LCEvent> event ) {
+  void DataSourcePlugin::processEvent( std::shared_ptr<EventStore> event ) {
     if( nullptr == _onEventRead ) {
       throw Exception( "DataSourcePlugin::processEvent: no callback function available" ) ;
     }

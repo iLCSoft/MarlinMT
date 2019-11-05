@@ -5,12 +5,6 @@
 #include "marlin/ProcessorApi.h"
 #include "marlin/PluginManager.h"
 
-// -- lcio headers
-#include "IMPL/LCEventImpl.h"
-#include "IMPL/LCRunHeaderImpl.h"
-
-using namespace EVENT ;
-using namespace IMPL ;
 using namespace marlin ;
 
 
@@ -28,22 +22,22 @@ class TestProcessorEventSeeder : public Processor {
  /** Called at the begin of the job before anything is read.
    * Use to initialize the processor, e.g. book histograms.
    */
-  void init() ;
+  void init() override ;
 
   /** Called for every run.
    */
-  void processRunHeader( LCRunHeader* run ) ;
+  void processRunHeader( RunHeader* run ) override ;
 
   /** Called for every event - the working horse.
    */
-  void processEvent( LCEvent * evt ) ;
+  void processEvent( EventStore * evt ) override ;
 
   /** Called after data processing for clean up.
    */
-  void end() ;
+  void end() override ;
 
 protected:
-  std::map< unsigned long long, unsigned int>  _seeds {} ;
+  std::map< unsigned int, unsigned int>  _seeds {} ;
   int _nRun = {0} ;
   int _nEvt = {0} ;
 } ;
@@ -69,16 +63,15 @@ void TestProcessorEventSeeder::init() {
 
 //--------------------------------------------------------------------------
 
-void TestProcessorEventSeeder::processRunHeader( EVENT::LCRunHeader* ) {
+void TestProcessorEventSeeder::processRunHeader( RunHeader* ) {
   ++_nRun ;
 }
 
 //--------------------------------------------------------------------------
 
-void TestProcessorEventSeeder::processEvent( EVENT::LCEvent * evt ) {
+void TestProcessorEventSeeder::processEvent( EventStore * evt ) {
 
-  streamlog_out(DEBUG) << "   processing event: " << evt->getEventNumber()
-		       << "   in run:  " << evt->getRunNumber()
+  streamlog_out(DEBUG) << "   processing event: " << evt->uid()
 		       << std::endl ;
 
   unsigned int seed = ProcessorApi::getRandomSeed( this, evt ) ;
@@ -86,7 +79,7 @@ void TestProcessorEventSeeder::processEvent( EVENT::LCEvent * evt ) {
   streamlog_out( DEBUG ) << "seed set to "
 			    << seed
 			    << " for event "
-			    << evt->getEventNumber()
+			    << evt->uid()
 			    << std::endl;
 
   try {
@@ -96,33 +89,31 @@ void TestProcessorEventSeeder::processEvent( EVENT::LCEvent * evt ) {
     log<ERROR>() << name() << " failed to register processor to event seed generator (TEST is OK)" << std::endl ;
   }
 
-  unsigned long long runnum_and_eventnum = evt->getRunNumber() ;
-  runnum_and_eventnum = runnum_and_eventnum << 32  ;
+  // unsigned long long runnum_and_eventnum = evt->getRunNumber() ;
+  // runnum_and_eventnum = runnum_and_eventnum << 32  ;
+  //
+  // runnum_and_eventnum += evt->getEventNumber() ;
 
-  runnum_and_eventnum += evt->getEventNumber() ;
+  // std::map< unsigned long long, unsigned int>::iterator it ;
 
-  std::map< unsigned long long, unsigned int>::iterator it ;
-
-  it = _seeds.find(runnum_and_eventnum);
+  auto it = _seeds.find( evt->uid() );
 
   if( it == _seeds.end() ){
-    _seeds[runnum_and_eventnum] = seed ;
+    _seeds[evt->uid()] = seed ;
   }
   else {
 
-    if( seed != _seeds[runnum_and_eventnum] ) {
+    if( seed != _seeds[evt->uid()] ) {
       streamlog_out(ERROR) << " Seeds don't match for"
-			   << " run " <<   evt->getRunNumber()
-			   << " event " << evt->getEventNumber()
-			   << " old seed = " << _seeds[runnum_and_eventnum]
+			   << " uid " <<   evt->uid()
+			   << " old seed = " << _seeds[evt->uid()]
 			   << " new seed = " << seed
 			   << std::endl ;
     }
     else{
       streamlog_out(DEBUG) << " Seeds match for"
-			   << " run " <<   evt->getRunNumber()
-			   << " event " << evt->getEventNumber()
-			   << " old seed = " << _seeds[runnum_and_eventnum]
+			   << " uid " << evt->uid()
+			   << " old seed = " << _seeds[evt->uid()]
 			   << " new seed = " << seed
 			   << std::endl ;
 

@@ -9,15 +9,12 @@
 #include <marlin/LoggerManager.h>
 #include <marlin/RandomSeedManager.h>
 
-namespace EVENT {
-  class LCEvent ;
-  class LCRunHeader ;
-}
-
 namespace marlin {
-  
+
   class IScheduler ;
   class DataSourcePlugin ;
+  class RunHeader ;
+  class EventStore ;
 
   /**
    *  @brief  Application class
@@ -29,7 +26,7 @@ namespace marlin {
     using CmdLineArguments = std::vector<std::string> ;
     using Logger = Logging::Logger ;
     using Scheduler = std::shared_ptr<IScheduler> ;
-    using EventList = std::vector<std::shared_ptr<EVENT::LCEvent>> ;
+    using EventList = std::vector<std::shared_ptr<EventStore>> ;
     using DataSource = std::shared_ptr<DataSourcePlugin> ;
     using ConditionsMap = std::map<std::string, std::string> ;
 
@@ -134,21 +131,21 @@ namespace marlin {
      *  @brief  Get the geometry manager
      */
     const GeometryManager &geometryManager() const ;
-    
+
     /**
      *  @brief  Get the random seed manager
      */
     const RandomSeedManager &randomSeedManager() const ;
-    
+
     /**
      *  @brief  Get the random seed manager
      */
     RandomSeedManager &randomSeedManager() ;
-    
+
     /**
      *  @brief  Set the scheduler instance to use in this application.
      *  Must be called before init(argc, argv)
-     *  
+     *
      *  @param  scheduler the sceduler instance to use
      */
     void setScheduler( Scheduler scheduler ) ;
@@ -169,21 +166,21 @@ namespace marlin {
      *  @brief  Create the parser instance based on the steering file extension
      */
     std::shared_ptr<IParser> createParser() const ;
-    
+
     /**
      *  @brief  Callback function to process an event received from the data source
-     * 
+     *
      *  @param  event the event to process
      */
-    void onEventRead( std::shared_ptr<EVENT::LCEvent> event ) ;
-    
+    void onEventRead( std::shared_ptr<EventStore> event ) ;
+
     /**
      *  @brief  Callback function to process a run header received from the data source
-     * 
+     *
      *  @param  rhdr the run header to process
      */
-    void onRunHeaderRead( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
-    
+    void onRunHeaderRead( std::shared_ptr<RunHeader> rhdr ) ;
+
     /**
      *  @brief  Processed finished events from the output queue
      *

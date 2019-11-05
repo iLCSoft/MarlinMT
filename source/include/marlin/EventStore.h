@@ -24,6 +24,18 @@ namespace marlin {
     EventStore &operator=(EventStore &&) = default ;
 
     /**
+     *  @brief  Set the event unique id
+     *
+     *  @brief  uid the unique id
+     */
+    void setUID( std::size_t uid ) ;
+
+    /**
+     *  @brief  Get the event unique id
+     */
+    std::size_t uid() const ;
+
+    /**
      *  @brief  Get the underlying event to a specific type
      */
     template <typename T>
@@ -89,6 +101,8 @@ namespace marlin {
     const Extensions &extensions() const ;
 
   private:
+    ///
+    std::size_t                 _uid {0} ;
     /// The underlying event store implementation
     std::shared_ptr<void>       _event {nullptr} ;
     /// The event implementtion type
@@ -98,6 +112,18 @@ namespace marlin {
   };
 
   //--------------------------------------------------------------------------
+  //--------------------------------------------------------------------------
+
+  inline void EventStore::setUID( std::size_t id ) {
+    _uid = id ;
+  }
+
+  //--------------------------------------------------------------------------
+
+  inline std::size_t EventStore::uid() const {
+    return _uid ;
+  }
+
   //--------------------------------------------------------------------------
 
   template <typename T>

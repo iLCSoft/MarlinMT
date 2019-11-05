@@ -1,14 +1,12 @@
 #ifndef MARLIN_PROCESSOR_h
 #define MARLIN_PROCESSOR_h 1
 
-// -- lcio headers
-#include <EVENT/LCEvent.h>
-#include <EVENT/LCRunHeader.h>
-
 // -- marlin headers
 #include <marlin/StringParameters.h>
 #include <marlin/Parameter.h>
 #include <marlin/Logging.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
 #include <marlin/MarlinConfig.h>  // for Marlin version macros
 
 // -- std headers
@@ -86,20 +84,13 @@ namespace marlin {
      *  @brief  Process a run header (start of run)
      *  Called for every run, e.g. overwrite to initialize run dependent histograms.
      */
-    virtual void processRunHeader( EVENT::LCRunHeader* ) { /* nop */ }
+    virtual void processRunHeader( RunHeader * ) { /* nop */ }
 
     /**
      *  @brief  Process an input event.
      *  Called for every event - the working horse.
      */
-    virtual void processEvent( EVENT::LCEvent * ) { /* nop */ }
-
-    /**
-     *  @brief Called for every event - right after processEvent()
-     *  has been called for this processor.
-     *  Use to check processing and/or produce check plots.
-     */
-    virtual void check( EVENT::LCEvent* ) { /* nop */ }
+    virtual void processEvent( EventStore * ) { /* nop */ }
 
     /**
      *  @brief  Terminate the processor.

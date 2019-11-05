@@ -32,7 +32,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void SequenceItem::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+  void SequenceItem::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
     if( nullptr != _mutex ) {
       std::lock_guard<std::mutex> lock( *_mutex ) ;
       _processor->processRunHeader( rhdr.get() ) ;
@@ -44,13 +44,12 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  clock::pair SequenceItem::processEvent( std::shared_ptr<EVENT::LCEvent> event ) {
+  clock::pair SequenceItem::processEvent( std::shared_ptr<EventStore> event ) {
     if( nullptr != _mutex ) {
       auto start = clock::now() ;
       std::lock_guard<std::mutex> lock( *_mutex ) ;
       auto start2 = clock::now() ;
       _processor->processEvent( event.get() ) ;
-      _processor->check( event.get() ) ;
       auto end = clock::now() ;
       return clock::pair(
         clock::time_difference<clock::seconds>(start, end),
@@ -59,7 +58,6 @@ namespace marlin {
     else {
       auto start = clock::now() ;
       _processor->processEvent( event.get() ) ;
-      _processor->check( event.get() ) ;
       auto end = clock::now() ;
       return clock::pair(
         clock::time_difference<clock::seconds>(start, end),
@@ -113,7 +111,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void Sequence::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+  void Sequence::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
     for ( auto item : _items ) {
       item->processRunHeader( rhdr ) ;
     }
@@ -121,9 +119,9 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void Sequence::processEvent( std::shared_ptr<EVENT::LCEvent> event ) {
+  void Sequence::processEvent( std::shared_ptr<EventStore> event ) {
     try {
-      auto extension = event->runtime().ext<ProcessorConditions>() ;
+      auto extension = event->extensions().get<extensions::ProcessorConditions, ProcessorConditionsExtension>() ;
       for ( auto item : _items ) {
         if ( not extension->check( item->name() ) ) {
           continue ;
@@ -266,7 +264,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void SuperSequence::processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
+  void SuperSequence::processRunHeader( std::shared_ptr<RunHeader> rhdr ) {
     for( auto item : _uniqueItems ) {
       item->processRunHeader( rhdr ) ;
     }

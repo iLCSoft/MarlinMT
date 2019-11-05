@@ -5,13 +5,10 @@
 #include <string>
 
 // -- marlin headers
+#include <marlin/Processor.h>
+#include <marlin/Application.h>
+#include <marlin/GeometryManager.h>
 #include <marlin/MarlinConfig.h>
-
-// lcio forward declarations
-namespace EVENT {
-  class LCEvent ;
-  class LCRunHeader ;
-}
 
 namespace marlin {
 
@@ -47,7 +44,7 @@ namespace marlin {
      *  @param  proc the processor instance
      *  @param  event the current event from which to get random seeds
      */
-    static unsigned int getRandomSeed( const Processor *const proc, EVENT::LCEvent *event ) ;
+    static unsigned int getRandomSeed( const Processor *const proc, EventStore *event ) ;
 
     /**
      *  @brief  Set the processor return value
@@ -56,7 +53,7 @@ namespace marlin {
      *  @param  event the event to which the condition is attached
      *  @param  value the processor return value
      */
-    static void setReturnValue( const Processor *const proc, EVENT::LCEvent *event, bool value ) ;
+    static void setReturnValue( const Processor *const proc, EventStore *event, bool value ) ;
 
     /**
      *  @brief  Set the named processor return value
@@ -66,7 +63,7 @@ namespace marlin {
      *  @param  name the name of the return value
      *  @param  value the processor return value
      */
-    static void setReturnValue( const Processor *const proc, EVENT::LCEvent *event, const std::string &name, bool value ) ;
+    static void setReturnValue( const Processor *const proc, EventStore *event, const std::string &name, bool value ) ;
 
     /**
      *  @brief  Whether the event is the first event to be processed.
@@ -78,7 +75,7 @@ namespace marlin {
      *
      *  @param  event the event to test
      */
-    static bool isFirstEvent( EVENT::LCEvent *event ) ;
+    static bool isFirstEvent( EventStore *event ) ;
 
     /**
      *  @brief  Get the geometry handle as a given type

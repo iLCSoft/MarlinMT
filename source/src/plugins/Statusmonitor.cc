@@ -36,11 +36,11 @@ namespace marlin {
     
     /** Called for every run.
      */
-    void processRunHeader( EVENT::LCRunHeader* run ) ;
+    void processRunHeader( RunHeader* run ) ;
     
     /** Called for every event - the working horse.
      */
-    void processEvent( EVENT::LCEvent * evt ) ; 
+    void processEvent( EventStore * evt ) ; 
     
     /** Called after data processing for clean up.
      */
@@ -78,13 +78,13 @@ namespace marlin {
   
   //--------------------------------------------------------------------------
 
-  void Statusmonitor::processRunHeader( EVENT::LCRunHeader* ) { 
+  void Statusmonitor::processRunHeader( RunHeader* ) { 
     _nRun++ ;
   }
   
   //--------------------------------------------------------------------------
 
-  void Statusmonitor::processEvent( EVENT::LCEvent *  ) {
+  void Statusmonitor::processEvent( EventStore *  ) {
     auto eventid = _nEvt.fetch_add(1) ;
     if (eventid % _howOften == 0) {
       log<MESSAGE>() 

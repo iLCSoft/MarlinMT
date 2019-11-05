@@ -1,6 +1,7 @@
 
 // -- marlin headers
 #include <marlin/Processor.h>
+#include <marlin/ProcessorApi.h>
 #include <marlin/PluginManager.h>
 
 // -- lcio headers
@@ -17,37 +18,37 @@
 #include <bitset>
 
 namespace marlin {
-  
-  /** Default output processor. If active every event is writen to the 
-   *  specified LCIO file.  
+
+  /** Default output processor. If active every event is writen to the
+   *  specified LCIO file.
    *  Make sure that the processor is the last one in your list
    *  of active processors. You can optionally drop some collections from the
-   *  event before it gets written to the file, e.g. you can drop 
+   *  event before it gets written to the file, e.g. you can drop
    *  all collections of types SimCalorimeterHit and SimTrackerHit. It is the users
-   *  responsibility to check whether the droped objects are still referenced by other 
-   *  objects (e.g. LCRelations) and drop those collections as well - if needed. 
+   *  responsibility to check whether the droped objects are still referenced by other
+   *  objects (e.g. LCRelations) and drop those collections as well - if needed.
    *  If CalorimeterHit and TrackerHit objects are droped then Tracks and clusters will be store w/o
    *  pointers to hits.
-   * 
-   *  <h4>Output</h4> 
+   *
+   *  <h4>Output</h4>
    *  file containing the LCIO events
-   * 
+   *
    * @param LCIOOutputFile  name of outputfile incl. path
    * @param LCIOWriteMode   WRITE_NEW, WRITE_APPEND  [optional]
    * @param DropCollectionNames   name of collections to be droped  [optional]
    * @param DropCollectionTypes   type of collections to be droped  [optional]
-   * 
-   * 
+   *
+   *
    * @param DropCollectionNames   drops the named collections from the event
    * @param DropCollectionTypes   drops all collections of the given type from the event
    * @param LCIOOutputFile        name of output file
    * @param LCIOWriteMode         write mode for output file:  WRITE_APPEND or WRITE_NEW
    * @param KeepCollectionNames   names of collections that are to be kept unconditionally
    * @param fullSubsetCollections optionally write all objects in subset collections to the file
-   *   
-   * 
+   *
+   *
    * @author F. Gaede, DESY
-   * @version $Id: LCIOOutputProcessor.h,v 1.8 2008-04-15 10:14:24 gaede Exp $ 
+   * @version $Id: LCIOOutputProcessor.h,v 1.8 2008-04-15 10:14:24 gaede Exp $
    */
   class LCIOOutputProcessor : public Processor {
   private:
@@ -66,42 +67,36 @@ namespace marlin {
 
     /** Write every run header.
      */
-    void processRunHeader( EVENT::LCRunHeader* run) ;
+    void processRunHeader( RunHeader* run) ;
 
     /** Write every event.
      */
-    void processEvent( EVENT::LCEvent * evt ) ; 
+    void processEvent( EventStore * evt ) ;
 
     /** Close outputfile.
      */
     void end() ;
 
-    /** Drops the collections specified in the steering file parameters DropCollectionNames and 
-     *  DropCollectionTypes. 
-     */
-    void dropCollections( EVENT::LCEvent * evt ) ;
-    
-    
   private:
     std::set<std::string> getWriteCollections( EVENT::LCEvent * evt ) const ;
 
   private:
-    Property<std::string> _lcioOutputFile {this, "LCIOOutputFile", 
+    Property<std::string> _lcioOutputFile {this, "LCIOOutputFile",
              "Name of the LCIO output file", "outputfile.slcio" } ;
-    
+
     Property<std::string> _lcioWriteMode {this, "LCIOWriteMode",
              "Write mode for output file:  WRITE_APPEND, WRITE_NEW or None", "None" } ;
 
-    OptionalProperty<std::vector<std::string>> _dropCollectionNames {this, "DropCollectionNames" , 
-             "drops the named collections from the event", {"TPCHits", "HCalHits"} } ; 
-    
-    OptionalProperty<std::vector<std::string>> _dropCollectionTypes {this, "DropCollectionTypes" , 
-             "drops all collections of the given type from the event", {"SimTrackerHit", "SimCalorimeterHit"} } ; 
-    
-    OptionalProperty<std::vector<std::string>> _keepCollectionNames {this, "KeepCollectionNames" , 
-             "force keep of the named collections - overrules DropCollectionTypes (and DropCollectionNames)", {"MyPreciousSimTrackerHits"} } ; 
-    
-    // OptionalProperty<int> _splitFileSizekB {this, "SplitFileSizekB" , 
+    OptionalProperty<std::vector<std::string>> _dropCollectionNames {this, "DropCollectionNames" ,
+             "drops the named collections from the event", {"TPCHits", "HCalHits"} } ;
+
+    OptionalProperty<std::vector<std::string>> _dropCollectionTypes {this, "DropCollectionTypes" ,
+             "drops all collections of the given type from the event", {"SimTrackerHit", "SimCalorimeterHit"} } ;
+
+    OptionalProperty<std::vector<std::string>> _keepCollectionNames {this, "KeepCollectionNames" ,
+             "force keep of the named collections - overrules DropCollectionTypes (and DropCollectionNames)", {"MyPreciousSimTrackerHits"} } ;
+
+    // OptionalProperty<int> _splitFileSizekB {this, "SplitFileSizekB" ,
     //          "will split output file if size in kB exceeds given value - doesn't work with APPEND and NEW", 1992294 } ;
 
     // runtime members
@@ -109,13 +104,13 @@ namespace marlin {
     std::atomic<int>      _nRuns {0} ;
     std::atomic<int>      _nEvents {0} ;
   };
-  
+
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  LCIOOutputProcessor::LCIOOutputProcessor() : 
+  LCIOOutputProcessor::LCIOOutputProcessor() :
     Processor("LCIOOutputProcessor") {
-    _description = "Writes the current event to the specified LCIO outputfile." ;    
+    _description = "Writes the current event to the specified LCIO outputfile." ;
     // no lock, the writer implementation is thread safe
     forceRuntimeOption( Processor::RuntimeOption::Critical, false ) ;
     // don't duplicate opening/writing of output file
@@ -127,7 +122,7 @@ namespace marlin {
   void LCIOOutputProcessor::init() {
     printParameters() ;
     _writer = std::make_shared<Writer::element_type>() ;
-    if ( _lcioWriteMode == "WRITE_APPEND" ) {  	 
+    if ( _lcioWriteMode == "WRITE_APPEND" ) {
       _writer->open( _lcioOutputFile , EVENT::LCIO::WRITE_APPEND ) ;
     }
     else if ( _lcioWriteMode == "WRITE_NEW" ) {
@@ -137,14 +132,47 @@ namespace marlin {
       _writer->open( _lcioOutputFile ) ;
     }
   }
-  
+
   //--------------------------------------------------------------------------
 
-  void LCIOOutputProcessor::processRunHeader( EVENT::LCRunHeader* run) { 
-    _writer->writeRunHeader( run ) ;
+  void LCIOOutputProcessor::processRunHeader( RunHeader* run ) {
+    auto rhdr = std::make_unique<IMPL::LCRunHeaderImpl>() ;
+    rhdr->setRunNumber( run->runNumber() ) ;
+    rhdr->setDetectorName( run->detectorName() ) ;
+    rhdr->setDescription( run->description() ) ;
+    auto activeSubdets = run->parameters().getValues<std::string>( "ActiveSubdetectors" ) ;
+    for( auto &det : activeSubdets ) {
+      rhdr->addActiveSubdetector( det ) ;
+    }
+    auto intKeys = run->parameters().getValues<std::string>( "LCIntKeys" ) ;
+    auto floatKeys = run->parameters().getValues<std::string>( "LCFloatKeys" ) ;
+    auto strKeys = run->parameters().getValues<std::string>( "LCStrKeys" ) ;
+    auto keys = run->parameters().keys() ;
+    for( auto &key : keys ) {
+      if( key == "ActiveSubdetectors" ) {
+        continue ;
+      }
+      if( std::find( intKeys.begin(), intKeys.end(), key ) != intKeys.end() ) {
+        auto values = run->parameters().getValues<int>( key ) ;
+        rhdr->parameters().setValues( key, values ) ;
+        continue ;
+      }
+      if( std::find( floatKeys.begin(), floatKeys.end(), key ) != floatKeys.end() ) {
+        auto values = run->parameters().getValues<float>( key ) ;
+        rhdr->parameters().setValues( key, values ) ;
+        continue ;
+      }
+      if( std::find( floatKeys.begin(), floatKeys.end(), key ) != floatKeys.end() ) {
+        auto values = run->parameters().getValues<float>( key ) ;
+        rhdr->parameters().setValues( key, values ) ;
+        continue ;
+      }
+    }
+
+    _writer->writeRunHeader( rhdr.release() ) ;
     _nRuns++ ;
   }
-  
+
   //--------------------------------------------------------------------------
 
   std::set<std::string> LCIOOutputProcessor::getWriteCollections( EVENT::LCEvent * evt ) const {
@@ -160,31 +188,35 @@ namespace marlin {
       if ( _dropCollectionTypes.isSet() && typeIter != _dropCollectionTypes.get().end() ) {
          continue ;
       }
-      if ( _dropCollectionNames.isSet() && nameIter != _dropCollectionNames.get().end() ) {	
+      if ( _dropCollectionNames.isSet() && nameIter != _dropCollectionNames.get().end() ) {
          continue ;
       }
-      if( _keepCollectionNames.isSet() && keepIter != _keepCollectionNames.get().end() ) {	
+      if( _keepCollectionNames.isSet() && keepIter != _keepCollectionNames.get().end() ) {
          continue ;
       }
       writeCollections.insert( colName ) ;
     }
     return writeCollections ;
   }
-  
+
   //--------------------------------------------------------------------------
 
-  void LCIOOutputProcessor::processEvent( EVENT::LCEvent * evt ) {
-    auto writeCols = getWriteCollections( evt ) ;
-    _writer->writeEvent( evt, writeCols ) ;
+  void LCIOOutputProcessor::processEvent( EventStore * evt ) {
+    auto lcevent = evt->event<EVENT::LCEvent>() ;
+    if( nullptr == lcevent ) {
+      ProcessorApi::abort( this, "Event is not an LCEvent" ) ;
+    }
+    auto writeCols = getWriteCollections( lcevent.get() ) ;
+    _writer->writeEvent( lcevent.get(), writeCols ) ;
     _nEvents ++ ;
   }
-  
+
   //--------------------------------------------------------------------------
 
-  void LCIOOutputProcessor::end() { 
-    log<MESSAGE4>() << std::endl 
-  			      << "LCIOOutputProcessor::end()  " << name() 
-  			      << ": " << _nEvents.load() << " events in " << _nRuns.load() << " runs written to file  " 
+  void LCIOOutputProcessor::end() {
+    log<MESSAGE4>() << std::endl
+  			      << "LCIOOutputProcessor::end()  " << name()
+  			      << ": " << _nEvents.load() << " events in " << _nRuns.load() << " runs written to file  "
   			      <<  _lcioOutputFile
   			      << std::endl
   			      << std::endl ;

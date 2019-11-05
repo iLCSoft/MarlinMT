@@ -24,11 +24,11 @@ class TestEventModifier : public Processor {
 
   /** Called for every run.
    */
-  void processRunHeader( LCRunHeader* run ) ;
+  void processRunHeader( RunHeader* run ) override ;
 
   /** Called for every event - the working horse.
    */
-  void processEvent( LCEvent * evt ) ;
+  void processEvent( EventStore * evt ) override ;
 
   /** Called after data processing for clean up.
    */
@@ -50,28 +50,15 @@ TestEventModifier::TestEventModifier() :
 
 //--------------------------------------------------------------------------
 
-void TestEventModifier::processRunHeader( LCRunHeader* run) {
-
-  LCRunHeaderImpl* rHdr = dynamic_cast< LCRunHeaderImpl* >( run ) ;
-
-  try {
-    if( rHdr != 0 ) {
-      rHdr->setRunNumber( _nRun + 42 ) ;
-      streamlog_out(MESSAGE4)  << " processRunHeader modified run number to be : "
-            << _nRun << " + 42 = " <<  run->getRunNumber() << std::endl ;
-      _nRun++ ;
-    }
-  }
-  catch( EVENT::Exception& ) {
-    streamlog_out(ERROR)  << " processRunHeader LCRunHeader::runNumber not modified ! "  << std::endl;
-  }
+void TestEventModifier::processRunHeader( RunHeader * ) {
+  _nRun ++ ;
 }
 
 //--------------------------------------------------------------------------
 
-void TestEventModifier::processEvent( LCEvent * e ) {
+void TestEventModifier::processEvent( EventStore * e ) {
 
-  LCEventImpl* evt = dynamic_cast<LCEventImpl*>( e ) ;
+  IMPL::LCEventImpl* evt = dynamic_cast<LCEventImpl*>( e->event<EVENT::LCEvent>().get() ) ;
 
   try {
 

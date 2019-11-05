@@ -6,6 +6,9 @@
 #include <marlin/ReaderListener.h>
 #include <marlin/PluginManager.h>
 #include <marlin/Logging.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
+#include <jenkinsHash.h>
 
 // -- lcio headers
 #include <IMPL/LCEventImpl.h>
@@ -37,7 +40,7 @@ namespace marlin {
   private:
     Property<std::string> _fileName {this, "StdHepFileName",
             "The StdHep input file name" } ;
-            
+
     Property<int> _maxRecordNumber {this, "MaxRecordNumber",
             "The maximum number of events to read", 0 } ;
 
@@ -72,7 +75,7 @@ namespace marlin {
   bool StdHepFileSource::readOne() {
     // first call is a run header
     if( _isFirstEvent ) {
-      auto rhdr = std::make_shared<IMPL::LCRunHeaderImpl>() ;
+      auto rhdr = std::make_shared<RunHeader>() ;
       rhdr->setDescription( " Events read from stdhep input file: " + _fileName.get() ) ;
       rhdr->setRunNumber( 0 ) ;
       processRunHeader( rhdr ) ;
@@ -92,7 +95,17 @@ namespace marlin {
     event->setRunNumber( 0 ) ;
     event->setEventNumber( _currentReadEvents ) ;
     event->addCollection( collection, _collectionName ) ;
-    processEvent( event ) ;
+    auto store = std::make_shared<EventStore>() ;
+    store->setEvent( event ) ;
+    // generate the event unique id
+    auto evtn = event->getEventNumber() ;
+    auto runn = event->getRunNumber() ;
+    unsigned char * c = (unsigned char *) &evtn ;
+    unsigned int uid = jenkins_hash( c, sizeof evtn, 0) ;
+    c = (unsigned char *) &runn ;
+    uid = jenkins_hash( c, sizeof runn, 0) ;
+    store->setUID( uid ) ;
+    processEvent( store ) ;
     ++_currentReadEvents ;
     return true ;
   }

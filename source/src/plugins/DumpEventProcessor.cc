@@ -7,7 +7,7 @@
 #include <UTIL/LCTOOLS.h>
 
 namespace marlin {
-  
+
   /** DumpEventProcessor simply dumps an event in the console
    *  <h4>Input - Prerequisites</h4>
    *  No input needed for this processor.
@@ -28,8 +28,8 @@ namespace marlin {
 
     // from Processor
   	void init() ;
-  	void processEvent( EVENT::LCEvent * evt ) ;  	
-  	
+  	void processEvent( EventStore * evt ) ;
+
   protected:
     OptionalProperty<bool> _dumpDetailed {this, "DumpDetailed",
              "Whether to make a detailed dump of the event", true } ;
@@ -38,37 +38,34 @@ namespace marlin {
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  DumpEventProcessor::DumpEventProcessor() : 
+  DumpEventProcessor::DumpEventProcessor() :
     Processor("DumpEvent") {
   	// modify processor description
-  	_description = "Simple processor to dump an event" ;             
-    // duplicate and don't lock. Anyway, this processor in MT mode doesn't make sense...    
+  	_description = "Simple processor to dump an event" ;
+    // duplicate and don't lock. Anyway, this processor in MT mode doesn't make sense...
     forceRuntimeOption( Processor::RuntimeOption::Critical, false ) ;
     forceRuntimeOption( Processor::RuntimeOption::Clone, true ) ;
   }
-  
+
   //--------------------------------------------------------------------------
 
   void DumpEventProcessor::init() {
   	// Print the initial parameters
   	printParameters() ;
   }
-  
+
   //--------------------------------------------------------------------------
 
-  void DumpEventProcessor::processEvent( EVENT::LCEvent * evt ) {
+  void DumpEventProcessor::processEvent( EventStore * evt ) {
+    auto lcevent = evt->event<EVENT::LCEvent>() ;
 	   if( _dumpDetailed ) {
-       UTIL::LCTOOLS::dumpEventDetailed( evt ) ;
+       UTIL::LCTOOLS::dumpEventDetailed( lcevent.get() ) ;
      }
      else {
-       UTIL::LCTOOLS::dumpEvent( evt ) ;
+       UTIL::LCTOOLS::dumpEvent( lcevent.get() ) ;
      }
   }
-  
+
   // plugin declaration
-  MARLIN_DECLARE_PROCESSOR( DumpEventProcessor ) 
+  MARLIN_DECLARE_PROCESSOR( DumpEventProcessor )
 }
-
-
-
-

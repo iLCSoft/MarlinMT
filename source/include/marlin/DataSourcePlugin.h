@@ -10,15 +10,11 @@
 #include <memory>
 #include <string>
 
-// lcio forward declaration
-namespace EVENT {
-  class LCEvent ;
-  class LCRunHeader ;
-}
-
 namespace marlin {
 
   class Application ;
+  class EventStore ;
+  class RunHeader ;
 
   /**
    *  @brief  DataSourcePlugin class
@@ -27,8 +23,8 @@ namespace marlin {
    */
   class DataSourcePlugin : public Parametrized {
   public:
-    using EventFunction = std::function<void(std::shared_ptr<EVENT::LCEvent>)> ;
-    using RunHeaderFunction = std::function<void(std::shared_ptr<EVENT::LCRunHeader>)> ;
+    using EventFunction = std::function<void(std::shared_ptr<EventStore>)> ;
+    using RunHeaderFunction = std::function<void(std::shared_ptr<RunHeader>)> ;
     using Logger = Logging::Logger ;
 
   public:
@@ -104,7 +100,7 @@ namespace marlin {
      *
      *  @param  event the event to process
      */
-    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
+    void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
 
     /**
      *  @brief  Must be called by daughter classes in readStream()
@@ -112,7 +108,7 @@ namespace marlin {
      *
      *  @param  event the event to process
      */
-    void processEvent( std::shared_ptr<EVENT::LCEvent> event ) ;
+    void processEvent( std::shared_ptr<EventStore> event ) ;
 
   protected:
     ///< The data source description

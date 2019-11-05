@@ -10,13 +10,11 @@
 #include <marlin/IScheduler.h>
 #include <marlin/SimpleScheduler.h>
 #include <marlin/XMLTools.h>
+#include <marlin/EventStore.h>
+#include <marlin/RunHeader.h>
 
 // -- std headers
 #include <cstring>
-
-// -- lcio headers
-#include <EVENT/LCEvent.h>
-#include <EVENT/LCRunHeader.h>
 
 using namespace std::placeholders ;
 
@@ -306,7 +304,7 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void Application::onEventRead( std::shared_ptr<EVENT::LCEvent> event ) {
+  void Application::onEventRead( std::shared_ptr<EventStore> event ) {
     EventList events ;
     while( _scheduler->freeSlots() == 0 ) {
       _scheduler->popFinishedEvents( events ) ;
@@ -321,12 +319,12 @@ namespace marlin {
     // random seeds extension
     auto seeds = _randomSeedMgr.generateRandomSeeds( event.get() ) ;
     auto randomSeedExtension = new RandomSeedExtension( std::move(seeds) ) ;
-    event->runtime().ext<RandomSeed>() = randomSeedExtension ;
+    event->extensions().add<extensions::RandomSeed>( randomSeedExtension ) ;
     // runtime conditions extension
     auto procCondExtension = new ProcessorConditionsExtension( _conditions ) ;
-    event->runtime().ext<ProcessorConditions>() = procCondExtension ;
+    event->extensions().add<extensions::ProcessorConditions>( procCondExtension )  ;
     // first event flag
-    event->runtime().ext<IsFirstEvent>() = _isFirstEvent ;
+    *( event->extensions().create<extensions::IsFirstEvent, bool>( true ) ) = _isFirstEvent ;
     _isFirstEvent = false ;
     _scheduler->pushEvent( event ) ;
     // check a second time
@@ -338,8 +336,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
 
-  void Application::onRunHeaderRead( std::shared_ptr<EVENT::LCRunHeader> rhdr ) {
-    logger()->log<MESSAGE9>() << "New run header no " << rhdr->getRunNumber() << std::endl ;
+  void Application::onRunHeaderRead( std::shared_ptr<RunHeader> rhdr ) {
+    logger()->log<MESSAGE9>() << "New run header no " << rhdr->runNumber() << std::endl ;
     _scheduler->processRunHeader( rhdr ) ;
   }
 
@@ -388,8 +386,7 @@ namespace marlin {
     // simple printout for the time being
     for( auto event : events ) {
       logger()->log<MESSAGE9>()
-        << "Run no " << event->getRunNumber()
-        << ", event no " << event->getEventNumber()
+        << "Event uid " << event->uid()
         << " finished" << std::endl ;
     }
   }

@@ -14,18 +14,14 @@
 #include <marlin/Logging.h>
 #include <marlin/Utils.h>
 
-// lcio forward declaration
-namespace EVENT {
-  class LCEvent ;
-  class LCRunHeader ;
-}
-
 namespace marlin {
 
   class Application ;
   class SequenceItem ;
   class Processor ;
   class StringParameters ;
+  class EventStore ;
+  class RunHeader ;
 
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
@@ -59,14 +55,7 @@ namespace marlin {
      *
      *  @param  rhdr the run header to process
      */
-    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
-
-    /**
-     *  @brief  Modify the run header
-     *
-     *  @param  rhdr the run header to modify
-     */
-    // void modifyRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
+    void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
 
     /**
      *  @brief  Call Processor::processEvent. Lock if the mutex has been initialized.
@@ -76,7 +65,7 @@ namespace marlin {
      *
      *  @param  event the event to process
      */
-    clock::pair processEvent( std::shared_ptr<EVENT::LCEvent> event ) ;
+    clock::pair processEvent( std::shared_ptr<EventStore> event ) ;
 
     /**
      *  @brief  Call Processor::modifyEvent. Lock if the mutex has been initialized
@@ -130,9 +119,7 @@ namespace marlin {
    *  SequenceItem objects allow for calling processor methods in a critical
    *  section. This methods are :
    *   - Processor::processEvent()
-   *   - Processor::modifyEvent()
    *   - Processor::processRunHeader()
-   *   - Processor::modifyRunHeader()
    *  Sequence provides a factory method createItem() to create items as
    *  shared pointer making it possible to share items between multiple sequence.
    *  To allow a proper management of multiple sequences in an application, see
@@ -186,28 +173,14 @@ namespace marlin {
      *
      *  @param  rhdr the run header to process
      */
-    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
-
-    /**
-     *  @brief  Modify the run header. Call modifyRunHeader() for each item in the sequence
-     *
-     *  @param  rhdr the run header to modify
-     */
-    // void modifyRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
+    void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
 
     /**
      *  @brief  Process the event. Call processEvent() for each item in the sequence
      *
      *  @param  event the event to process
      */
-    void processEvent( std::shared_ptr<EVENT::LCEvent> event ) ;
-
-    /**
-     *  @brief  Modify the event. Call modifyEvent() for each item in the sequence
-     *
-     *  @param  event the event to modify
-     */
-    // void modifyEvent( std::shared_ptr<EVENT::LCEvent> event ) ;
+    void processEvent( std::shared_ptr<EventStore> event ) ;
 
     /**
      *  @brief  Generate a clock measure summary of all items
@@ -305,14 +278,7 @@ namespace marlin {
      *
      *  @param  rhdr the run header to process
      */
-    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
-
-    /**
-     *  @brief  Modify the run header. Call modifyRunHeader() for each item in the sequence
-     *
-     *  @param  rhdr the run header to modify
-     */
-    // void modifyRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
+    void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
 
     /**
      *  @brief  Call Processor::end() for all processors

@@ -1,13 +1,21 @@
 #ifndef MARLIN_READERLISTENER_h
 #define MARLIN_READERLISTENER_h 1
 
-// -- lcio headers
-#include <MT/LCReaderListener.h>
-
 // -- std headers
 #include <functional>
+#include <memory>
+
+#include <MT/LCReaderListener.h>
+
+namespace EVENT {
+  class LCEvent ;
+  class LCRunHeader ;
+}
 
 namespace marlin {
+
+  class EventStore ;
+  class RunHeader ;
 
   /**
    *  @brief  ReaderListener class.
@@ -19,11 +27,11 @@ namespace marlin {
    *  Example with lambda functions:
    *  @code{cpp}
    *  ReaderListener listener ;
-   *  listener.onEventRead( [](std::shared_ptr<EVENT::LCEvent> event){
-   *    std::cout << "Read event no " << event->getEventNumber() << std::endl ;
+   *  listener.onEventRead( [](std::shared_ptr<EventStore> event){
+   *    std::cout << "Read event uid " << event->uid() << std::endl ;
    *  }) ;
-   *  listener.onRunHeaderRead( [](std::shared_ptr<EVENT::LCRunHeader> rhdr){
-   *    std::cout << "Read run header no " << rhdr->getRunNumber() << std::endl ;
+   *  listener.onRunHeaderRead( [](std::shared_ptr<RunHeader> rhdr){
+   *    std::cout << "Read run info no " << rhdr->runNumber() << std::endl ;
    *  }) ;
    *  @endcode
    *
@@ -35,15 +43,11 @@ namespace marlin {
    *  listener.onEventRead( std::bind(&UserClass::processEvent, &user, _1) ) ;
    *  listener.onRunHeaderRead( std::bind(&UserClass::processRunHeader, &user, _1) ) ;
    *  @endcode
-   *
-   * Note that the current implementation forward the processing only on
-   * modifyEvent() and modifyRunHeader(). Thus the data can be modified in
-   * callback functions. This is a requirement for concurrent applications
    */
   class ReaderListener : public MT::LCReaderListener {
   public:
-    using LCEventFunction = std::function<void(std::shared_ptr<EVENT::LCEvent>)> ;
-    using LCRunHeaderFunction = std::function<void(std::shared_ptr<EVENT::LCRunHeader>)> ;
+    using EventFunction = std::function<void(std::shared_ptr<EventStore>)> ;
+    using RunHeaderFunction = std::function<void(std::shared_ptr<RunHeader>)> ;
 
   public:
     ReaderListener() = default ;
@@ -54,23 +58,22 @@ namespace marlin {
     /**
      *  @brief  Set the callback function to process on event read
      */
-    void onEventRead( LCEventFunction func ) ;
+    void onEventRead( EventFunction func ) ;
 
     /**
-     *  @brief  Set the callback function to process on run header read
+     *  @brief  Set the callback function to process on run info read
      */
-    void onRunHeaderRead( LCRunHeaderFunction func ) ;
+    void onRunHeaderRead( RunHeaderFunction func ) ;
 
-  private:
-    // from MT::LCReaderListener
+  protected:
     void processEvent( std::shared_ptr<EVENT::LCEvent> event ) override ;
-    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> hdr ) override ;
+    void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) override ;
 
   private:
-    ///< Callback function on event read
-    LCEventFunction        _onEventRead {nullptr} ;
-    ///< Callback function on run header read
-    LCRunHeaderFunction    _onRunHeaderRead {nullptr} ;
+    /// Callback function on event read
+    EventFunction          _onEventRead {nullptr} ;
+    /// Callback function on run info read
+    RunHeaderFunction      _onRunHeaderRead {nullptr} ;
   };
 
 }

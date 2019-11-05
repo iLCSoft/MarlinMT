@@ -23,7 +23,7 @@ namespace marlin {
      */
     struct WorkerOutput {
       ///< The input event
-      std::shared_ptr<EVENT::LCEvent>     _event {nullptr} ;
+      std::shared_ptr<EventStore>         _event {nullptr} ;
       ///< An exception potential throw in the worker thread
       std::exception_ptr                  _exception {nullptr} ;
     };
@@ -45,13 +45,13 @@ namespace marlin {
     class PEPScheduler : public IScheduler {
     public:
       using ConditionsMap = std::map<std::string, std::string> ;
-      using InputType = std::shared_ptr<EVENT::LCEvent> ;
+      using InputType = std::shared_ptr<EventStore> ;
       using OutputType = WorkerOutput ;
       using WorkerPool = ThreadPool<InputType,OutputType> ;
       using Logger = Logging::Logger ;
       using ProcessorSequence = std::shared_ptr<SuperSequence> ;
       using PushResultList = std::vector<WorkerPool::PushResult> ;
-      using EventList = std::vector<std::shared_ptr<EVENT::LCEvent>> ;
+      using EventList = std::vector<std::shared_ptr<EventStore>> ;
       using Clock = std::chrono::steady_clock ;
       using TimePoint = std::chrono::steady_clock::time_point ;
 
@@ -62,9 +62,9 @@ namespace marlin {
       // from IScheduler interface
       void init( Application *app ) override ;
       void end() override ;
-      void processRunHeader( std::shared_ptr<EVENT::LCRunHeader> rhdr ) ;
-      void pushEvent( std::shared_ptr<EVENT::LCEvent> event ) override ;
-      void popFinishedEvents( std::vector<std::shared_ptr<EVENT::LCEvent>> &events ) override ;
+      void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
+      void pushEvent( std::shared_ptr<EventStore> event ) override ;
+      void popFinishedEvents( std::vector<std::shared_ptr<EventStore>> &events ) override ;
       std::size_t freeSlots() const override ;
 
     private:

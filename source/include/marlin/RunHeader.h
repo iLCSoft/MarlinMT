@@ -10,7 +10,7 @@
 namespace marlin {
 
   /**
-   *  @brief  RunInfo class.
+   *  @brief  RunHeader class.
    *
    *  Provide a simple interface describing a run.
    *  The basic metadata are run number, detector name
@@ -18,14 +18,14 @@ namespace marlin {
    *  The parameters are real properties of a run whereas the extensions
    *  can also be attached to a run object but are only valid at runtime.
    */
-  class RunInfo {
+  class RunHeader {
   public:
-    RunInfo() = default ;
-    ~RunInfo() = default ;
-    RunInfo(const RunInfo &) = delete ;
-    RunInfo &operator=(const RunInfo &) = delete ;
-    RunInfo(RunInfo &&) = default ;
-    RunInfo &operator=(RunInfo &&) = default ;
+    RunHeader() = default ;
+    ~RunHeader() = default ;
+    RunHeader(const RunHeader &) = delete ;
+    RunHeader &operator=(const RunHeader &) = delete ;
+    RunHeader(RunHeader &&) = default ;
+    RunHeader &operator=(RunHeader &&) = default ;
 
     /**
      *  @brief  Get the run number
@@ -37,7 +37,7 @@ namespace marlin {
      *
      *  @param  n the run number
      */
-    RunInfo &setRunNumber( int n ) ;
+    RunHeader &setRunNumber( int n ) ;
 
     /**
      *  @brief  Get the run description
@@ -49,7 +49,7 @@ namespace marlin {
      *
      *  @param  desc the run description
      */
-    RunInfo &description( const std::string &desc ) ;
+    RunHeader &setDescription( const std::string &desc ) ;
 
     /**
      *  @brief  Get the detector name
@@ -61,7 +61,7 @@ namespace marlin {
      *
      *  @param  det the detector name
      */
-    RunInfo &setDetectorName( const std::string &det ) ;
+    RunHeader &setDetectorName( const std::string &det ) ;
 
     /**
      *  @brief  Get the run parameters
@@ -99,64 +99,64 @@ namespace marlin {
   //--------------------------------------------------------------------------
   //--------------------------------------------------------------------------
 
-  inline int RunInfo::runNumber() const {
+  inline int RunHeader::runNumber() const {
     return _runNumber ;
   }
 
   //--------------------------------------------------------------------------
 
-  RunInfo &RunInfo::setRunNumber( int n ) {
+  inline RunHeader &RunHeader::setRunNumber( int n ) {
     _runNumber = n ;
     return *this ;
   }
 
   //--------------------------------------------------------------------------
 
-  const std::string &RunInfo::description() const {
+  inline const std::string &RunHeader::description() const {
     return _description ;
   }
 
   //--------------------------------------------------------------------------
 
-  RunInfo &RunInfo::description( const std::string &desc ) {
+  inline RunHeader &RunHeader::setDescription( const std::string &desc ) {
     _description = desc ;
     return *this ;
   }
 
   //--------------------------------------------------------------------------
 
-  const std::string &RunInfo::detectorName() const {
+  inline const std::string &RunHeader::detectorName() const {
     return _detectorName ;
   }
 
   //--------------------------------------------------------------------------
 
-  RunInfo &RunInfo::setDetectorName( const std::string &det ) {
+  inline RunHeader &RunHeader::setDetectorName( const std::string &det ) {
     _detectorName = det ;
     return *this ;
   }
 
   //--------------------------------------------------------------------------
 
-  const StringParameters &RunInfo::parameters() const {
+  inline const StringParameters &RunHeader::parameters() const {
     return _parameters ;
   }
 
   //--------------------------------------------------------------------------
 
-  StringParameters &RunInfo::parameters() {
+  inline StringParameters &RunHeader::parameters() {
     return _parameters ;
   }
 
   //--------------------------------------------------------------------------
 
-  inline Extensions &RunInfo::extensions() {
+  inline Extensions &RunHeader::extensions() {
     return _extensions ;
   }
 
   //--------------------------------------------------------------------------
 
-  inline const Extensions &RunInfo::extensions() const {
+  inline const Extensions &RunHeader::extensions() const {
     return _extensions ;
   }
 

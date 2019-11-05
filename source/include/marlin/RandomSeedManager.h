@@ -8,11 +8,9 @@
 #include <functional>
 #include <unordered_set>
 
-namespace EVENT {
-  class LCEvent ;
-}
-
 namespace marlin {
+
+  class EventStore ;
 
   /**
    *  @brief  RandomSeedManager class
@@ -66,7 +64,7 @@ namespace marlin {
      *
      *  @param  evt the event source
      */
-    std::unique_ptr<RandomSeedMap> generateRandomSeeds( const EVENT::LCEvent * const evt ) ;
+    std::unique_ptr<RandomSeedMap> generateRandomSeeds( const EventStore * const evt ) ;
 
   private:
     /**

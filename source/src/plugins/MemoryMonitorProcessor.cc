@@ -40,7 +40,7 @@ namespace marlin {
 
     // from Processor
   	void init() ;
-  	void processEvent( EVENT::LCEvent * evt ) ;  	
+  	void processEvent( EventStore * evt ) ;  	
   	
   protected:
     Property<int> _howOften {this, "howOften",
@@ -74,7 +74,7 @@ namespace marlin {
   
   //--------------------------------------------------------------------------
 
-  void MemoryMonitorProcessor::processEvent( EVENT::LCEvent * /*evt*/ ) {
+  void MemoryMonitorProcessor::processEvent( EventStore * /*evt*/ ) {
     if (_eventNumber % _howOften == 0) {
 
 #ifdef __APPLE__
