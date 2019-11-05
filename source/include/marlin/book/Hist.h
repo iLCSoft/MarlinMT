@@ -3,340 +3,418 @@
 // -- std includes
 #include <functional>
 #include <iostream>
-#include <vector>
 #include <type_traits>
+#include <vector>
 
 // -- MarlinBook includes
+#include "marlin/book/BookStore.h"
 #include "marlin/book/EntryData.h"
 #include "marlin/book/ROOTAdapter.h"
-#include "marlin/book/BookStore.h"
 
 namespace marlin {
-  namespace book {
+	namespace book {
 
-    // -- MarlinBook forward declaration
-    class BookStore ;
-    template < typename T >
-    class BaseHandle ;
-    template < typename T >
-    class Handle ;
-    template < typename T >
-    class EntrySingle ;
-    template < typename T >
-    class EntryMultiCopy ;
-    template < typename T >
-    class EntryMultiShared ;
-    template < typename T >
-    struct trait ;
-    template < typename,unsigned long long>
-    class BookHelper ;
-    class BookHelperBase;
+		// -- MarlinBook forward declaration
+		class BookStore ;
+		template < typename T >
+		class BaseHandle ;
+		template < typename T >
+		class Handle ;
+		template < typename T >
+		class EntrySingle ;
+		template < typename T >
+		class EntryMultiCopy ;
+		template < typename T >
+		class EntryMultiShared ;
+		template < typename T >
+		struct trait ;
+		template < typename, unsigned long long >
+		class BookHelper ;
+		class BookHelperBase ;
 
-    /// trait specialisation for Histograms.
-    template < int D, typename T, template < int, class > class... STAT >
-    struct trait< types::RH< D, T, STAT... > > {
-      /**
-       *  @brief merging two histograms using Add.
-       *  @note \code {RHist::GetEntries()} is broken after that.
-       */
-      static void
-      Merge( const std::shared_ptr< types::RH< D, T, STAT... > > &dst,
-             const std::shared_ptr< types::RH< D, T, STAT... > > &src ) {
-        Add( *dst, *src ) ;
-        }
-    } ;
+		/// trait specialisation for Histograms.
+		template < int D, typename T, template < int, class > class... STAT >
+		struct trait< types::RH< D, T, STAT... > > {
+			/**
+			 *	@brief merging two histograms using Add.
+			 *	@note \code {RHist::GetEntries()} is broken after that.
+			 */
+			static void
+			Merge( const std::shared_ptr< types::RH< D, T, STAT... > > &dst,
+						 const std::shared_ptr< types::RH< D, T, STAT... > > &src ) {
+				Add( *dst, *src ) ;
+			}
+		} ;
 
+		/**
+		 *	@brief BookHelper instance for Histograms.
+		 *	Used to construct BookHelper for different Managed Histograms.
+		 */
+		template < int D, typename T, template < int, class > class... STAT >
+		class BookHelper< types::RH< D, T, STAT... >, 0 > : public BookHelperBase {
+			friend BookStore ;
+			BookHelper( BookStore &             store,
+									const std::string_view &path,
+									const std::string_view &name ) ;
 
+		public:
+			/**
+			 *	@brief produce an BookHelper to construct a Single Histogram.
+			 */
+			const BookHelper< types::RH< D, T, STAT... >,
+												Flags::Book::Single.VAL_INIT >
+			single() const ;
 
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper<types::RH< D,T,STAT...>, 0> : public BookHelperBase{
-      friend BookStore;
-      BookHelper(
-        BookStore &store,
-        const std::string_view &path,
-        const std::string_view &name
-      );
+			/**
+			 *	@brief produce an BookHelper to construct a multi copy Histogram.
+			 *	@param n number of instances which should be created.
+			 */
+			const BookHelper< types::RH< D, T, STAT... >,
+												Flags::Book::MultiCopy.VAL_INIT >
+			multiCopy( std::size_t n ) const ;
 
-    public:
-      const BookHelper<types::RH<D,T,STAT...>,Flags::Book::Single.VAL_INIT>
-      single() const ;      
-      
-      const BookHelper<types::RH<D,T,STAT...>,Flags::Book::MultiCopy.VAL_INIT>
-      multiCopy(std::size_t n) const ;
-    } ;
+			/**
+			 *	@brief produce an BookHelper to construct one Histogram with
+			 *	concurrent access.
+			 */
+			const BookHelper< types::RH< D, T, STAT... >,
+												Flags::Book::MultiCopy.VAL_INIT >
+			multiShared() const ;
 
-    template < int D, typename T, template<int, class> class ... STAT>
-    class BookHelper<types::RH<D, T, STAT...>, Flags::Book::Single.VAL_INIT>  : public BookHelperBase{
-      friend BookHelper<types::RH<D,T,STAT...>,0>;
-      using Object_t = types::RH<D, T, STAT...>;
-      
-      BookHelper(
-        BookStore& store,
-        const std::string_view& path,
-        const std::string_view& name
-      ) ;     
+		} ;
 
-      template<typename ... Args_t>
-      EntrySingle<Object_t> construct (Args_t ... args) const {
-        return _store.bookSingle<Object_t, Args_t ...>(_path, _name, args...);
-      }
+		/**
+		 *	@brief BookHelper which books Single Histograms.
+		 *	A functor which takes depending on the dimension of the histogram
+		 *	1 to 3 axis configuration to finally construct and book it. 
+		 */
+		template < int D, typename T, template < int, class > class... STAT >
+		class BookHelper< types::RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
+			: public BookHelperBase {
+			friend BookHelper< types::RH< D, T, STAT... >, 0 > ;
+			using Object_t = types::RH< D, T, STAT... > ;
 
-      public:
-        template<int d = D>
-        std::enable_if_t<d == 1, EntrySingle<Object_t>>
-        operator()(const types::RAxisConfig& axis) const {
-          return this->template construct<const types::RAxisConfig&>(axis);
-        }
+			BookHelper( BookStore &             store,
+									const std::string_view &path,
+									const std::string_view &name ) ;
 
-        template<int d = D>
-        std::enable_if_t<d == 2, EntrySingle<Object_t>>
-        operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2) const{
-          return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2);
-        }
+			template < typename... Args_t >
+			EntrySingle< Object_t > construct( Args_t... args ) const {
+				return _store.bookSingle< Object_t, Args_t... >(
+					_path, _name, args... ) ;
+			}
 
-        template<int d = D>
-        std::enable_if_t<d == 3, EntrySingle<Object_t>>
-        operator()(
-          const types::RAxisConfig& ax1,
-          const types::RAxisConfig& ax2,
-          const types::RAxisConfig& ax3
-        ) const {
-          return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2, ax3);
-        }
-    };
+		public:
+			/**
+			 *	@brief construct and book the Histogram.
+			 * 	At place and kind defined before.
+			 *	Only available for 1D Histograms.
+			 *	@param axis configuration for the Histogram.
+			 */
+			template < int d = D >
+			std::enable_if_t< d == 1, EntrySingle< Object_t > >
+			operator()( const types::RAxisConfig &axis ) const {
+				static_assert(d == 1, "Only used for 1D Histograms!"
+				"You should not manually enter template arguments for this operator.")
+				return this->template construct< const types::RAxisConfig & >( axis ) ;
+			}
 
-    template <int D, typename T, template<int,class>class...STAT>
-    class BookHelper<types::RH<D,T,STAT...>, Flags::Book::MultiShared.VAL_INIT> : public BookHelperBase {
-      using Object_t = types::RH<D,T,STAT...>;
-      friend BookHelper<Object_t,0>;
+			/**
+			 *	@brief construct and book the Histogram.
+			 *	At place and kind defined before.
+			 *  Only available for 2D Histograms.
+			 *	@param ax1 configuration for the first axis.
+			 *	@param ax2 configuration for the second axis.
+			 */
+			template < int d = D >
+			std::enable_if_t< d == 2, EntrySingle< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2 ) const {
+				static_assert(d == 2, "Only used for 2D Histograms!"
+				"You should not manually enter template arguments for this operator.")
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig & >( ax1,
+																																			 ax2 ) ;
+			}
 
-      BookHelper(
-        BookStore &store,
-        const std::string_view &path,
-        const std::string_view &name
-      );
+			/**
+			 *	@brief construct and book the Histogram.
+			 *	At place and kind defined before.
+			 *  Only available for 3D Histograms.
+			 *	@param ax1 configuration for the first axis.
+			 *	@param ax2 configuration for the second axis.
+			 *	@param ax3 configuration for the third axis. 
+			 */
+			template < int d = D >
+			std::enable_if_t< d == 3, EntrySingle< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2,
+									const types::RAxisConfig &ax3 ) const {
+				static_assert(d == 3, "Only used for 3D Histograms!"
+				"You should not manually enter template arguments for this operator.")
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig &,
+																				 const types::RAxisConfig & >(
+					ax1, ax2, ax3 ) ;
+			}
+		} ;
 
-      template<typename ... Args_t>
-      EntryMultiShared<Object_t> construct(Args_t ... args) const {
-        return _store.bookMultiShared<Object_t, Args_t...>(_path, _name, args...);
-      }
+		/**
+		 *	@brief BookHelper for multi shared histograms.
+		 *	A functor which takes depending on the dimension of the histogram
+		 *	1 to 3 axis configuration to finally construct and book it. 
+		 */
+		template < int D, typename T, template < int, class > class... STAT >
+		class BookHelper< types::RH< D, T, STAT... >,
+											Flags::Book::MultiShared.VAL_INIT >
+			: public BookHelperBase {
+			using Object_t = types::RH< D, T, STAT... > ;
+			friend BookHelper< Object_t, 0 > ;
 
-    public:
-      template<int d = D>
-      std::enable_if_t<d == 1, EntryMultiShared<Object_t>>
-      operator()(const types::RAxisConfig& axis) const {
-        return this->template construct<const types::RAxisConfig&>(axis);
-      }
+			BookHelper( BookStore &             store,
+									const std::string_view &path,
+									const std::string_view &name ) ;
 
-      template<int d = D>
-      std::enable_if_t<d == 2, EntryMultiShared<Object_t>>
-      operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2) const {
-        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2);
-      }
+			template < typename... Args_t >
+			EntryMultiShared< Object_t > construct( Args_t... args ) const {
+				return _store.bookMultiShared< Object_t, Args_t... >(
+					_path, _name, args... ) ;
+			}
 
-      template<int d = D>
-      std::enable_if_t<d == 3, EntryMultiShared<Object_t>>
-      operator()(const types::RAxisConfig& ax1, const types::RAxisConfig& ax2, const types::RAxisConfig& ax3) const {
-        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2, ax3);
-      }
-    };
-    
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper<types::RH< D ,T,STAT...>, Flags::Book::MultiCopy.VAL_INIT> : public BookHelperBase{
-      using Object_t = types::RH<D,T,STAT...>;
-      friend BookHelper<Object_t,0>;
+		public:
+			template < int d = D >
+			std::enable_if_t< d == 1, EntryMultiShared< Object_t > >
+			operator()( const types::RAxisConfig &axis ) const {
+				return this->template construct< const types::RAxisConfig & >( axis ) ;
+			}
 
-      BookHelper(
-        BookStore &store,
-        const std::string_view &path,
-        const std::string_view &name, const std::size_t amt);
+			template < int d = D >
+			std::enable_if_t< d == 2, EntryMultiShared< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2 ) const {
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig & >( ax1,
+																																			 ax2 ) ;
+			}
 
-      template<typename ... Args_t>
-      EntryMultiCopy<Object_t> construct (Args_t ... args) const {
-        return _store.bookMultiCopy<Object_t, Args_t ...>(_amt, _path,_name,args...);
-      }
-    public:
-      template<int d = D> 
-      std::enable_if_t<d == 1, EntryMultiCopy<Object_t>>
-      operator()(const types::RAxisConfig& axis) const {
-        return this->template construct<const types::RAxisConfig&>(axis);
-      }
+			template < int d = D >
+			std::enable_if_t< d == 3, EntryMultiShared< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2,
+									const types::RAxisConfig &ax3 ) const {
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig &,
+																				 const types::RAxisConfig & >(
+					ax1, ax2, ax3 ) ;
+			}
+		} ;
 
-      template<int d = D>
-      std::enable_if_t<d == 2, EntryMultiCopy<Object_t>>
-      operator()(
-        const types::RAxisConfig& ax1,
-        const types::RAxisConfig& ax2
-      ) const {
-        return this->template construct<const types::RAxisConfig&, const types::RAxisConfig&>(ax1, ax2);
-      }
+		/**
+		 *	@brief BookHelper for multi copy histograms.
+		 *	A functor which takes depending on the dimension of the histogram
+		 *	1 to 3 axis configuration to finally construct and book it. 
+		 */
+		template < int D, typename T, template < int, class > class... STAT >
+		class BookHelper< types::RH< D, T, STAT... >,
+											Flags::Book::MultiCopy.VAL_INIT >
+			: public BookHelperBase {
+			using Object_t = types::RH< D, T, STAT... > ;
+			friend BookHelper< Object_t, 0 > ;
 
-      template<int d = D>
-      std::enable_if_t<d == 3, EntryMultiCopy<Object_t>>
-      operator()(
-        const types::RAxisConfig& ax1,
-        const types::RAxisConfig& ax2,
-        const types::RAxisConfig& ax3
-      ) const {
-        return this->template construct<const types::RAxisConfig&,const types::RAxisConfig&,const types::RAxisConfig&>(ax1, ax2, ax3);
-      }
-    
-    private:
-      const std::size_t _amt;
-    } ;
+			BookHelper( BookStore &             store,
+									const std::string_view &path,
+									const std::string_view &name,
+									const std::size_t       amt ) ;
 
+			template < typename... Args_t >
+			EntryMultiCopy< Object_t > construct( Args_t... args ) const {
+				return _store.bookMultiCopy< Object_t, Args_t... >(
+					_amt, _path, _name, args... ) ;
+			}
 
-    /// Handle specialisation for Histograms.
-    template < int D, typename T, template < int, class > class... STAT >
-    class Handle< types::RH< D, T, STAT... > >
-      : private BaseHandle< types::RH< D, T, STAT... > > {
-      friend BookStore ;
+		public:
+			template < int d = D >
+			std::enable_if_t< d == 1, EntryMultiCopy< Object_t > >
+			operator()( const types::RAxisConfig &axis ) const {
+				return this->template construct< const types::RAxisConfig & >( axis ) ;
+			}
 
-    public:
-      /// Histogram Type which is Handled
-      using Type         = types::RH< D, T, STAT... > ;
-      /// CoordArray_t from managed Histogram
-      using CoordArray_t = typename Type::CoordArray_t ;
-      /// Weigh_t from managed Histogram
-      using Weight_t     = typename Type::Weight_t ;
+			template < int d = D >
+			std::enable_if_t< d == 2, EntryMultiCopy< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2 ) const {
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig & >( ax1,
+																																			 ax2 ) ;
+			}
 
-      /// type of the RHist::Fill function. 
-      using FillFn_t
-        = std::function< void( const CoordArray_t &, const Weight_t & ) > ;
-      /// type of the RHist::FillN function
-      using FillNFn_t = std::function< void( const std::span< CoordArray_t > &,
-                                             const std::span< Weight_t > & ) > ;
-      using FinalizeFn_t = std::function< void() > ;
+			template < int d = D >
+			std::enable_if_t< d == 3, EntryMultiCopy< Object_t > >
+			operator()( const types::RAxisConfig &ax1,
+									const types::RAxisConfig &ax2,
+									const types::RAxisConfig &ax3 ) const {
+				return this->template construct< const types::RAxisConfig &,
+																				 const types::RAxisConfig &,
+																				 const types::RAxisConfig & >(
+					ax1, ax2, ax3 ) ;
+			}
 
-    public:
-      /// construct a Handle.
-      Handle( const std::shared_ptr< MemLayout > &mem,
-              const std::shared_ptr< Type > &     obj,
-              const FillFn_t &                    fillFn,
-              const FillNFn_t &                   fillNFn,
-              const FinalizeFn_t &                finalFn ) ;
+		private:
+			const std::size_t _amt ;
+		} ;
 
-      /**
-       *  @brief Adds one datum to the Histogram.
-       *  @param x point to add.
-       *  @param w weight of point.
-       */
-      void        fill( const CoordArray_t &x, const Weight_t &w ) ;
+		/// Handle specialisation for Histograms.
+		template < int D, typename T, template < int, class > class... STAT >
+		class Handle< types::RH< D, T, STAT... > >
+			: private BaseHandle< types::RH< D, T, STAT... > > {
+			friend BookStore ;
 
-      /**
-       *  @brief Adds N data to the Histogram.
-       *  @param x span of points to add.
-       *  @param w span of weights to add.
-       */
-      void        fillN( const std::span< CoordArray_t > &x,
-                         const std::span< Weight_t >     &w ) ;
+		public:
+			/// Histogram Type which is Handled
+			using Type = types::RH< D, T, STAT... > ;
+			/// CoordArray_t from managed Histogram
+			using CoordArray_t = typename Type::CoordArray_t ;
+			/// Weigh_t from managed Histogram
+			using Weight_t = typename Type::Weight_t ;
 
-      /**
-       *  @brief get completed Object.
-       *  @return Object which all data from every handle.
-       *  @note for MultyCopy objects expansive.
-       *  Creates every time a new merged Histogram. 
-       */
-      const Type &merged() ;
+			/// type of the RHist::Fill function.
+			using FillFn_t
+				= std::function< void( const CoordArray_t &, const Weight_t & ) > ;
+			/// type of the RHist::FillN function
+			using FillNFn_t = std::function< void( const std::span< CoordArray_t > &,
+																						 const std::span< Weight_t > & ) > ;
+			using FinalizeFn_t = std::function< void() > ;
 
-    private:
-      /// Function to call for fill one object.
-      FillFn_t     _fillFn ;
-      /// Function to call for fill N objects.
-      FillNFn_t    _fillNFn ;
-      /// Function to call to flush queues which may exists
-      FinalizeFn_t _finalFn ;
-    } ;
+		public:
+			/// construct a Handle.
+			Handle( const std::shared_ptr< MemLayout > &mem,
+							const std::shared_ptr< Type > &     obj,
+							const FillFn_t &                    fillFn,
+							const FillNFn_t &                   fillNFn,
+							const FinalizeFn_t &                finalFn ) ;
 
-    /// specialisation of EntrySingle for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntrySingle< types::RH< D, T, STAT... > > : public EntryBase {
+			/**
+			 *	@brief Adds one datum to the Histogram.
+			 *	@param x point to add.
+			 *	@param w weight of point.
+			 */
+			void fill( const CoordArray_t &x, const Weight_t &w ) ;
 
-      friend BookStore ;
+			/**
+			 *	@brief Adds N data to the Histogram.
+			 *	@param x span of points to add.
+			 *	@param w span of weights to add.
+			 */
+			void fillN( const std::span< CoordArray_t > &x,
+									const std::span< Weight_t > &    w ) ;
 
-    public:
-      /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+			/**
+			 *	@brief get completed Object.
+			 *	@return Object which all data from every handle.
+			 *	@note for MultyCopy objects expansive.
+			 *	Creates every time a new merged Histogram.
+			 */
+			const Type &merged() ;
 
-      /// constructor
-      EntrySingle( const Context &context ) ;
+		private:
+			/// Function to call for fill one object.
+			FillFn_t _fillFn ;
+			/// Function to call for fill N objects.
+			FillNFn_t _fillNFn ;
+			/// Function to call to flush queues which may exists
+			FinalizeFn_t _finalFn ;
+		} ;
 
-      /// default constructor. Constructs invalid Entry.
-      EntrySingle() = default ;
+		/// specialisation of EntrySingle for Histograms
+		template < int D, typename T, template < int, class > class... STAT >
+		class EntrySingle< types::RH< D, T, STAT... > > : public EntryBase {
 
-      /**
-       *  @brief creates new Handle for Contained Histogram.
-       *  @note not thread save.
-       */
-      Handle< Type > handle() ;
+			friend BookStore ;
 
-    private:
-      /// \see {EntrySingle::_context}
-      Context _context ;
-    } ;
+		public:
+			/// Type of contained Histogram.
+			using Type = types::RH< D, T, STAT... > ;
 
-    /// specialisation of EntryMultiCopy for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiCopy< types::RH< D, T, STAT... > > : public EntryBase {
+			/// constructor
+			EntrySingle( const Context &context ) ;
 
-      friend BookStore ;
+			/// default constructor. Constructs invalid Entry.
+			EntrySingle() = default ;
 
-    public:
-      /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+			/**
+			 *	@brief creates new Handle for Contained Histogram.
+			 *	@note not thread save.
+			 */
+			Handle< Type > handle() ;
 
-      /// constructor
-      EntryMultiCopy( const Context &context ) ;
+		private:
+			/// \see {EntrySingle::_context}
+			Context _context ;
+		} ;
 
-      /// default constructor. Constructs invalid Entry.
-      EntryMultiCopy() = default ;
+		/// specialisation of EntryMultiCopy for Histograms
+		template < int D, typename T, template < int, class > class... STAT >
+		class EntryMultiCopy< types::RH< D, T, STAT... > > : public EntryBase {
 
-      /**
-       *  @brief creates a new Handle for one instance.
-       *  @param idx id of instance which should be accessed.
-       *  @note handles to the same instance should be only use in sequential code. 
-       */
-      Handle< Type > handle( std::size_t idx ) ;
+			friend BookStore ;
 
-    private:
-      /// \see {EntrySingle::_context}
-      Context _context ;
-    } ;
-    /// specialisation of EntryMultiShared for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiShared< types::RH< D, T, STAT... > > : public EntryBase {
-      friend BookStore ;
+		public:
+			/// Type of contained Histogram.
+			using Type = types::RH< D, T, STAT... > ;
 
-    public:
-      /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+			/// constructor
+			EntryMultiCopy( const Context &context ) ;
 
-      /// constructor
-      EntryMultiShared( const Context &context ) ;
+			/// default constructor. Constructs invalid Entry.
+			EntryMultiCopy() = default ;
 
-      // EntryMultiShared() = default ;
-      /// destructor. Flush filler.
-      ~EntryMultiShared() ;
+			/**
+			 *	@brief creates a new Handle for one instance.
+			 *	@param idx id of instance which should be accessed.
+			 * 	@note handles to the same instance should be only use in sequential
+			 *code.
+			 */
+			Handle< Type > handle( std::size_t idx ) ;
 
-      /**
-       *  @brief creates a new Handle.
-       *  @note each Handle contains a buffer to reduce synchronisation.
-       *  This memory will be freed when the handle is destructed.
-       */
-      Handle< Type > handle() ;
-      
-      /// flush every Buffer from each Handle.
-      void flush() ;
+		private:
+			/// \see {EntrySingle::_context}
+			Context _context ;
+		} ;
+		/// specialisation of EntryMultiShared for Histograms
+		template < int D, typename T, template < int, class > class... STAT >
+		class EntryMultiShared< types::RH< D, T, STAT... > > : public EntryBase {
+			friend BookStore ;
 
-    private:
-      /// \see {EntrySingle::_context}
-      Context                                                      _context ;
-      /// Manager to construct Filler.
-      std::shared_ptr< types::RHistConcurrentFillManager< Type > > _fillMgr ;
-      /// list of produced Filler to flush them when needed.
-      std::vector< std::weak_ptr< types::RHistConcurrentFiller< Type > > >
-        _fillers ;
-    } ;
-    
-  } // end namespace book
+		public:
+			/// Type of contained Histogram.
+			using Type = types::RH< D, T, STAT... > ;
+
+			/// constructor
+			EntryMultiShared( const Context &context ) ;
+
+			// EntryMultiShared() = default ;
+			/// destructor. Flush filler.
+			~EntryMultiShared() ;
+
+			/**
+			 *	@brief creates a new Handle.
+			 *	@note each Handle contains a buffer to reduce synchronisation.
+			 *	This memory will be freed when the handle is destructed.
+			 */
+			Handle< Type > handle() ;
+
+			/// flush every Buffer from each Handle.
+			void flush() ;
+
+		private:
+			/// \see {EntrySingle::_context}
+			Context _context ;
+			/// Manager to construct Filler.
+			std::shared_ptr< types::RHistConcurrentFillManager< Type > > _fillMgr ;
+			/// list of produced Filler to flush them when needed.
+			std::vector< std::weak_ptr< types::RHistConcurrentFiller< Type > > >
+				_fillers ;
+		} ;
+
+	} // end namespace book
 } // end namespace marlin
