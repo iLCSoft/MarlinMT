@@ -29,17 +29,17 @@ ENDIF()
 
 # required packages
 FIND_PACKAGE( Threads REQUIRED )
-FIND_PACKAGE( LCIO REQUIRED )
 
 # export Marlin_DEPENDS_INCLUDE_DIRS to MarlinConfig.cmake
-SET( Marlin_DEPENDS_INCLUDE_DIRS ${LCIO_INCLUDE_DIRS} ${streamlog_INCLUDE_DIRS} )
-SET( Marlin_DEPENDS_LIBRARY_DIRS ${LCIO_LIBRARY_DIRS} ${streamlog_LIBRARY_DIRS} )
-SET( Marlin_DEPENDS_LIBRARIES ${LCIO_LIBRARIES} ${streamlog_LIBRARIES} )
+SET( Marlin_DEPENDS_INCLUDE_DIRS ${streamlog_INCLUDE_DIRS} )
+SET( Marlin_DEPENDS_LIBRARY_DIRS ${streamlog_LIBRARY_DIRS} )
+SET( Marlin_DEPENDS_LIBRARIES ${streamlog_LIBRARIES} )
 
 INCLUDE_DIRECTORIES( SYSTEM ${Marlin_DEPENDS_INCLUDE_DIRS} )
 
 OPTION( MARLIN_BOOK  "Set to ON to build Marlin with book store functionality (requires ROOT7 !)" OFF )
 OPTION( MARLIN_DD4HEP "Set to ON to build Marlin with DD4hep" ON )
+OPTION( MARLIN_LCIO   "Set to ON to build Marlin with LCIO support" ON )
 
 IF( MARLIN_BOOK )
   LIST( APPEND ROOT_COMPONENTS Core Hist RIO )

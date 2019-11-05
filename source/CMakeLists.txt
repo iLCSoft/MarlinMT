@@ -46,8 +46,7 @@ INSTALL_SHARED_LIBRARY( MarlinXML DESTINATION lib )
 INSTALL_SHARED_LIBRARY( Marlin DESTINATION lib )
 TARGET_LINK_LIBRARIES( Marlin ${CMAKE_DL_LIBS} MarlinXML ${Marlin_DEPENDS_LIBRARIES}
   ## Note: it is not a problem if any variables is empty because package not found
-  ${AIDA_LIBRARIES} ${CLHEP_LIBRARIES} ${LCCD_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT}
-  ${DD4hep_LIBRARIES} ${DD4hep_COMPONENT_LIBRARIES} ${ROOT_LIBRARIES}  )
+  ${CMAKE_THREAD_LIBS_INIT} ${DD4hep_LIBRARIES} ${DD4hep_COMPONENT_LIBRARIES} ${ROOT_LIBRARIES}  )
 
 
 # ----- MarlinShellCompletion executable ----------------------------------------------------
@@ -84,6 +83,12 @@ IF( ROOT_FOUND )
   SET_TARGET_PROPERTIES( bin_MarlinMT_IOCPUBounds PROPERTIES OUTPUT_NAME MarlinMT_IOCPUBounds )
   TARGET_LINK_LIBRARIES( bin_MarlinMT_IOCPUBounds Marlin )
   INSTALL( TARGETS bin_MarlinMT_IOCPUBounds DESTINATION bin )
+ENDIF()
+# ----------------------------------------------------------------------------
+
+# ----- MarlinLCIO ------------------------------------------------------------
+IF( MARLIN_LCIO )
+    ADD_SUBDIRECTORY( lcio )
 ENDIF()
 # ----------------------------------------------------------------------------
 
