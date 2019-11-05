@@ -10,4 +10,4 @@
 /include/
 /lib/
 /*~
-
+/source/include/marlin/MarlinConfig.h
