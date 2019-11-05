@@ -12,9 +12,6 @@
 #include <sstream>
 #include <atomic>
 
-// -- lcio headers
-#include <lcio.h>
-
 namespace marlin {
 
   /** Simple processor for testing.

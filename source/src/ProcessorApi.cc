@@ -6,9 +6,6 @@
 #include <marlin/Processor.h>
 #include <marlin/EventExtensions.h>
 
-// -- lcio headers
-#include <EVENT/LCEvent.h>
-
 namespace marlin {
 
   void ProcessorApi::registerForRandomSeeds( Processor *const proc ) {

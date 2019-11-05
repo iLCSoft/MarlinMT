@@ -5,9 +5,6 @@
 #include <marlin/Logging.h>
 #include <marlin/PluginManager.h>
 
-// -- lcio headers
-#include <lcio.h>
-
 // -- std headers
 #include <cmath>
 #include <ctime>
