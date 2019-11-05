@@ -60,7 +60,7 @@ endfunction()
 #
 #
 function( marlin_add_processor_test test_name )
-  cmake_parse_arguments(ARG "" "STEERING_FILE;REGEX_PASS;REGEX_FAIL" "INPUT_FILES;MARLIN_ARGS" ${ARGN} )
+  cmake_parse_arguments(ARG "" "STEERING_FILE;REGEX_PASS;REGEX_FAIL" "INPUT_FILES;MARLIN_ARGS;MARLIN_DLL" ${ARGN} )
   if( NOT test_name )
     message( FATAL_ERROR "[UNIT_TESTS] Configuring processor test without name" )
   endif()
@@ -80,6 +80,8 @@ function( marlin_add_processor_test test_name )
     set( MARLIN_ARGS "${MARLIN_ARGS} ${marg}" )
   endforeach()
   set( MARLIN_DLL "$<TARGET_FILE:MarlinUnitTest>" )
+  list( APPEND MARLIN_DLL ${ARG_MARLIN_DLL} )
+  list( JOIN MARLIN_DLL ":" MARLIN_DLL )
   # configure cmake test file.
   # Read the file content and use file( GENERATE )
   # because the MARLIN_DLL contains generator expressions
