@@ -85,7 +85,6 @@ namespace marlin {
        */
       const Entry &get( std::size_t i ) { return _entries[i]; }
 
-
       /**
        *  @brief remove entry at position.
        *  @param i position of entry to remove.

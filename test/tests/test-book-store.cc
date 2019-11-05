@@ -203,19 +203,17 @@ int main(int, char**) {
 		EntrySingle e = store.book<RH1F>("path", "my Name").single()({"x", 2, -1.0, 5.0});
 		e.handle().fill({0}, 1);
 
-		EntrySingle entry = 
-			*std::static_pointer_cast<EntrySingle<RH1F>>(
-				store
-					.find(ConditionBuilder().setName("my Name").setPath("path"))
-					.begin()
-					->entry()
-		);
-		entry.handle().fill({0}, 1);
+
+		Selection sel = store.find(ConditionBuilder().setName("my Name"));
+		std::optional<Handle<RH1F>> oh = sel.begin()->handle<RH1F>();
+
+		
+		Handle<RH1F> h = oh.value();
+		h.fill({0}, 1);
 
 		test.test("Get booked entry from BookStore",
-			entry.handle().merged().GetBinContent({0}) == 2
-			&& e.handle().merged().GetBinContent({0}) == 2);
-					
+			e.handle().merged().GetBinContent({0}) == 2
+			&& h.merged().GetBinContent({0}) == 2);		
 
 	}	
 

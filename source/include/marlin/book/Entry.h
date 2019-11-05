@@ -135,14 +135,38 @@ namespace marlin {
       /// default constructor. Not valid!
       Entry() = default ;
 
-      /// access actual entry.
-      std::shared_ptr< EntryBase > entry() const { return _entry; }
+      /**
+       *  @brief creates an handle for the entry.
+       *  @param idx of instance, only used for multi copy entries
+       *  @return empty optional if the type or the configuration not matches.
+       */
+      template<class T>
+      std::optional<Handle<T>> handle(std::size_t idx = -1) const {
+        if(std::type_index(typeid(T)) != _key.type) {
+          // TODO add log
+          return std::optional<Handle<T>>();
+        }
+
+        if(_key.flags.Contains(Flags::Book::Single)) {
+          return std::static_pointer_cast<EntrySingle<T>>(_entry)->handle();
+
+        } else if (_key.flags.Contains(Flags::Book::MultiCopy)) {
+          return std::static_pointer_cast<EntryMultiCopy<T>>(_entry)->handle(idx);
+
+        } else if(_key.flags.Contains(Flags::Book::MultiShared)) {
+          return std::static_pointer_cast<EntryMultiShared<T>>(_entry)->handle();
+
+        }
+        // TODO add log
+        return std::optional<Handle<T>>();
+      }
 
       /// access key data from entry.
       const EntryKey &key() const { return _key; }
 
       /**
        *  @brief check if entry is valid.
+       *  check if there is a reference stored or not.
        *  @return true if entry is valid.
        */
       bool valid() const { return static_cast< bool >( _entry ); }
