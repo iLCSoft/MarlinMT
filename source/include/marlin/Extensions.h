@@ -19,25 +19,25 @@ namespace marlin {
 
   public:
     template <typename T>
-    Extension( T *obj, bool isOwned ) :
+    inline Extension( T *obj, bool isOwned ) :
       _isOwned(isOwned) ,
       _typeidx(typeid(T)) {
       if( _isOwned ) {
-        _object = std::make_shared<T>( obj ) ;
+        _object = std::shared_ptr<T>( obj ) ;
       }
       else {
-        _object = std::make_shared<T>( obj, [](T *){ /* nop */ } ) ;
+        _object = std::shared_ptr<T>( obj, [](T *){ /* nop */ } ) ;
       }
     }
 
     template <typename T>
     inline const T *object() const {
-      return std::static_pointer_cast<T>(_object).get() ;
+      return static_cast<const T*>(_object.get()) ;
     }
 
     template <typename T>
     inline T *object() {
-      return std::static_pointer_cast<T>(_object).get() ;
+      return static_cast<T*>(_object.get()) ;
     }
 
     template <typename T>
@@ -70,7 +70,7 @@ namespace marlin {
    */
   class Extensions {
   public:
-    using ExtensionMap = std::map<std::size_t, std::unique_ptr<Extension>> ;
+    using ExtensionMap = std::map<std::size_t, std::shared_ptr<Extension>> ;
 
   public:
     Extensions() = default ;
@@ -92,7 +92,7 @@ namespace marlin {
       if( iter != _extensions.end() ) {
         MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
       }
-      auto ext = std::make_unique<Extension>( ptr, isOwned ) ;
+      auto ext = std::make_shared<Extension>( ptr, isOwned ) ;
       _extensions.insert( { typeidx.hash_code(), ext } ) ;
     }
 
@@ -103,8 +103,9 @@ namespace marlin {
       if( iter != _extensions.end() ) {
         MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
       }
-      auto ext = std::make_unique<Extension>( new T( args... ), isOwned ) ;
+      auto ext = std::make_shared<Extension>( new T( args... ), isOwned ) ;
       _extensions.insert( { typeidx.hash_code(), ext } ) ;
+      return ext->template object<T>() ;
     }
 
     template <typename K, typename T>
