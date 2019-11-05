@@ -5,6 +5,7 @@
 #include <functional>
 #include <memory>
 
+// -- lcio headers
 #include <MT/LCReaderListener.h>
 
 namespace EVENT {

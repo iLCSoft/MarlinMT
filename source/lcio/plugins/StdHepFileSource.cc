@@ -1,9 +1,10 @@
 #ifndef MARLIN_STDHEPFILESOURCE_h
 #define MARLIN_STDHEPFILESOURCE_h 1
 
+#include <marlin/lcio/ReaderListener.h>
+
 // -- marlin headers
 #include <marlin/DataSourcePlugin.h>
-#include <marlin/ReaderListener.h>
 #include <marlin/PluginManager.h>
 #include <marlin/Logging.h>
 #include <marlin/EventStore.h>

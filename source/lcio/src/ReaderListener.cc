@@ -1,8 +1,11 @@
-#include <marlin/ReaderListener.h>
+#include <marlin/lcio/ReaderListener.h>
+
+// -- marlin headers
 #include <marlin/RunHeader.h>
 #include <marlin/EventStore.h>
 #include <jenkinsHash.h>
 
+// -- lcio headers
 #include <EVENT/LCEvent.h>
 #include <EVENT/LCRunHeader.h>
 
