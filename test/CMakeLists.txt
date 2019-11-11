@@ -17,6 +17,12 @@ if( MARLIN_LCIO )
   link_libraries( ${LCIO_LIBRARIES} )
 endif()
 
+if( MARLIN_BOOK )
+	#find_package(MarlinBook CONFIG REQUIRED )
+	include_directories( ${PROJECT_SOURCE_DIR}/source/book/include)
+	link_libraries( "${PROJECT_SOURCE_DIR}/build/lib/libMarlinBook.so" )
+endif()
+
 # add unit test library
 
 aux_source_directory( ./processors library_sources )
@@ -24,6 +30,7 @@ set( library_sources processors/TestProcessorEventSeeder.cc )
 if( MARLIN_LCIO )
   list( APPEND library_sources processors/TestEventModifier.cc )
 endif()
+
 
 add_shared_library( MarlinUnitTest ${library_sources} )
 target_link_libraries( MarlinUnitTest Marlin )

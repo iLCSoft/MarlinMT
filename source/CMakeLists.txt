@@ -36,9 +36,10 @@ IF( NOT MARLIN_GEAR )
     LIST( REMOVE_ITEM library_sources ./src/plugins/GearGeometry.cc )
 ENDIF()
 IF( MARLIN_BOOK )
-	AUX_SOURCE_DIRECTORY( ./src/book library_sources )
+	# LIST(…) TODO when in framework
 ENDIF()
 INCLUDE_DIRECTORIES( SYSTEM tinyxml/include )
+
 
 # create library
 ADD_SHARED_LIBRARY( Marlin ${library_sources} )
@@ -90,6 +91,12 @@ ENDIF()
 # ----- MarlinGUI ------------------------------------------------------------
 IF( MARLIN_GUI )
     ADD_SUBDIRECTORY( ./gui )
+ENDIF()
+# ----------------------------------------------------------------------------
+
+# ----- MarlinBooK ------------------------------------------------------------
+IF( MARLIN_BOOK )
+    ADD_SUBDIRECTORY( book )
 ENDIF()
 # ----------------------------------------------------------------------------
 
