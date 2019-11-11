@@ -32,7 +32,7 @@ using namespace ROOT::Experimental;
 
 
 int main(int, char**) {
-	marlin::test::UnitTest test(" MemFillerTest ");
+	marlin::test::UnitTest test(" Memory Filler Test ");
 	BookStore store{};
 	
 	auto helper = store.book<RH1F>("path", "name"); // TODO: forbid this!
@@ -195,10 +195,12 @@ int main(int, char**) {
 		store.book<RH1F>("path", mergedUnicStr()).single()(axis);
 		store.book<RH2F>("path", mergedUnicStr()).single()(axis, axis);
 		store.book<RH3F>("path", mergedUnicStr()).single()(axis, axis, axis);
+		store.book<RH1I>("path", mergedUnicStr()).multiCopy(3)(axis);
+		store.book<RH1D>("path", mergedUnicStr()).multiShared()(axis);
 
 		std::size_t n2 = store.find(ConditionBuilder()).size();
 
-		test.test("BookHelper usage", n + 3 == n2);
+		test.test("BookHelper usage", n + 5 == n2);
 	} {
 		EntrySingle e = store.book<RH1F>("path", "my Name").single()({"x", 2, -1.0, 5.0});
 		e.handle().fill({0}, 1);

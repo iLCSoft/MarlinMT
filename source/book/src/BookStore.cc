@@ -1,11 +1,12 @@
 #include "marlin/book/BookStore.h"
-
 // -- std includes
 #include <typeindex>
 #include <typeinfo>
 
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
+#include "marlin/book/EntryData.h"
+#include "marlin/book/Flags.h"
 #include "marlin/book/Hist.h"
 #include "marlin/book/MemLayout.h"
 #include "marlin/book/ROOTAdapter.h"
@@ -31,7 +32,6 @@ namespace marlin {
 		}
 
 		//--------------------------------------------------------------------------
-
 		template < class T, typename... Args_t >
 		EntrySingle< T > BookStore::bookSingle( const std::string_view &path,
 		                                        const std::string_view &name,
