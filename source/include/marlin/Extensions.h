@@ -82,7 +82,7 @@ namespace marlin {
 
     template <typename K>
     inline bool exits() const {
-      return _extensions.find( std::type_index(typeid(K)).hash_code() ) ;
+      return ( _extensions.find( std::type_index(typeid(K)).hash_code() ) != _extensions.end() ) ;
     }
 
     template <typename K, typename T>
