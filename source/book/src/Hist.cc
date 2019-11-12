@@ -8,110 +8,102 @@
 namespace marlin {
 	namespace book {
 		using namespace types ;
-		
+
 		template < int D, typename T, template < int, class > class... STAT >
 		EntryDataBase< RH< D, T, STAT... > >::EntryDataBase(
-			const std::string_view& title		
-		) : _title{title}{}
-
+		  const std::string_view &title )
+		  : _title{title} {}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < int D, typename T, template < int, class > class... STAT >
-		EntryData<RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT>
+		EntryData< RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
 		EntryDataBase< RH< D, T, STAT... > >::single() const {
-			return EntryData<types::RH< D, T, STAT...> , Flags::Book::Single.VAL_INIT>(
-				*this
-			);
+			return EntryData< types::RH< D, T, STAT... >,
+			                  Flags::Book::Single.VAL_INIT >( *this ) ;
 		}
 
 		//--------------------------------------------------------------------------
-	
+
 		template < int D, typename T, template < int, class > class... STAT >
-		EntryData<RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT>
-		EntryDataBase<RH< D, T, STAT... > >::multiCopy(std::size_t n) const {
-			return EntryData< types::RH< D, T, STAT...>, Flags::Book::MultiCopy.VAL_INIT >(
-				*this, n
-			);
+		EntryData< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+		EntryDataBase< RH< D, T, STAT... > >::multiCopy( std::size_t n ) const {
+			return EntryData< types::RH< D, T, STAT... >,
+			                  Flags::Book::MultiCopy.VAL_INIT >( *this, n ) ;
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < int D, typename T, template < int, class > class... STAT >
 		EntryData< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
 		EntryDataBase< RH< D, T, STAT... > >::multiShared() const {
-			return EntryData<types::RH< D, T, STAT...>, Flags::Book::MultiShared.VAL_INIT>(
-				*this
-			);
+			return EntryData< types::RH< D, T, STAT... >,
+			                  Flags::Book::MultiShared.VAL_INIT >( *this ) ;
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 1, T, STAT... >, 0 >::EntryData(
-			const RAxisConfig& axis	
-		) : EntryDataBase<RH< 1, T, STAT... > >(){
-			this->_axis[0] = &axis;
+		EntryData< RH< 1, T, STAT... >, 0 >::EntryData( const RAxisConfig &axis )
+		  : EntryDataBase< RH< 1, T, STAT... > >() {
+			this->_axis[0] = &axis ;
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 1, T, STAT... >,0 >::EntryData(
-				const std::string_view& title,
-				const RAxisConfig& axis
-		) : EntryDataBase<RH< 1, T, STAT... > >(title){
-			this->_axis[0] = &axis;
+		EntryData< RH< 1, T, STAT... >, 0 >::EntryData(
+		  const std::string_view &title, const RAxisConfig &axis )
+		  : EntryDataBase< RH< 1, T, STAT... > >( title ) {
+			this->_axis[0] = &axis ;
 		}
 
 		//--------------------------------------------------------------------------
-		
-	template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 2, T, STAT... >, 0 >::EntryData(
-			const RAxisConfig& x_axis,
-			const RAxisConfig& y_axis
-		) : EntryDataBase<RH< 2, T, STAT... > >(){
-			this->_axis[0] = &x_axis;
-			this->_axis[1] = &y_axis;
-		}
 
-		//--------------------------------------------------------------------------
-		
 		template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 2, T, STAT... >,0 >::EntryData(
-				const std::string_view& title,
-				const RAxisConfig& x_axis,
-				const RAxisConfig& y_axis
-		) : EntryDataBase<RH< 2, T, STAT... > >(title){
-			this->_axis[0] = &x_axis;
-			this->_axis[1] = &y_axis;
+		EntryData< RH< 2, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
+		                                                const RAxisConfig &y_axis )
+		  : EntryDataBase< RH< 2, T, STAT... > >() {
+			this->_axis[0] = &x_axis ;
+			this->_axis[1] = &y_axis ;
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 3, T, STAT... >, 0 >::EntryData(
-			const RAxisConfig& x_axis,	
-			const RAxisConfig& y_axis,
-			const RAxisConfig& z_axis
-		) : EntryDataBase<RH< 3, T, STAT... > >(){
-			this->_axis[0] = &x_axis;
-			this->_axis[1] = &y_axis;
-			this->_axis[2] = &z_axis;
+		EntryData< RH< 2, T, STAT... >, 0 >::EntryData(
+		  const std::string_view &title,
+		  const RAxisConfig &     x_axis,
+		  const RAxisConfig &     y_axis )
+		  : EntryDataBase< RH< 2, T, STAT... > >( title ) {
+			this->_axis[0] = &x_axis ;
+			this->_axis[1] = &y_axis ;
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template < typename T, template < int, class > class... STAT >
-		EntryData<RH< 3, T, STAT... >,0 >::EntryData(
-				const std::string_view& title,
-				const RAxisConfig& x_axis,
-				const RAxisConfig& y_axis,
-				const RAxisConfig& z_axis
-		) : EntryDataBase<RH< 3, T, STAT... > >(title){
-			this->_axis[0] = &x_axis;
-			this->_axis[1] = &y_axis;
-			this->_axis[2] = &z_axis;
+		EntryData< RH< 3, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
+		                                                const RAxisConfig &y_axis,
+		                                                const RAxisConfig &z_axis )
+		  : EntryDataBase< RH< 3, T, STAT... > >() {
+			this->_axis[0] = &x_axis ;
+			this->_axis[1] = &y_axis ;
+			this->_axis[2] = &z_axis ;
+		}
+
+		//--------------------------------------------------------------------------
+
+		template < typename T, template < int, class > class... STAT >
+		EntryData< RH< 3, T, STAT... >, 0 >::EntryData(
+		  const std::string_view &title,
+		  const RAxisConfig &     x_axis,
+		  const RAxisConfig &     y_axis,
+		  const RAxisConfig &     z_axis )
+		  : EntryDataBase< RH< 3, T, STAT... > >( title ) {
+			this->_axis[0] = &x_axis ;
+			this->_axis[1] = &y_axis ;
+			this->_axis[2] = &z_axis ;
 		}
 
 		//--------------------------------------------------------------------------
@@ -256,16 +248,16 @@ namespace marlin {
 	template class Handle< TYPE >;                                               \
 	template class EntrySingle< TYPE >;                                          \
 	template class EntryMultiCopy< TYPE >;                                       \
-	template class EntryData< TYPE, 0>;\
-	template EntryData<TYPE, Flags::Book::Single.VAL_INIT>\
-		EntryDataBase< TYPE>::single()const;\
-	template EntryData<TYPE, Flags::Book::MultiShared.VAL_INIT>\
-		EntryDataBase<TYPE>::multiShared()const;\
-	template EntryData<TYPE, Flags::Book::MultiCopy.VAL_INIT>\
-		EntryDataBase<TYPE>::multiCopy(std::size_t)const;\
-	template class EntryData< TYPE, 1>;\
-	template class EntryData< TYPE, 2>;\
-	template class EntryData< TYPE, 4>;\
+	template class EntryData< TYPE, 0 >;                                         \
+	template EntryData< TYPE, Flags::Book::Single.VAL_INIT >                     \
+	EntryDataBase< TYPE >::single() const;                                       \
+	template EntryData< TYPE, Flags::Book::MultiShared.VAL_INIT >                \
+	EntryDataBase< TYPE >::multiShared() const;                                  \
+	template EntryData< TYPE, Flags::Book::MultiCopy.VAL_INIT >                  \
+	  EntryDataBase< TYPE >::multiCopy( std::size_t ) const;                     \
+	template class EntryData< TYPE, 1 >;                                         \
+	template class EntryData< TYPE, 2 >;                                         \
+	template class EntryData< TYPE, 4 >;                                         \
 	template class EntryMultiShared< TYPE >
 
 		LinkType( RH1D ) ;

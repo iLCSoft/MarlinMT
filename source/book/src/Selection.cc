@@ -78,7 +78,7 @@ namespace marlin {
 		}
 
 		//--------------------------------------------------------------------------
-		
+
 		template Selection
 		Selection::find< Selection::iterator >( Selection::iterator begin,
 		                                        Selection::iterator end,

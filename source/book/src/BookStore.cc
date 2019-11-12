@@ -109,7 +109,7 @@ namespace marlin {
 
 		//--------------------------------------------------------------------------
 
-#define LinkT( TYPE )                                                         
+#define LinkT( TYPE )
 
 #define LinkH1( TYPE )                                                         \
 	template EntrySingle< TYPE >                                                 \
@@ -148,48 +148,39 @@ namespace marlin {
 	    const RAxisConfig & );                                                   \
 	LinkT( TYPE )
 
-#define LinkH3( TYPE )                                                         \
-	template EntryMultiShared< TYPE >                                            \
-	BookStore::bookMultiShared< TYPE,                                            \
-	                            const RAxisConfig &,                             \
-	                            const RAxisConfig &,                             \
-	                            const RAxisConfig & >( 													 \
-		const std::string_view &, 																								 \
-	  const std::string_view &, 																								 \
-	  const RAxisConfig &,      																								 \
-	  const RAxisConfig &,      																								 \
-	  const RAxisConfig & );    																								 \
-	template EntryMultiCopy< TYPE >                                              \
-	                             BookStore::bookMultiCopy< TYPE,                 \
-                            const RAxisConfig &,                               \
-                            const RAxisConfig &,                               \
-                            const RAxisConfig & >(														 \
-		 std::size_t,                																							 \
-		 const std::string_view &,   																							 \
-		 const std::string_view &,   																							 \
-		 const RAxisConfig &,        																							 \
-		 const RAxisConfig &,        																							 \
-		 const RAxisConfig & );      																							 \
-	template EntrySingle< TYPE > BookStore::bookSingle< TYPE,                    \
-	                                                    const RAxisConfig &,     \
-	                                                    const RAxisConfig &,     \
-	                                                    const RAxisConfig & >(   \
-	  const std::string_view &,                                                  \
-	  const std::string_view &,                                                  \
-	  const RAxisConfig &,                                                       \
-	  const RAxisConfig &,                                                       \
-	  const RAxisConfig & );                                                     \
+#define LinkH3( TYPE )                                                                                    \
+	template EntryMultiShared< TYPE >                                                                       \
+	BookStore::bookMultiShared< TYPE,                                                                       \
+	                            const RAxisConfig &,                                                        \
+	                            const RAxisConfig &,                                                        \
+	                            const RAxisConfig & >( const std::string_view &,                            \
+	                                                   const std::string_view &,                            \
+	                                                   const RAxisConfig &,                                 \
+	                                                   const RAxisConfig &,                                 \
+	                                                   const RAxisConfig & );                               \
+	template EntryMultiCopy< TYPE >                                                                         \
+	                             BookStore::bookMultiCopy< TYPE,                                            \
+                            const RAxisConfig &,                             \
+                            const RAxisConfig &,                             \
+                            const RAxisConfig & >( std::size_t,              \
+                                                   const std::string_view &, \
+                                                   const std::string_view &, \
+                                                   const RAxisConfig &,      \
+                                                   const RAxisConfig &,      \
+                                                   const RAxisConfig & );    \
+	template EntrySingle< TYPE > BookStore::bookSingle< TYPE,                                               \
+	                                                    const RAxisConfig &,                                \
+	                                                    const RAxisConfig &,                                \
+	                                                    const RAxisConfig & >(                              \
+	  const std::string_view &,                                                                             \
+	  const std::string_view &,                                                                             \
+	  const RAxisConfig &,                                                                                  \
+	  const RAxisConfig &,                                                                                  \
+	  const RAxisConfig & );                                                                                \
 	LinkT( TYPE )
 
-		LinkH1( RH1I ) 
-		LinkH1( RH1F ) 
-		LinkH1( RH1D ) 
-		LinkH2( RH2I ) 
-		LinkH2( RH2F ) 
-		LinkH2( RH2D ) 
-		LinkH3( RH3I ) 
-		LinkH3( RH3F ) 
-		LinkH3( RH3D ) 
+		LinkH1( RH1I ) LinkH1( RH1F ) LinkH1( RH1D ) LinkH2( RH2I ) LinkH2( RH2F )
+		  LinkH2( RH2D ) LinkH3( RH3I ) LinkH3( RH3F ) LinkH3( RH3D )
 
 	} // end namespace book
 } // end namespace marlin

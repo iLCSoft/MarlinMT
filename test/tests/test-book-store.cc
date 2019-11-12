@@ -111,7 +111,6 @@ int main(int, char**) {
 		}
 		
 		Selection sel = store.find(ConditionBuilder().setPath(path));
-		std::size_t n = sel.size();
 
 		{
 			Condition all = ConditionBuilder();

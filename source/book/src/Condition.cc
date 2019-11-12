@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 
-
 // -- MarlinBook includes
 #include "marlin/book/EntryData.h"
 
