@@ -8,69 +8,7 @@
 namespace marlin {
 	namespace book {
 		using namespace types ;
-
-		template < int D, typename T, template < int, class > class... STAT >
-		BookHelper< RH< D, T, STAT... >, 0 >::BookHelper(
-		  BookStore &             store,
-		  const std::string_view &path,
-		  const std::string_view &name )
-		  : BookHelperBase( store, path, name ) {}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		const BookHelper< RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
-		BookHelper< RH< D, T, STAT... >, 0 >::single() const {
-			return BookHelper< RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >(
-			  _store, _path, _name ) ;
-		}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		const BookHelper< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
-		BookHelper< RH< D, T, STAT... >, 0 >::multiCopy( std::size_t n ) const {
-			return BookHelper< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >(
-			  _store, _path, _name, n ) ;
-		}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		const BookHelper< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
-		BookHelper< RH< D, T, STAT... >, 0 >::multiShared() const {
-			return BookHelper< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >(
-			  _store, _path, _name ) ;
-		}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		BookHelper< RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >::BookHelper(
-		  BookStore &             store,
-		  const std::string_view &path,
-		  const std::string_view &name )
-		  : BookHelperBase( store, path, name ) {}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		BookHelper< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >::
-		  BookHelper( BookStore &             store,
-		              const std::string_view &path,
-		              const std::string_view &name,
-		              const std::size_t       amt )
-		  : BookHelperBase( store, path, name ), _amt{amt} {}
-
-		//--------------------------------------------------------------------------
-
-		template < int D, typename T, template < int, class > class... STAT >
-		BookHelper< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >::
-		  BookHelper( BookStore &             store,
-		              const std::string_view &path,
-		              const std::string_view &name )
-		  : BookHelperBase( store, path, name ) {}
-
+		
 		//--------------------------------------------------------------------------
 
 		template < int D, typename T, template < int, class > class... STAT >
@@ -213,10 +151,10 @@ namespace marlin {
 	template class Handle< TYPE >;                                               \
 	template class EntrySingle< TYPE >;                                          \
 	template class EntryMultiCopy< TYPE >;                                       \
-	template class BookHelper< TYPE, 0 >;                                        \
-	template class BookHelper< TYPE, 1 >;                                        \
-	template class BookHelper< TYPE, 2 >;                                        \
-	template class BookHelper< TYPE, 4 >;                                        \
+	template class EntryData< TYPE, 0>;\
+	template class EntryData< TYPE, 1>;\
+	template class EntryData< TYPE, 2>;\
+	template class EntryData< TYPE, 4>;\
 	template class EntryMultiShared< TYPE >
 
 		LinkType( RH1D ) ;

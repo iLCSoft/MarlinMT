@@ -35,18 +35,11 @@ int main(int, char**) {
 	marlin::test::UnitTest test(" Memory Filler Test ");
 	BookStore store{};
 	
-	auto helper = store.book<RH1F>("path", "name"); // TODO: forbid this!
-	auto h2 = helper.single();
-
 	{
 
 		// EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
-		// EntrySingle entry = BookHelper<RH1F>(store, Flags::Book::Single)({"a", 3, 1.0, 2.0});
+		EntrySingle entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
 
-		EntrySingle entry = store.book<RH1F>("path", "name").single()({"a", 3, 1.0, 2.0});
-
-
-		// EntrySingle entry = store.bookH1<RH1F>("path", "name", {"a", 3, 1.0, 2.0});
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
 		std::vector<typename decltype(hnd)::CoordArray_t> xs;
@@ -61,8 +54,8 @@ int main(int, char**) {
 		test.test("Single Hist Filling", hist.GetEntries() == 11);
 
 	}{
-		// EntryMultiCopy entry = store.bookMultiCopy<RH1I, const RAxisConfig&>(2, "path2", "name", {"a", 2, -1, 2});
-		EntryMultiCopy entry = store.book<RH1I>("path2", "name").multiCopy(2)({"a", 2, -1, 2});
+		EntryMultiCopy entry = store.book("path2", "name", EntryData<RH1I>({"a", 2, -1, 2}).multiCopy(2));
+
 		auto hnd = entry.handle(0);
 		hnd.fill({0}, 1);
 
@@ -100,7 +93,7 @@ int main(int, char**) {
 
 	} {
 	
-		EntryMultiShared entry = store.bookMultiShared<RH1I, const RAxisConfig&>("path3", "name", {"a", 3, 1.0, 2.0});
+		EntryMultiShared entry = store.book("path3", "name", EntryData<RH1I>({"a", 3, 1.0, 2.0}).multiShared());
 		auto hnd = entry.handle();
 		hnd.fill({0}, 1);
 
@@ -192,17 +185,20 @@ int main(int, char**) {
 		std::size_t n = store.find(ConditionBuilder()).size();
 
 		RAxisConfig axis{"x", 2, 1.0, 2.0};
-		store.book<RH1F>("path", mergedUnicStr()).single()(axis);
-		store.book<RH2F>("path", mergedUnicStr()).single()(axis, axis);
-		store.book<RH3F>("path", mergedUnicStr()).single()(axis, axis, axis);
-		store.book<RH1I>("path", mergedUnicStr()).multiCopy(3)(axis);
-		store.book<RH1D>("path", mergedUnicStr()).multiShared()(axis);
+		EntryData<RH1F> entry1(axis);
+		EntryData<RH2F> entry2(axis, axis);
+		EntryData<RH3F> entry3(axis, axis, axis);
+		store.book("path", mergedUnicStr(), entry1.single());
+		store.book("path", mergedUnicStr(), entry2.single());
+		store.book("path", mergedUnicStr(), entry3.single());
+		store.book("path", mergedUnicStr(), entry1.multiShared());
+		store.book("path", mergedUnicStr(), entry1.multiCopy(3));
 
 		std::size_t n2 = store.find(ConditionBuilder()).size();
 
 		test.test("BookHelper usage", n + 5 == n2);
 	} {
-		EntrySingle e = store.book<RH1F>("path", "my Name").single()({"x", 2, -1.0, 5.0});
+		EntrySingle e = store.book("path", "my Name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
 		e.handle().fill({0}, 1);
 
 		EntrySingle entry = 
@@ -220,7 +216,6 @@ int main(int, char**) {
 					
 
 	}	
-
 
 
 	return 0;

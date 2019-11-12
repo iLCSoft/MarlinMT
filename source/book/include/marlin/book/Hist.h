@@ -1,6 +1,7 @@
 #pragma once
 
 // -- std includes
+#include <array>
 #include <functional>
 #include <iostream>
 #include <type_traits>
@@ -28,10 +29,11 @@ namespace marlin {
     class EntryMultiShared ;
     template < typename T >
     struct trait ;
-    template < typename, unsigned long long >
-    class BookHelper ;
-    class BookHelperBase ;
-
+    template < typename >
+    class EntryDataBase;
+    template <typename, unsigned long long>
+    class EntryData;
+    
     /// trait specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >
     struct trait< types::RH< D, T, STAT... > > {
@@ -45,234 +47,208 @@ namespace marlin {
         Add( *dst, *src ) ;
       }
     } ;
-
-    /**
-     *  @brief BookHelper instance for Histograms.
-     *  Used to construct BookHelper for different Managed Histograms.
-     */
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper< types::RH< D, T, STAT... >, 0 > : public BookHelperBase {
-      friend BookStore ;
-      BookHelper( BookStore &             store,
-                  const std::string_view &path,
-                  const std::string_view &name ) ;
-
+    
+    template<int D, typename T, template < int, class > class... STAT >
+    class EntryDataBase< types::RH< D, T, STAT... >> : public EntryDataBase<void> {
+      template<typename, unsigned long long>
+      friend class EntryData;
+      static constexpr std::string_view empty{""};
     public:
-      /**
-       *  @brief produce an BookHelper to construct a Single Histogram.
-       */
-      const BookHelper< types::RH< D, T, STAT... >,
-                        Flags::Book::Single.VAL_INIT >
-      single() const ;
+      EntryDataBase(const std::string_view& title = empty)  
+      : _title{title}{}
 
-      /**
-       *  @brief produce an BookHelper to construct a multi copy Histogram.
-       *  @param n number of instances which should be created.
-       */
-      const BookHelper< types::RH< D, T, STAT... >,
-                        Flags::Book::MultiCopy.VAL_INIT >
-      multiCopy( std::size_t n ) const ;
+      EntryData< types::RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
+        single() const {
+          return EntryData<types::RH< D, T, STAT...> , Flags::Book::Single.VAL_INIT>(
+              *this
+              );
+        }
 
-      /**
-       *  @brief produce an BookHelper to construct one Histogram with
-       *  concurrent access.
-       */
-      const BookHelper< types::RH< D, T, STAT... >,
-                        Flags::Book::MultiShared.VAL_INIT >
-      multiShared() const ;
+      EntryData<types::RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+        multiCopy(std::size_t n) const {
+          return EntryData< types::RH< D, T, STAT...>, Flags::Book::MultiCopy.VAL_INIT >(
+              *this, n
+              );
+        }
 
+      EntryData< types::RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
+        multiShared() const {
+          return EntryData<types::RH< D, T, STAT...>, Flags::Book::MultiShared.VAL_INIT>(
+              *this
+              );
+        }
+    protected:
+      const std::string_view& _title;
+      std::array<const types::RAxisConfig*, D> _axis{};
+    };
+
+    template<typename T, template<int,class>class ...STAT>
+    class EntryData<types::RH< 1, T, STAT...>, 0> : public EntryDataBase<types::RH< 1, T, STAT... >>{
+    public:
+      EntryData(const types::RAxisConfig& axis) 
+        : EntryDataBase<types::RH< 1, T, STAT...>>(){
+          this->_axis[0] = &axis;
+        }
+      EntryData(const std::string_view& title, const types::RAxisConfig& axis)
+        : EntryDataBase<types::RH< 1, T, STAT... >>(title) {
+          this->_axis[0] = &axis;
+        }
+    };
+
+    template<typename T, template<int,class>class ...STAT>
+    class EntryData<types::RH< 2, T, STAT...>, 0> : public EntryDataBase<types::RH< 2, T, STAT... >>{
+    public:
+      EntryData(const types::RAxisConfig& x_axis, const types::RAxisConfig& y_axis) 
+        : EntryDataBase<types::RH< 2, T, STAT...>>(){
+          this->_axis[0] = &x_axis;
+          this->_axis[1] = &y_axis;
+        }
+      EntryData(const std::string_view& title, const types::RAxisConfig& x_axis, const types::RAxisConfig& y_axis)
+        : EntryDataBase<types::RH< 2, T, STAT... >>(title) {
+          this->_axis[0] = &x_axis;
+          this->_axis[1] = &y_axis;
+        }
+    };
+    
+    template<typename T, template<int,class>class ...STAT>
+    class EntryData<types::RH< 3, T, STAT...>, 0> : public EntryDataBase<types::RH< 3, T, STAT... >>{
+    public:
+      EntryData(const types::RAxisConfig& x_axis, const types::RAxisConfig& y_axis, const types::RAxisConfig& z_axis) 
+        : EntryDataBase<types::RH< 3, T, STAT...>>(){
+          this->_axis[0] = &x_axis;
+          this->_axis[1] = &y_axis;
+          this->_axis[2] = &z_axis;
+        }
+      EntryData(const std::string_view& title, const types::RAxisConfig& x_axis, const types::RAxisConfig& y_axis, const types::RAxisConfig& z_axis)
+        : EntryDataBase<types::RH< 3, T, STAT... >>(title) {
+          this->_axis[0] = &x_axis;
+          this->_axis[1] = &y_axis;
+          this->_axis[2] = &z_axis;
+        }
+    };
+
+
+
+    template<int D, typename T, template<int,class>class...STAT>
+    class EntryData<types::RH<D,T,STAT...>, Flags::Book::Single.VAL_INIT>{
+      friend EntryDataBase<types::RH< D, T, STAT... >>;
+      friend BookStore;
+      EntryData(const EntryDataBase<types::RH< D, T, STAT... >>& data)
+        : _data{data}{}
+
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==1, EntrySingle<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookSingle<types::RH< 1, T, STAT... >, const types::RAxisConfig&>(
+              args...,
+              *_data._axis[0]
+            );
+      }
+
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==2, EntrySingle<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookSingle<types::RH< 2, T, STAT... >, const types::RAxisConfig&, const types::RAxisConfig&>(
+          args...,
+          *_data._axis[0],
+          *_data._axis[1]
+        );
+      }
+
+      template<typename ...Args_t, int d = D>
+        std::enable_if_t<d==3,EntrySingle<types::RH< D, T, STAT... >>>
+        book(BookStore& store, const Args_t& ... args)const {
+          return store.bookSingle<types::RH< 3, T, STAT... >, const types::RAxisConfig&, const types::RAxisConfig&, const types::RAxisConfig&>(
+            args...,
+            *_data._axis[0],
+            *_data._axis[1],
+            *_data._axis[2]
+            );
+        }
+      const EntryDataBase<types::RH< D, T, STAT... >>& _data;
     } ;
 
-    /**
-     *  @brief BookHelper which books Single Histograms.
-     *  A functor which takes depending on the dimension of the histogram
-     *  1 to 3 axis configuration to finally construct and book it. 
-     */
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper< types::RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
-      : public BookHelperBase {
-      friend BookHelper< types::RH< D, T, STAT... >, 0 > ;
-      using Object_t = types::RH< D, T, STAT... > ;
+    template<int D, typename T, template<int,class>class...STAT>
+    class EntryData<types::RH<D,T,STAT...>, Flags::Book::MultiCopy.VAL_INIT>{
+      friend EntryDataBase<types::RH< D, T, STAT... >>;
+      friend BookStore;
+      EntryData(const EntryDataBase<types::RH< D, T, STAT... >>& data, std::size_t n)
+        : _data{data}, _n{n}{}
 
-      BookHelper( BookStore &             store,
-                  const std::string_view &path,
-                  const std::string_view &name ) ;
-
-      template < typename... Args_t >
-      EntrySingle< Object_t > construct( Args_t... args ) const {
-        return _store.bookSingle< Object_t, Args_t... >(
-          _path, _name, args... ) ;
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==1, EntryMultiCopy<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookMultiCopy<types::RH< 1, T, STAT... >, const types::RAxisConfig&>(
+              _n,
+              args...,
+              *_data._axis[0]
+            );
       }
 
-    public:
-      /**
-       *  @brief construct and book the Histogram.
-       *  At place and kind defined before.
-       *  Only available for 1D Histograms.
-       *  @param axis configuration for the Histogram.
-       */
-      template < int d = D >
-      std::enable_if_t< d == 1, EntrySingle< Object_t > >
-      operator()( const types::RAxisConfig &axis ) const {
-        static_assert(d == 1, "Only used for 1D Histograms!"
-        "You should not manually enter template arguments for this operator.") ;
-        return this->template construct< const types::RAxisConfig & >( axis ) ;
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==2, EntryMultiCopy<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookMultiCopy<types::RH< 2, T, STAT... >,  const types::RAxisConfig&, const types::RAxisConfig&>(
+          _n,
+          args...,
+          *_data._axis[0],
+          *_data._axis[1]
+        );
       }
 
-      /**
-       *  @brief construct and book the Histogram.
-       *  At place and kind defined before.
-       *  Only available for 2D Histograms.
-       *  @param ax1 configuration for the first axis.
-       *  @param ax2 configuration for the second axis.
-       */
-      template < int d = D >
-      std::enable_if_t< d == 2, EntrySingle< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2 ) const {
-        static_assert(d == 2, "Only used for 2D Histograms!"
-        "You should not manually enter template arguments for this operator.") ;
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig & >( ax1,
-                                                                       ax2 ) ;
-      }
-
-      /**
-       *  @brief construct and book the Histogram.
-       *  At place and kind defined before.
-       *  Only available for 3D Histograms.
-       *  @param ax1 configuration for the first axis.
-       *  @param ax2 configuration for the second axis.
-       *  @param ax3 configuration for the third axis. 
-       */
-      template < int d = D >
-      std::enable_if_t< d == 3, EntrySingle< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2,
-                  const types::RAxisConfig &ax3 ) const {
-        static_assert(d == 3, "Only used for 3D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig &,
-                                         const types::RAxisConfig & >(
-          ax1, ax2, ax3 ) ;
-      }
+      template<typename ...Args_t, int d = D>
+        std::enable_if_t<d==3,EntryMultiCopy<types::RH< D, T, STAT... >>>
+        book(BookStore& store, const Args_t& ... args)const {
+          return store.bookMultiCopy<types::RH< 3, T, STAT... >, const types::RAxisConfig&, const types::RAxisConfig&, const types::RAxisConfig&>(
+            _n,
+            args...,
+            *_data._axis[0],
+            *_data._axis[1],
+            *_data._axis[2]
+            );
+        }
+      const EntryDataBase<types::RH< D, T, STAT... >>& _data;
+      const std::size_t _n;
     } ;
 
-    /**
-     *  @brief BookHelper for multi shared histograms.
-     *  A functor which takes depending on the dimension of the histogram
-     *  1 to 3 axis configuration to finally construct and book it. 
-     */
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper< types::RH< D, T, STAT... >,
-                      Flags::Book::MultiShared.VAL_INIT >
-      : public BookHelperBase {
-      using Object_t = types::RH< D, T, STAT... > ;
-      friend BookHelper< Object_t, 0 > ;
+  
+    template<int D, typename T, template<int,class>class...STAT>
+    class EntryData<types::RH<D,T,STAT...>, Flags::Book::MultiShared.VAL_INIT>{
+      friend EntryDataBase<types::RH< D, T, STAT... >>;
+      friend BookStore;
+      EntryData(const EntryDataBase<types::RH< D, T, STAT... >>& data)
+        : _data{data}{}
 
-      BookHelper( BookStore &             store,
-                  const std::string_view &path,
-                  const std::string_view &name ) ;
-
-      template < typename... Args_t >
-      EntryMultiShared< Object_t > construct( Args_t... args ) const {
-        return _store.bookMultiShared< Object_t, Args_t... >(
-          _path, _name, args... ) ;
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==1, EntryMultiShared<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookMultiShared<types::RH< 1, T, STAT... >, const types::RAxisConfig&>(
+              args...,
+              *_data._axis[0]
+            );
       }
 
-    public:
-      template < int d = D >
-      std::enable_if_t< d == 1, EntryMultiShared< Object_t > >
-      operator()( const types::RAxisConfig &axis ) const {
-        static_assert(d == 1, "Only used for 1D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig & >( axis ) ;
+      template<typename ...Args_t, int d = D>
+      std::enable_if_t<d==2, EntryMultiShared<types::RH< D, T, STAT... >>>
+      book(BookStore& store, const Args_t& ... args)const {
+        return store.bookMultiShared<types::RH< 2, T, STAT... >,  const types::RAxisConfig&, const types::RAxisConfig&>(
+          args...,
+          *_data._axis[0],
+          *_data._axis[1]
+        );
       }
 
-      template < int d = D >
-      std::enable_if_t< d == 2, EntryMultiShared< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2 ) const {
-        static_assert(d == 2, "Only used for 2D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig & >( ax1,
-                                                                       ax2 ) ;
-      }
-
-      template < int d = D >
-      std::enable_if_t< d == 3, EntryMultiShared< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2,
-                  const types::RAxisConfig &ax3 ) const {
-        static_assert(d == 3, "Only used for 3D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig &,
-                                         const types::RAxisConfig & >(
-          ax1, ax2, ax3 ) ;
-      }
-    } ;
-
-    /**
-     *  @brief BookHelper for multi copy histograms.
-     *  A functor which takes depending on the dimension of the histogram
-     *  1 to 3 axis configuration to finally construct and book it. 
-     */
-    template < int D, typename T, template < int, class > class... STAT >
-    class BookHelper< types::RH< D, T, STAT... >,
-                      Flags::Book::MultiCopy.VAL_INIT >
-      : public BookHelperBase {
-      using Object_t = types::RH< D, T, STAT... > ;
-      friend BookHelper< Object_t, 0 > ;
-
-      BookHelper( BookStore &             store,
-                  const std::string_view &path,
-                  const std::string_view &name,
-                  const std::size_t       amt ) ;
-
-      template < typename... Args_t >
-      EntryMultiCopy< Object_t > construct( Args_t... args ) const {
-        return _store.bookMultiCopy< Object_t, Args_t... >(
-          _amt, _path, _name, args... ) ;
-      }
-
-    public:
-      template < int d = D >
-      std::enable_if_t< d == 1, EntryMultiCopy< Object_t > >
-      operator()( const types::RAxisConfig &axis ) const {
-        static_assert(d == 1, "Only used for 1D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig & >( axis ) ;
-      }
-
-      template < int d = D >
-      std::enable_if_t< d == 2, EntryMultiCopy< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2 ) const {
-        static_assert(d == 2, "Only used for 2D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig & >( ax1,
-                                                                       ax2 ) ;
-      }
-
-      template < int d = D >
-      std::enable_if_t< d == 3, EntryMultiCopy< Object_t > >
-      operator()( const types::RAxisConfig &ax1,
-                  const types::RAxisConfig &ax2,
-                  const types::RAxisConfig &ax3 ) const {
-        static_assert(d == 3, "Only used for 3D Histograms!"
-        "You should not manually enter template arguments for this operator.");
-        return this->template construct< const types::RAxisConfig &,
-                                         const types::RAxisConfig &,
-                                         const types::RAxisConfig & >(
-          ax1, ax2, ax3 ) ;
-      }
-
-    private:
-      const std::size_t _amt ;
+      template<typename ...Args_t, int d = D>
+        std::enable_if_t<d==3,EntryMultiShared<types::RH< D, T, STAT... >>>
+        book(BookStore& store, const Args_t& ... args)const {
+          return store.bookMultiShared<types::RH< 3, T, STAT... >, const types::RAxisConfig&, const types::RAxisConfig&, const types::RAxisConfig&>(
+            args...,
+            *_data._axis[0],
+            *_data._axis[1],
+            *_data._axis[2]
+            );
+        }
+      const EntryDataBase<types::RH< D, T, STAT... >>& _data;
     } ;
 
     /// Handle specialisation for Histograms.

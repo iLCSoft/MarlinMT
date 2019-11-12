@@ -27,13 +27,6 @@ namespace marlin {
 
 		//--------------------------------------------------------------------------
 
-		template < class T >
-		const BookHelper< T, 0 > BookStore::book( const std::string_view &path,
-		                                          const std::string_view &name ) {
-			return BookHelper< T, 0 >( *this, path, name ) ;
-		}
-
-		//--------------------------------------------------------------------------
 		template < class T, typename... Args_t >
 		EntrySingle< T > BookStore::bookSingle( const std::string_view &path,
 		                                        const std::string_view &name,
@@ -116,9 +109,7 @@ namespace marlin {
 
 		//--------------------------------------------------------------------------
 
-#define LinkT( TYPE )                                                          \
-	template const BookHelper< TYPE, 0 > BookStore::book< TYPE >(                \
-	  const std::string_view &, const std::string_view & )
+#define LinkT( TYPE )                                                         
 
 #define LinkH1( TYPE )                                                         \
 	template EntrySingle< TYPE >                                                 \
@@ -190,15 +181,15 @@ namespace marlin {
 	  const RAxisConfig & );                                                     \
 	LinkT( TYPE )
 
-		LinkH1( RH1I ) ;
-		LinkH1( RH1F ) ;
-		LinkH1( RH1D ) ;
-		LinkH2( RH2I ) ;
-		LinkH2( RH2F ) ;
-		LinkH2( RH2D ) ;
-		LinkH3( RH3I ) ;
-		LinkH3( RH3F ) ;
-		LinkH3( RH3D ) ;
+		LinkH1( RH1I ) 
+		LinkH1( RH1F ) 
+		LinkH1( RH1D ) 
+		LinkH2( RH2I ) 
+		LinkH2( RH2F ) 
+		LinkH2( RH2D ) 
+		LinkH3( RH3I ) 
+		LinkH3( RH3F ) 
+		LinkH3( RH3D ) 
 
 	} // end namespace book
 } // end namespace marlin

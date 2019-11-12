@@ -31,35 +31,21 @@ namespace marlin {
     class Selection ;
 
     /**
-     *  @brief Base class for BookHelper to avoid redundant code.
-     *  Contains all information to identify an Object.
-     *  @note This class works with references to minimize the memory usage,
-     *  it isn't recommended storing this class in a lvalue.
+     *  @brief Base Class for Entry Data, to shorten class definitions.
      */
-    class BookHelperBase {
+    template < class T> class EntryDataBase{};
+    template<>
+    class EntryDataBase<void>{
     public:
-      /// No Copy, because there is no use case.
-      BookHelperBase( const BookHelperBase & )            = delete ;
-      /// No Copy, because there is no use case.
-      BookHelperBase &operator=( const BookHelperBase & ) = delete ;
-      /// No Move, because there is no use case.
-      BookHelperBase( BookHelperBase && )                 = delete ;
-      /// No Move, because there is no use case.
-      BookHelperBase &operator=( BookHelperBase && )      = delete ;
-      BookHelperBase()                                    = delete ;
-
-    protected:
-      /// name of the object to store.
-      const std::string_view &_name ;
-      /// path of the object to store.
-      const std::string_view &_path ;
-      /// store to store the object in.
-      BookStore &             _store ;
-
-      BookHelperBase( BookStore &             store,
-                      const std::string_view &path,
-                      const std::string_view &name )
-        : _name{name}, _path{path}, _store{store} {}
+      EntryDataBase() = default ;
+      EntryDataBase( const EntryDataBase&) = delete ;
+      EntryDataBase& operator=(const EntryDataBase &) = delete ;
+      EntryDataBase(EntryDataBase && )                  = default ;
+      EntryDataBase & operator=(EntryDataBase &&) = default ;
+    
+      // template<typename ... Args_t>
+      // void book(BookStore & store, Args_t... args){
+      // }
     } ;
     
     /**
@@ -67,8 +53,9 @@ namespace marlin {
      *  Specialisation for each object type, so there is no need 
      *  to specify the book function arguments by ourself.
      */
-    template < class T, unsigned long long >
-    class BookHelper : public BookHelperBase {} ;
+    template < class T, unsigned long long = 0 >
+    class EntryData : public EntryDataBase<void> {} ;
+
 
     /**
      *  @brief Managed Access and creation to Objects.
@@ -88,9 +75,11 @@ namespace marlin {
       Entry &get( const EntryKey &key ) { return _entries[key.hash]; }
 
     public:
-      template < class T >
-      const BookHelper< T, 0 > book( const std::string_view &path,
-                                     const std::string_view &name ) ;
+      template<class T>
+      auto book(const std::string_view& path, const std::string_view& name, const T& data) {
+        // TODO static assert and type check
+        return data.template book<std::string_view, std::string_view>(*this, path, name)  ;
+      }
 
       /**
        *  @brief creates an Entry for a default Object.
