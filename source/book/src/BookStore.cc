@@ -109,78 +109,81 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-#define LinkT( TYPE )
+#define BFN_H1( RET, NAME, TYPE, ... )                                         \
+  template RET< TYPE >                                                         \
+  BookStore::NAME< TYPE, const std::string_view &, const RAxisConfig & >(      \
+    __VA_ARGS__ const std::string_view &,                                      \
+    const std::string_view &,                                                  \
+    const std::string_view &,                                                  \
+    const RAxisConfig & );                                                     \
+  template RET< TYPE > BookStore::NAME< TYPE, const RAxisConfig & >(           \
+    __VA_ARGS__ const std::string_view &,                                      \
+    const std::string_view &,                                                  \
+    const RAxisConfig & )
 
 #define LinkH1( TYPE )                                                         \
-  template EntrySingle< TYPE >                                                 \
-  BookStore::bookSingle< TYPE, const RAxisConfig & >(                          \
-    const std::string_view &, const std::string_view &, const RAxisConfig & ); \
-  template EntryMultiCopy< TYPE >                                              \
-  BookStore::bookMultiCopy< TYPE, const RAxisConfig & >(                       \
-    std::size_t,                                                               \
+  BFN_H1( EntrySingle, bookSingle, TYPE, );                                    \
+  BFN_H1( EntryMultiShared, bookMultiShared, TYPE, );                          \
+  BFN_H1( EntryMultiCopy, bookMultiCopy, TYPE, std::size_t, )
+
+#define BFN_H2( RET, NAME, TYPE, ... )                                         \
+  template RET< TYPE > BookStore::NAME< TYPE,                                  \
+                                        const std::string_view &,              \
+                                        const RAxisConfig &,                   \
+                                        const RAxisConfig & >(                 \
+    __VA_ARGS__ const std::string_view &,                                      \
     const std::string_view &,                                                  \
     const std::string_view &,                                                  \
+    const RAxisConfig &,                                                       \
     const RAxisConfig & );                                                     \
-  template EntryMultiShared< TYPE >                                            \
-  BookStore::bookMultiShared< TYPE, const RAxisConfig & >(                     \
-    const std::string_view &, const std::string_view &, const RAxisConfig & ); \
-  LinkT( TYPE )
+  template RET< TYPE >                                                         \
+  BookStore::NAME< TYPE, const RAxisConfig &, const RAxisConfig & >(           \
+    __VA_ARGS__ const std::string_view &,                                      \
+    const std::string_view &,                                                  \
+    const RAxisConfig &,                                                       \
+    const RAxisConfig & )
 
 #define LinkH2( TYPE )                                                         \
-  template EntryMultiCopy< TYPE >                                              \
-  BookStore::bookMultiCopy< TYPE, const RAxisConfig &, const RAxisConfig & >(  \
-    std::size_t,                                                               \
+  BFN_H2( EntrySingle, bookSingle, TYPE, );                                    \
+  BFN_H2( EntryMultiShared, bookMultiShared, TYPE, );                          \
+  BFN_H2( EntryMultiCopy, bookMultiCopy, TYPE, std::size_t, )
+
+#define BFN_H3( RET, NAME, TYPE, ... )                                         \
+  template RET< TYPE > BookStore::NAME< TYPE,                                  \
+                                        const std::string_view &,              \
+                                        const RAxisConfig &,                   \
+                                        const RAxisConfig &,                   \
+                                        const RAxisConfig & >(                 \
+    __VA_ARGS__ const std::string_view &,                                      \
     const std::string_view &,                                                  \
     const std::string_view &,                                                  \
     const RAxisConfig &,                                                       \
-    const RAxisConfig & );                                                     \
-  template EntrySingle< TYPE >                                                 \
-  BookStore::bookSingle< TYPE, const RAxisConfig &, const RAxisConfig & >(     \
-    const std::string_view &,                                                  \
-    const std::string_view &,                                                  \
     const RAxisConfig &,                                                       \
     const RAxisConfig & );                                                     \
-  template EntryMultiShared< TYPE > BookStore::                                \
-    bookMultiShared< TYPE, const RAxisConfig &, const RAxisConfig & >(         \
-      const std::string_view &,                                                \
-      const std::string_view &,                                                \
-      const RAxisConfig &,                                                     \
-      const RAxisConfig & );                                                   \
-  LinkT( TYPE )
+  template RET< TYPE > BookStore::NAME< TYPE,                                  \
+                                        const RAxisConfig &,                   \
+                                        const RAxisConfig &,                   \
+                                        const RAxisConfig & >(                 \
+    __VA_ARGS__ const std::string_view &,                                      \
+    const std::string_view &,                                                  \
+    const RAxisConfig &,                                                       \
+    const RAxisConfig &,                                                       \
+    const RAxisConfig & )
 
-#define LinkH3( TYPE )                                                                                    \
-  template EntryMultiShared< TYPE >                                                                       \
-  BookStore::bookMultiShared< TYPE,                                                                       \
-                              const RAxisConfig &,                                                        \
-                              const RAxisConfig &,                                                        \
-                              const RAxisConfig & >( const std::string_view &,                            \
-                                                     const std::string_view &,                            \
-                                                     const RAxisConfig &,                                 \
-                                                     const RAxisConfig &,                                 \
-                                                     const RAxisConfig & );                               \
-  template EntryMultiCopy< TYPE >                                                                         \
-                               BookStore::bookMultiCopy< TYPE,                                            \
-                            const RAxisConfig &,                             \
-                            const RAxisConfig &,                             \
-                            const RAxisConfig & >( std::size_t,              \
-                                                   const std::string_view &, \
-                                                   const std::string_view &, \
-                                                   const RAxisConfig &,      \
-                                                   const RAxisConfig &,      \
-                                                   const RAxisConfig & );    \
-  template EntrySingle< TYPE > BookStore::bookSingle< TYPE,                                               \
-                                                      const RAxisConfig &,                                \
-                                                      const RAxisConfig &,                                \
-                                                      const RAxisConfig & >(                              \
-    const std::string_view &,                                                                             \
-    const std::string_view &,                                                                             \
-    const RAxisConfig &,                                                                                  \
-    const RAxisConfig &,                                                                                  \
-    const RAxisConfig & );                                                                                \
-  LinkT( TYPE )
+#define LinkH3( TYPE )                                                         \
+  BFN_H3( EntrySingle, bookSingle, TYPE, );                                    \
+  BFN_H3( EntryMultiShared, bookMultiShared, TYPE, );                          \
+  BFN_H3( EntryMultiCopy, bookMultiCopy, TYPE, std::size_t, )
 
-    LinkH1( RH1I ) LinkH1( RH1F ) LinkH1( RH1D ) LinkH2( RH2I ) LinkH2( RH2F )
-      LinkH2( RH2D ) LinkH3( RH3I ) LinkH3( RH3F ) LinkH3( RH3D )
+    LinkH1( RH1I ) ;
+    LinkH1( RH1F ) ;
+    LinkH1( RH1D ) ;
+    LinkH2( RH2I ) ;
+    LinkH2( RH2F ) ;
+    LinkH2( RH2D ) ;
+    LinkH3( RH3I ) ;
+    LinkH3( RH3F ) ;
+    LinkH3( RH3D ) ;
 
   } // end namespace book
 } // end namespace marlin

@@ -81,8 +81,8 @@ namespace marlin {
       multiShared() const ;
 
     protected:
-      const std::string_view                      &_title  ;
-      std::array< const types::RAxisConfig *, D >  _axis{} ;
+      const std::string_view &                    _title ;
+      std::array< const types::RAxisConfig *, D > _axis{} ;
     } ;
 
     /**
@@ -103,7 +103,7 @@ namespace marlin {
        *  @param title of the Histogram.
        *  @param axis configuration.
        */
-      EntryData( const std::string_view   &title,
+      EntryData( const std::string_view &  title,
                  const types::RAxisConfig &axis ) ;
     } ;
 
@@ -121,18 +121,18 @@ namespace marlin {
        */
       EntryData( const types::RAxisConfig &x_axis,
                  const types::RAxisConfig &y_axis ) ;
-  
+
       /**
        *  @brief Constructor.
        *  @param title of the Histogram.
        *  @param x_axis configuration of first axis.
        *  @param y_axis configuration of second axis.
        */
-      EntryData( const std::string_view   &title,
+      EntryData( const std::string_view &  title,
                  const types::RAxisConfig &x_axis,
                  const types::RAxisConfig &y_axis ) ;
     } ;
-    
+
     /**
      *  @brief EntryData for 3 dimensional Histograms.
      */
@@ -151,22 +151,21 @@ namespace marlin {
                  const types::RAxisConfig &z_axis ) ;
 
       /**
-       *  @brief Constructor. 
+       *  @brief Constructor.
        *  @param title of Histogram
        *  @param x_axis configuration of first axis.
        *  @param y_axis configuration of second axis.
        *  @param z_axis configuration of third axis.
-      */
-      EntryData( const std::string_view   &title,
+       */
+      EntryData( const std::string_view &  title,
                  const types::RAxisConfig &x_axis,
                  const types::RAxisConfig &y_axis,
                  const types::RAxisConfig &z_axis ) ;
     } ;
 
     /**
-     *  @brief EntryData for objects in Single mode. 
-    */
-    
+     *  @brief EntryData for objects in Single mode.
+     */
     template < int D, typename T, template < int, class > class... STAT >
     class EntryData< types::RH< D, T, STAT... >,
                      Flags::Book::Single.VAL_INIT > {
@@ -179,36 +178,42 @@ namespace marlin {
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 1, EntrySingle< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store
-          .bookSingle< types::RH< 1, T, STAT... >, const types::RAxisConfig & >(
-            args..., *_data._axis[0] ) ;
+        return store.bookSingle< types::RH< 1, T, STAT... >,
+                                 const std::string_view &,
+                                 const types::RAxisConfig & >(
+          args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 2, EntrySingle< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookSingle< types::RH< 2, T, STAT... >,
+                                 const std::string_view &,
                                  const types::RAxisConfig &,
                                  const types::RAxisConfig & >(
-          args..., *_data._axis[0], *_data._axis[1] ) ;
+          args..., _data._title, *_data._axis[0], *_data._axis[1] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 3, EntrySingle< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookSingle< types::RH< 3, T, STAT... >,
+                                 const std::string_view &,
                                  const types::RAxisConfig &,
                                  const types::RAxisConfig &,
                                  const types::RAxisConfig & >(
-          args..., *_data._axis[0], *_data._axis[1], *_data._axis[2] ) ;
+          args...,
+          _data._title,
+          *_data._axis[0],
+          *_data._axis[1],
+          *_data._axis[2] ) ;
       }
       const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
     } ;
 
     /**
-     *  @brief EntryData for objects in MultiCopy Mode 
-    */
-    
+     *  @brief EntryData for objects in MultiCopy Mode
+     */
     template < int D, typename T, template < int, class > class... STAT >
     class EntryData< types::RH< D, T, STAT... >,
                      Flags::Book::MultiCopy.VAL_INIT > {
@@ -222,35 +227,43 @@ namespace marlin {
       std::enable_if_t< d == 1, EntryMultiCopy< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RH< 1, T, STAT... >,
+                                    const std::string_view &,
                                     const types::RAxisConfig & >(
-          _n, args..., *_data._axis[0] ) ;
+          _n, args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 2, EntryMultiCopy< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RH< 2, T, STAT... >,
+                                    const std::string_view &,
                                     const types::RAxisConfig &,
                                     const types::RAxisConfig & >(
-          _n, args..., *_data._axis[0], *_data._axis[1] ) ;
+          _n, args..., _data._title, *_data._axis[0], *_data._axis[1] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 3, EntryMultiCopy< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RH< 3, T, STAT... >,
+                                    const std::string_view &,
                                     const types::RAxisConfig &,
                                     const types::RAxisConfig &,
                                     const types::RAxisConfig & >(
-          _n, args..., *_data._axis[0], *_data._axis[1], *_data._axis[2] ) ;
+          _n,
+          args...,
+          _data._title,
+          *_data._axis[0],
+          *_data._axis[1],
+          *_data._axis[2] ) ;
       }
       const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
       const std::size_t                                  _n ;
     } ;
-  
+
     /**
-     *  @brief  EntryData for objects in MultiShared mode 
-    */  
+     *  @brief  EntryData for objects in MultiShared mode
+     */
     template < int D, typename T, template < int, class > class... STAT >
     class EntryData< types::RH< D, T, STAT... >,
                      Flags::Book::MultiShared.VAL_INIT > {
@@ -263,27 +276,34 @@ namespace marlin {
       std::enable_if_t< d == 1, EntryMultiShared< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RH< 1, T, STAT... >,
+                                      const std::string_view &,
                                       const types::RAxisConfig & >(
-          args..., *_data._axis[0] ) ;
+          args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 2, EntryMultiShared< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RH< 2, T, STAT... >,
+                                      const std::string_view &,
                                       const types::RAxisConfig &,
                                       const types::RAxisConfig & >(
-          args..., *_data._axis[0], *_data._axis[1] ) ;
+          args..., _data._title, *_data._axis[0], *_data._axis[1] ) ;
       }
 
       template < typename... Args_t, int d = D >
       std::enable_if_t< d == 3, EntryMultiShared< types::RH< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RH< 3, T, STAT... >,
+                                      const std::string_view &,
                                       const types::RAxisConfig &,
                                       const types::RAxisConfig &,
                                       const types::RAxisConfig & >(
-          args..., *_data._axis[0], *_data._axis[1], *_data._axis[2] ) ;
+          args...,
+          _data._title,
+          *_data._axis[0],
+          *_data._axis[1],
+          *_data._axis[2] ) ;
       }
       const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
     } ;
