@@ -35,23 +35,23 @@ Depending on the use case, the BookStore can provide you're object in different 
 
 ## Creating new objects
 
-1. call `book<Type>(path, name)` to set the type and position information for the Object.
-2. call `single()`, `multiCopy(n)`, etc. for the type of usage you prefer.
-3. pass the arguments for construction.
+1. construct `EnrtyData` (blueprint) for the object to book
+2. book object with `book(absolut-path, name, entryData)`
 
 **examples**
 
 * **for an single `RH1F`**
 ```cpp
-	auto entry = store.book<RH1F>("/path/to/object/", "name").single()({"axis title", bins, min, max});
+	EnrtyData entryData = EntryData<RH1F>("title", {"axis titile", bins, min, max});
+	auto entry = store.book("/path/to/object/", "name", entryData.single());
 ```
 * **for an multiCopy, with 4 instances, `RH1F`**
 ```cpp
-	auto entry = store.book<RH1F>("/path/", "name").multiCopy(4)({"a", bins, min, max});
+	auto entry = store.book("/path/", "name", EntryData<RH1F>(axis).multiCopy(4));
 ```
 * **for an single `RH2F`**
 ```cpp
-	auto entry = store.book<RH2F>("/path/", "name").single()({"a", nA, minA, maxA}, {"b", nB, minB, maxB});
+	auto entry = store.book("/path/", "name", EntryData<RH2F>(axis1, axis2).sinlge());
 ```
 
 ## Writing to an object
