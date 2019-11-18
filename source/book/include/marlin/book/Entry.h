@@ -6,6 +6,9 @@
 #include <typeinfo>
 #include <variant>
 
+// -- Marlin includes
+#include "marlin/Exceptions.h"
+
 // -- MarlinBook includes
 #include "marlin/book/EntryData.h"
 #include "marlin/book/MemLayout.h"
@@ -142,8 +145,7 @@ namespace marlin {
       template < class T >
       std::optional< Handle< T > > handle( std::size_t idx = -1 ) const {
         if ( std::type_index( typeid( T ) ) != _key.type ) {
-          // TODO add log
-          return std::optional< Handle< T > >() ;
+          MARLIN_THROW_T(BookStoreException, "Entry is not demanded type. Can't create Handle!");
         }
 
         if ( _key.flags.Contains( Flags::Book::Single ) ) {
@@ -158,8 +160,8 @@ namespace marlin {
           return std::static_pointer_cast< EntryMultiShared< T > >( _entry )
             ->handle() ;
         }
-        // TODO add log
-        return std::optional< Handle< T > >() ;
+
+        MARLIN_THROW_T(BookStoreException, "Entry has an invalid Flag combination! Can't create Handle!");
       }
 
       /// access key data from entry.
