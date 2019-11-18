@@ -14,7 +14,7 @@ nav:
       - XML parser: 'user-manual/xml-parser.md'
       - Processor API: 'user-manual/processor-api.md'
       - Multi-threading with MarlinMT: 'user-manual/marlin-mt.md'
-      - Use global Objects in Parallel: 'user-manual/booking-system.md'
+      - Histograms booking: 'user-manual/booking-system.md'
     - Reference manual: 'doxygen/index.html'
 plugins:
   - search:
