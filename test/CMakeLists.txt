@@ -20,7 +20,7 @@ endif()
 if( MARLIN_BOOK )
 	#find_package(MarlinBook CONFIG REQUIRED )
 	include_directories( ${PROJECT_SOURCE_DIR}/source/book/include)
-	link_libraries( "${PROJECT_SOURCE_DIR}/build/lib/libMarlinBook.so" )
+	link_libraries( MarlinBook )
 endif()
 
 # add unit test library

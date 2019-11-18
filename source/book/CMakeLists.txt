@@ -1,6 +1,6 @@
 #################################
 # cmake file for building MarlinBOOK component
-# @author Remi Ete, DESY
+# @author Remi Ete, Julian Benda, DESY
 #################################
 
 #include directories

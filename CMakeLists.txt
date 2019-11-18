@@ -141,7 +141,6 @@ INSTALL( FILES "${PROJECT_SOURCE_DIR}/source/python/compareMarlinSteeringFiles.p
 	      OWNER_WRITE )
 # -----------------------------------------------------------------------------
 
-set(MARLIN_BOOK ${MARLIN_BOOK} CACHE BOOL "not again" FORCE)
 ADD_SUBDIRECTORY( source )
 ##########################################################################
 

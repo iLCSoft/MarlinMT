@@ -35,9 +35,7 @@ ENDIF()
 IF( NOT MARLIN_GEAR )
     LIST( REMOVE_ITEM library_sources ./src/plugins/GearGeometry.cc )
 ENDIF()
-IF( MARLIN_BOOK )
-	# LIST(…) TODO when in framework
-ENDIF()
+
 INCLUDE_DIRECTORIES( SYSTEM tinyxml/include )
 
 
