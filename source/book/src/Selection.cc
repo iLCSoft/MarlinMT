@@ -27,7 +27,7 @@ namespace marlin {
           _condition = sel.condition() ;
           break ;
         default:
-          throw "Strategy not defined!" ;
+          MARLIN_THROW_T(BookStoreException, "Condition compose strategy is not defined.");
       }
     }
 

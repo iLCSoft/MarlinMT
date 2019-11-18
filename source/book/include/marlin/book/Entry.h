@@ -140,6 +140,8 @@ namespace marlin {
       /**
        *  @brief creates an handle for the entry.
        *  @param idx of instance, only used for multi copy entries
+       *  @throw BookStoreException when the Entry has Invalid Flags, or 
+       *  type mismatch with demanded Handle.
        *  @return empty optional if the type or the configuration not matches.
        */
       template < class T >

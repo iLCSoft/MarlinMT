@@ -6,6 +6,9 @@
 #include <string_view>
 #include <unordered_map>
 
+// -- Marlin includes
+#include "marlin/Exceptions.h"
+
 // -- MarlinBook includes
 #include "marlin/book/ROOTAdapter.h"
 #include "marlin/book/Entry.h"
@@ -67,9 +70,16 @@ namespace marlin {
 
       /**
        *  @brief get Entry from key.
-       *  @throw std::out_of_range key not exist in Store.
+       *  @throw BookStoreException key not exist in Store.
        */
-      Entry &get( const EntryKey &key ) { return _entries[key.hash]; }
+      Entry &get( const EntryKey &key ) { 
+        try {
+          return _entries[key.hash]; 
+        } catch(const auto&) {
+          MARLIN_THROW_T(BookStoreException, "Invalid key.");
+        }
+      
+      }
 
     public:
       template < class T >
