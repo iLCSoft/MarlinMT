@@ -14,10 +14,6 @@
 #include <memory>
 #include <string>
 
-template<typename T>
-void MergeaHist(const std::shared_ptr<T>& dst, const std::shared_ptr<T>& src) {
-  ROOT::Experimental::Add(*dst, *src);
-}
 
 std::string mergedUnicStr() {
   static std::size_t num = 0;
@@ -37,7 +33,7 @@ int main(int, char**) {
   
   {
 
-    // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;	
+    // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;  
     EntrySingle entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
 
     auto hnd = entry.handle();
@@ -150,7 +146,7 @@ int main(int, char**) {
         && selC[1].size() == selC[2].size()
         && selC[2].size() == selC[3].size()
         && equal);
-    } 	
+    }   
   }{
 
       
@@ -177,7 +173,7 @@ int main(int, char**) {
 
     test.test("Remove Elements from store", 
           equal
-      && 	rem2.size() == 0 
+      &&  rem2.size() == 0 
       && selAll.size() == 0);
   
   } {
@@ -210,9 +206,9 @@ int main(int, char**) {
 
     test.test("Get booked entry from BookStore",
       e.handle().merged().GetBinContent({0}) == 2
-      && h.merged().GetBinContent({0}) == 2);		
+      && h.merged().GetBinContent({0}) == 2);   
 
-  }	{
+  } {
     EntrySingle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", {"x", 2, -1.0, 5.0}).single());
     e.handle().fill({0}, 1);
     test.test("Named Histograms", e.handle().merged().GetEntries() == 1);
