@@ -21,9 +21,6 @@ namespace marlin {
      */
     template < typename T >
     class BaseHandle {
-      std::shared_ptr< MemLayout > _mem ;
-      std::shared_ptr< T >         _obj ;
-
     protected:
       BaseHandle( const std::shared_ptr< MemLayout > &mem,
                   const std::shared_ptr< T >         &obj )
@@ -41,6 +38,12 @@ namespace marlin {
        *  @return object which is contains data from every handle.
        */
       const T &merged() { return *_mem->template merged< T >(); }
+
+    private:
+      /// pointer to memory from instances.
+      std::shared_ptr< MemLayout > _mem ;
+      /// pointer to the one managed instance.
+      std::shared_ptr< T >         _obj ;
     } ;
 
     /**

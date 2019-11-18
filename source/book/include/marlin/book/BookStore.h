@@ -6,10 +6,8 @@
 #include <string_view>
 #include <unordered_map>
 
-// -- map ROOT to MarlinBook types
-#include "marlin/book/ROOTAdapter.h"
-
 // -- MarlinBook includes
+#include "marlin/book/ROOTAdapter.h"
 #include "marlin/book/Entry.h"
 
 namespace marlin {
@@ -35,6 +33,7 @@ namespace marlin {
      */
     template < class T >
     class EntryDataBase {} ;
+
     template <>
     class EntryDataBase< void > {
     public:
@@ -77,7 +76,6 @@ namespace marlin {
       auto book( const std::string_view &path,
                  const std::string_view &name,
                  const T &               data ) {
-        // TODO static assert and type check
         return data.template book< std::string_view, std::string_view >(
           *this, path, name ) ;
       }

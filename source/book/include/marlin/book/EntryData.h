@@ -21,16 +21,15 @@ namespace marlin {
       /// default constructor.
       EntryKey() : type{std::type_index( typeid( void ) )} {}
 
-      // TODO: clean solution
       /// Construct typed EntryKey.
       EntryKey( const std::type_index &t ) : type{t} {}
 
       /// virtual Entry path
-      std::string path{""},
-        /// Entry name
-        name{""} ;
+      std::string path{""} ;
+      /// Entry name
+      std::string name{""} ;
       /// number of memory instances
-      std::size_t amt{0} ;
+      std::size_t mInstances{0} ;
       /// Type of object stored in Entry.
       std::type_index type ;
       /// Status flags from Entry.

@@ -19,24 +19,25 @@ namespace marlin {
      *  Used to doing action on a range of entries.
      */
     class Selection {
-      friend BookStore ;
 
+    public:
       /**
        *  @brief Construct Selection from range of Entries.
        *  @param begin,end range of Entries
        *  @param cond Condition to filter Entries.
+       *  @tparam T iterator type
+       *  @note For Library  internal usage, only instances for some types.
        */
       template < typename T >
       static Selection find( T begin, T end, const Condition &cond ) ;
 
-    public:
       /// type for iteration through a Selection.
-      using iterator = typename std::vector< Entry >::const_iterator ;
+      using const_iterator = typename std::vector< Entry >::const_iterator ;
 
       /// Possibilities to compose Conditions when creating sub selections.
       /// Composed the new condition with the condition from the super
       /// selection.
-      enum struct ComposeStrategie { AND, ONLY_CHILD, ONLY_PARENT } ;
+      enum struct ComposeStrategy { AND, ONLY_CHILD, ONLY_PARENT } ;
 
       /// default constructor. Construct empty selection.
       Selection() = default ;
@@ -54,16 +55,16 @@ namespace marlin {
        */
       Selection( const Selection &sel,
                  const Condition &cond,
-                 ComposeStrategie strategy = ComposeStrategie::AND ) ;
+                 ComposeStrategy strategy = ComposeStrategy::AND ) ;
 
       /// getter for Condition which every Entry full fill.
       const Condition &condition() const { return _condition; }
 
       /// begin iterator to iterate through entries.
-      iterator begin() const { return _entries.cbegin(); }
+      const_iterator begin() const { return _entries.cbegin(); }
 
       /// end iterator for entries. First not valid iterator.
-      iterator end() const { return _entries.cend(); }
+      const_iterator end() const { return _entries.cend(); }
 
       /// @return number of entries included in the selection.
       std::size_t size() const { return _entries.size(); }
@@ -74,7 +75,7 @@ namespace marlin {
        *  @param strategy to compos selection with sub selection condition.
        */
       Selection find( const Condition &cond,
-                      ComposeStrategie strategie = ComposeStrategie::AND ) ;
+                      ComposeStrategy strategy = ComposeStrategy::AND ) ;
 
       /**
        *  @brief get entry at position.
@@ -99,7 +100,7 @@ namespace marlin {
        *  @brief remove entry.
        *  @param itr iterator from entry which should be removed.
        */
-      void remove( iterator itr ) ;
+      void remove( const_iterator itr ) ;
 
       /**
        *  @brief remove entry range.
@@ -107,7 +108,7 @@ namespace marlin {
        *  @param begin first entry which should be removed.
        *  @param end first entry which should not be removed.
        */
-      void remove( iterator begin, iterator end ) ;
+      void remove( const_iterator begin, const_iterator end ) ;
 
     private:
       /// entries which included in selection.

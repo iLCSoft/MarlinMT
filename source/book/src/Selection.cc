@@ -14,16 +14,16 @@ namespace marlin {
 
     Selection::Selection( const Selection &sel,
                           const Condition &cond,
-                          ComposeStrategie strategie )
+                          ComposeStrategy strategy )
       : Selection{find( sel.begin(), sel.end(), cond )} {
-      switch ( strategie ) {
-        case ComposeStrategie::AND:
+      switch ( strategy ) {
+        case ComposeStrategy::AND:
           _condition = sel.condition().And( cond ) ;
           break ;
-        case ComposeStrategie::ONLY_CHILD:
+        case ComposeStrategy::ONLY_CHILD:
           _condition = cond ;
           break ;
-        case ComposeStrategie::ONLY_PARENT:
+        case ComposeStrategy::ONLY_PARENT:
           _condition = sel.condition() ;
           break ;
         default:
@@ -50,8 +50,8 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     Selection Selection::find( const Condition &cond,
-                               ComposeStrategie strategie ) {
-      return Selection( *this, cond, strategie ) ;
+                               ComposeStrategy strategy ) {
+      return Selection( *this, cond, strategy ) ;
     }
 
     //--------------------------------------------------------------------------

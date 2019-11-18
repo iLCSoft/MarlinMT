@@ -20,7 +20,7 @@ namespace marlin {
        */
       template < typename T >
       std::shared_ptr< const T > at( std::size_t idx ) const {
-        return std::static_pointer_cast< const T >( imp_at( idx ) ) ;
+        return std::static_pointer_cast< const T >( impAt( idx ) ) ;
       }
 
       /**
@@ -30,7 +30,7 @@ namespace marlin {
        */
       template < typename T >
       std::shared_ptr< T > at( std::size_t idx ) {
-        return std::static_pointer_cast< T >( imp_at( idx ) ) ;
+        return std::static_pointer_cast< T >( impAt( idx ) ) ;
       }
 
       /**
@@ -39,16 +39,16 @@ namespace marlin {
        */
       template < typename T >
       std::shared_ptr< const T > merged() {
-        return std::static_pointer_cast< const T >( imp_merged() ) ;
+        return std::static_pointer_cast< const T >( impMerged() ) ;
       }
 
       virtual ~MemLayout() = default ;
 
     protected:
       /// implementation from at
-      virtual std::shared_ptr< void > imp_at( std::size_t idx ) const = 0 ;
+      virtual std::shared_ptr< void > impAt( std::size_t idx ) const = 0 ;
       /// implementation from merged
-      virtual std::shared_ptr< void > imp_merged() = 0 ;
+      virtual std::shared_ptr< void > impMerged() = 0 ;
     } ;
 
     /**

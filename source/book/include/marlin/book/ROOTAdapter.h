@@ -7,7 +7,7 @@
 #include "ROOT/RHist.hxx"
 #include "ROOT/RHistConcurrentFill.hxx"
 #include "ROOT/RHistData.hxx"
-#include "ROOT/span.hxx"
+#include "ROOT/RSpan.hxx"
 
 namespace marlin {
   namespace book {
@@ -19,11 +19,11 @@ namespace marlin {
 
       /// Generic Histogram.
       template < int D, typename T, template < int, class > class... STAT >
-      using RH = ROOT::Experimental::RHist< D, T, STAT... > ;
+      using RHist = ROOT::Experimental::RHist< D, T, STAT... > ;
 
       /// Histogram merge function.
       template < typename TO, typename FROM >
-      void ADD( const TO &to, const FROM &from ) {
+      void addHists( const TO &to, const FROM &from ) {
         ROOT::Experimental::Add( to, from ) ;
       }
 
@@ -46,18 +46,17 @@ namespace marlin {
       /// often used Histograms Instance.
       using RH3I = ROOT::Experimental::RH3I ;
 
+
+#ifndef MARLIN_HIST_FILLER_BUFFER_SIZE
+#define MARLIN_HIST_FILLER_BUFFER_SIZE 1024
+#endif
       /**
        *  @brief Buffer size for Histograms used in Shared mode.
        *  - larger →  less synchronisation points
        *  - larger →  more memory consumption.
-       *  @note can set with the CMAKE  Variable \cod {NAME}
+       *  @note can set with the CMAKE  Variable \cod {MARLIN_HIST_FILLER_BUFFER_SIZE}
        */
-      constexpr std::size_t HistogramFillerBufferSize
-#ifdef HISTOGRAM_FILLER_BUFFER_SIZE
-        = HISTOGRAM_FILLER_BUFFER_SIZE ;
-#else
-        = 1024 ;
-#endif
+      constexpr std::size_t HistogramFillerBufferSize = MARLIN_HIST_FILLER_BUFFER_SIZE;
 
       /**
        *  @brief produce concurrent filler for one Histogram.
@@ -65,7 +64,7 @@ namespace marlin {
        */
       template < class T >
       using RHistConcurrentFillManager
-        = ROOT::Experimental::RHistConcurrentFillManager< T, 1024 > ;
+        = ROOT::Experimental::RHistConcurrentFillManager< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
 
       /**
        *  @brief to fill a Histogram concurrent.
@@ -73,7 +72,7 @@ namespace marlin {
        */
       template < class T >
       using RHistConcurrentFiller
-        = ROOT::Experimental::RHistConcurrentFiller< T, 1024 > ;
+        = ROOT::Experimental::RHistConcurrentFiller< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
 
     } // end namespace types
   } // end namespace book
