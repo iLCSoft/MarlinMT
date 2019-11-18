@@ -461,5 +461,243 @@ namespace marlin {
         _fillers ;
     } ;
 
+    //--------------------------------------------------------------------------
+    
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryDataBase< types::RHist< D, T, STAT... > >::EntryDataBase(
+      const std::string_view &title )
+      : _title{title} {}
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
+    EntryDataBase< types::RHist< D, T, STAT... > >::single() const {
+      return EntryData< types::RHist< D, T, STAT... >,
+                        Flags::Book::Single.VAL_INIT >( *this ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+    EntryDataBase< types::RHist< D, T, STAT... > >::multiCopy( std::size_t n ) const {
+      return EntryData< types::RHist< D, T, STAT... >,
+                        Flags::Book::MultiCopy.VAL_INIT >( *this, n ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
+    EntryDataBase< types::RHist< D, T, STAT... > >::multiShared() const {
+      return EntryData< types::RHist< D, T, STAT... >,
+                        Flags::Book::MultiShared.VAL_INIT >( *this ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 1, T, STAT... >, 0 >::EntryData( const types::RAxisConfig &axis )
+      : EntryDataBase< types::RHist< 1, T, STAT... > >() {
+      this->_axis[0] = &axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 1, T, STAT... >, 0 >::EntryData(
+      const std::string_view &title, const types::RAxisConfig &axis )
+      : EntryDataBase< types::RHist< 1, T, STAT... > >( title ) {
+      this->_axis[0] = &axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 2, T, STAT... >, 0 >::EntryData( const types::RAxisConfig &x_axis,
+                                                    const types::RAxisConfig &y_axis )
+      : EntryDataBase< types::RHist< 2, T, STAT... > >() {
+      this->_axis[0] = &x_axis ;
+      this->_axis[1] = &y_axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 2, T, STAT... >, 0 >::EntryData(
+      const std::string_view &title,
+      const types::RAxisConfig &     x_axis,
+      const types::RAxisConfig &     y_axis )
+      : EntryDataBase< types::RHist< 2, T, STAT... > >( title ) {
+      this->_axis[0] = &x_axis ;
+      this->_axis[1] = &y_axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 3, T, STAT... >, 0 >::EntryData( const types::RAxisConfig &x_axis,
+                                                    const types::RAxisConfig &y_axis,
+                                                    const types::RAxisConfig &z_axis )
+      : EntryDataBase< types::RHist< 3, T, STAT... > >() {
+      this->_axis[0] = &x_axis ;
+      this->_axis[1] = &y_axis ;
+      this->_axis[2] = &z_axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T, template < int, class > class... STAT >
+    EntryData< types::RHist< 3, T, STAT... >, 0 >::EntryData(
+      const std::string_view &title,
+      const types::RAxisConfig &     x_axis,
+      const types::RAxisConfig &     y_axis,
+      const types::RAxisConfig &     z_axis )
+      : EntryDataBase< types::RHist< 3, T, STAT... > >( title ) {
+      this->_axis[0] = &x_axis ;
+      this->_axis[1] = &y_axis ;
+      this->_axis[2] = &z_axis ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    Handle< types::RHist< D, T, STAT... > >::Handle(
+      const std::shared_ptr< MemLayout > &                        mem,
+      const std::shared_ptr< types::RHist< D, T, STAT... > > &              obj,
+      const typename Handle< types::RHist< D, T, STAT... > >::FillFn_t &    fillFn,
+      const typename Handle< types::RHist< D, T, STAT... > >::FillNFn_t &   fillNFn,
+      const typename Handle< types::RHist< D, T, STAT... > >::FinalizeFn_t &finalFn )
+      : BaseHandle< types::RHist< D, T, STAT... > >{mem, obj}, _fillFn{fillFn},
+        _fillNFn{fillNFn}, _finalFn{finalFn} {}
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    void Handle< types::RHist< D, T, STAT... > >::fill(
+      const typename Handle< types::RHist< D, T, STAT... > >::CoordArray_t &x,
+      const typename Handle< types::RHist< D, T, STAT... > >::Weight_t &    w ) {
+      _fillFn( x, w ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    void Handle< types::RHist< D, T, STAT... > >::fillN(
+      const std::span< typename Handle< types::RHist< D, T, STAT... > >::CoordArray_t >
+        &                                                                  x,
+      const std::span< typename Handle< types::RHist< D, T, STAT... > >::Weight_t > &w ) {
+      _fillNFn( x, w ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    const types::RHist< D, T, STAT... > &Handle< types::RHist< D, T, STAT... > >::merged() {
+      _finalFn() ;
+      return BaseHandle< types::RHist< D, T, STAT... > >::merged() ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntrySingle< types::RHist< D, T, STAT... > >::EntrySingle( const Context &context )
+      : _context{context} {}
+
+    template < int D, typename T, template < int, class > class... STAT >
+    Handle< types::RHist< D, T, STAT... > > EntrySingle< types::RHist< D, T, STAT... > >::handle() {
+      using Hnd_t = types::RHist< D, T, STAT... > ;
+      auto hist   = _context.mem->at< Type >( 0 ) ;
+      return Handle< Type >(
+        _context.mem,
+        hist,
+        [hist]( const typename Hnd_t::CoordArray_t &x,
+                const typename Hnd_t::Weight_t &    w ) { hist->Fill( x, w ); },
+        [hist]( const std::span< typename Hnd_t::CoordArray_t > &x,
+                const std::span< typename Hnd_t::Weight_t > &    w ) {
+          hist->FillN( x, w ) ;
+        },
+        []() {} ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryMultiCopy< types::RHist< D, T, STAT... > >::EntryMultiCopy(
+      const Context &context )
+      : _context{context} {}
+
+    template < int D, typename T, template < int, class > class... STAT >
+    Handle< types::RHist< D, T, STAT... > >
+    EntryMultiCopy< types::RHist< D, T, STAT... > >::handle( std::size_t idx ) {
+      using Hnd_t = types::RHist< D, T, STAT... > ;
+      auto pHist  = _context.mem->at< Type >( idx ) ;
+      return Handle< Type >(
+        _context.mem,
+        pHist,
+        [pHist]( const typename Hnd_t::CoordArray_t &x,
+                 const typename Hnd_t::Weight_t &w ) { pHist->Fill( x, w ); },
+        [pHist]( const std::span< typename Hnd_t::CoordArray_t > &x,
+                 const std::span< typename Hnd_t::Weight_t > &    w ) {
+          pHist->FillN( x, w ) ;
+        },
+        []() {} ) ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < int D, typename T, template < int, class > class... STAT >
+    void EntryMultiShared< types::RHist< D, T, STAT... > >::flush() {
+      for ( auto &filler : _fillers ) {
+        if ( auto ptr = filler.lock() ) {
+          ptr->Flush() ;
+        }
+      }
+    }
+
+
+    //--------------------------------------------------------------------------
+    
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryMultiShared< types::RHist< D, T, STAT... > >::EntryMultiShared(
+      const Context &context )
+      : _context{context},
+        _fillMgr{
+          std::make_shared< types::RHistConcurrentFillManager< types::RHist< D, T, STAT... > > >(
+            *context.mem->at< types::RHist< D, T, STAT... > >( 0 ) )},
+        _fillers( 0 ) {}
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    EntryMultiShared< types::RHist< D, T, STAT... > >::~EntryMultiShared() {
+      flush() ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < int D, typename T, template < int, class > class... STAT >
+    Handle< types::RHist< D, T, STAT... > >
+    EntryMultiShared< types::RHist< D, T, STAT... > >::handle() {
+      using Hnd_t = types::RHist< D, T, STAT... > ;
+      auto pFiller
+        = std::make_shared< types::RHistConcurrentFiller< types::RHist< D, T, STAT... > > >(
+          *_fillMgr ) ;
+      _fillers.push_back( pFiller ) ;
+      return Handle< Type >(
+        _context.mem,
+        _context.mem->at< Type >( 0 ),
+        [pFiller = pFiller]( const typename Hnd_t::CoordArray_t &x,
+                             const typename Hnd_t::Weight_t &    w ) {
+          pFiller->Fill( x, w ) ;
+        },
+        [pFiller = pFiller]( const std::span< typename Hnd_t::CoordArray_t > &x,
+                             const std::span< typename Hnd_t::Weight_t > &w ) {
+          pFiller->FillN( x, w ) ;
+        },
+        [this]() { this->flush(); } ) ;
+    }
+
   } // end namespace book
 } // end namespace marlin

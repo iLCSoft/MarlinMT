@@ -2,10 +2,14 @@
 
 // -- std includes
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <iterator>
 
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
+#include "marlin/book/MemLayout.h"
 
 namespace marlin {
   namespace book {
@@ -116,6 +120,80 @@ namespace marlin {
       /// condition which every entry full fill.
       Condition _condition{} ;
     } ;
+
+    //--------------------------------------------------------------------------
+    
+    Selection::Selection( const Selection &sel,
+                          const Condition &cond,
+                          ComposeStrategy strategy )
+      : Selection{find( sel.begin(), sel.end(), cond )} {
+      switch ( strategy ) {
+        case ComposeStrategy::AND:
+          _condition = sel.condition().And( cond ) ;
+          break ;
+        case ComposeStrategy::ONLY_CHILD:
+          _condition = cond ;
+          break ;
+        case ComposeStrategy::ONLY_PARENT:
+          _condition = sel.condition() ;
+          break ;
+        default:
+          MARLIN_THROW_T(BookStoreException, "Condition compose strategy is not defined.");
+      }
+    }
+
+    //--------------------------------------------------------------------------
+
+    template < typename T >
+    Selection Selection::find( T begin, T end, const Condition &cond ) {
+      Selection res{} ;
+      res._condition = cond ;
+
+      std::copy_if( begin,
+                    end,
+                    std::back_inserter( res._entries ),
+                    [&c = cond]( const Entry &e ) -> bool {
+                      return e.valid() && c( e.key() ) ;
+                    } ) ;
+      return res ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    Selection Selection::find( const Condition &cond,
+                               ComposeStrategy strategy ) {
+      return Selection( *this, cond, strategy ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    void Selection::remove( std::size_t id ) {
+      _entries.erase( _entries.cbegin() + id ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    void Selection::remove( std::size_t id, std::size_t n ) {
+      auto beg = _entries.cbegin() + id ;
+      _entries.erase( beg, beg + n ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    void Selection::remove( const_iterator itr ) { _entries.erase( itr ); }
+
+    //--------------------------------------------------------------------------
+
+    void Selection::remove( const_iterator begin, const_iterator end ) {
+      _entries.erase( begin, end ) ;
+    }
+
+    //--------------------------------------------------------------------------
+
+    template Selection
+    Selection::find< Selection::const_iterator >( Selection::const_iterator begin,
+                                            Selection::const_iterator end,
+                                            const Condition &   cond ) ;
 
   } // end namespace book
 } // end namespace marlin
