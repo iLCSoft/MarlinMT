@@ -10,60 +10,60 @@ namespace marlin {
     using namespace types ;
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryDataBase< RH< D, T, STAT... > >::EntryDataBase(
+    EntryDataBase< RHist< D, T, STAT... > >::EntryDataBase(
       const std::string_view &title )
       : _title{title} {}
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryData< RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
-    EntryDataBase< RH< D, T, STAT... > >::single() const {
-      return EntryData< types::RH< D, T, STAT... >,
+    EntryData< RHist< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
+    EntryDataBase< RHist< D, T, STAT... > >::single() const {
+      return EntryData< types::RHist< D, T, STAT... >,
                         Flags::Book::Single.VAL_INIT >( *this ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryData< RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
-    EntryDataBase< RH< D, T, STAT... > >::multiCopy( std::size_t n ) const {
-      return EntryData< types::RH< D, T, STAT... >,
+    EntryData< RHist< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+    EntryDataBase< RHist< D, T, STAT... > >::multiCopy( std::size_t n ) const {
+      return EntryData< types::RHist< D, T, STAT... >,
                         Flags::Book::MultiCopy.VAL_INIT >( *this, n ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryData< RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
-    EntryDataBase< RH< D, T, STAT... > >::multiShared() const {
-      return EntryData< types::RH< D, T, STAT... >,
+    EntryData< RHist< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
+    EntryDataBase< RHist< D, T, STAT... > >::multiShared() const {
+      return EntryData< types::RHist< D, T, STAT... >,
                         Flags::Book::MultiShared.VAL_INIT >( *this ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 1, T, STAT... >, 0 >::EntryData( const RAxisConfig &axis )
-      : EntryDataBase< RH< 1, T, STAT... > >() {
+    EntryData< RHist< 1, T, STAT... >, 0 >::EntryData( const RAxisConfig &axis )
+      : EntryDataBase< RHist< 1, T, STAT... > >() {
       this->_axis[0] = &axis ;
     }
 
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 1, T, STAT... >, 0 >::EntryData(
+    EntryData< RHist< 1, T, STAT... >, 0 >::EntryData(
       const std::string_view &title, const RAxisConfig &axis )
-      : EntryDataBase< RH< 1, T, STAT... > >( title ) {
+      : EntryDataBase< RHist< 1, T, STAT... > >( title ) {
       this->_axis[0] = &axis ;
     }
 
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 2, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
+    EntryData< RHist< 2, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
                                                     const RAxisConfig &y_axis )
-      : EntryDataBase< RH< 2, T, STAT... > >() {
+      : EntryDataBase< RHist< 2, T, STAT... > >() {
       this->_axis[0] = &x_axis ;
       this->_axis[1] = &y_axis ;
     }
@@ -71,11 +71,11 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 2, T, STAT... >, 0 >::EntryData(
+    EntryData< RHist< 2, T, STAT... >, 0 >::EntryData(
       const std::string_view &title,
       const RAxisConfig &     x_axis,
       const RAxisConfig &     y_axis )
-      : EntryDataBase< RH< 2, T, STAT... > >( title ) {
+      : EntryDataBase< RHist< 2, T, STAT... > >( title ) {
       this->_axis[0] = &x_axis ;
       this->_axis[1] = &y_axis ;
     }
@@ -83,10 +83,10 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 3, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
+    EntryData< RHist< 3, T, STAT... >, 0 >::EntryData( const RAxisConfig &x_axis,
                                                     const RAxisConfig &y_axis,
                                                     const RAxisConfig &z_axis )
-      : EntryDataBase< RH< 3, T, STAT... > >() {
+      : EntryDataBase< RHist< 3, T, STAT... > >() {
       this->_axis[0] = &x_axis ;
       this->_axis[1] = &y_axis ;
       this->_axis[2] = &z_axis ;
@@ -95,12 +95,12 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T, template < int, class > class... STAT >
-    EntryData< RH< 3, T, STAT... >, 0 >::EntryData(
+    EntryData< RHist< 3, T, STAT... >, 0 >::EntryData(
       const std::string_view &title,
       const RAxisConfig &     x_axis,
       const RAxisConfig &     y_axis,
       const RAxisConfig &     z_axis )
-      : EntryDataBase< RH< 3, T, STAT... > >( title ) {
+      : EntryDataBase< RHist< 3, T, STAT... > >( title ) {
       this->_axis[0] = &x_axis ;
       this->_axis[1] = &y_axis ;
       this->_axis[2] = &z_axis ;
@@ -109,51 +109,51 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    Handle< RH< D, T, STAT... > >::Handle(
+    Handle< RHist< D, T, STAT... > >::Handle(
       const std::shared_ptr< MemLayout > &                        mem,
-      const std::shared_ptr< RH< D, T, STAT... > > &              obj,
-      const typename Handle< RH< D, T, STAT... > >::FillFn_t &    fillFn,
-      const typename Handle< RH< D, T, STAT... > >::FillNFn_t &   fillNFn,
-      const typename Handle< RH< D, T, STAT... > >::FinalizeFn_t &finalFn )
-      : BaseHandle< RH< D, T, STAT... > >{mem, obj}, _fillFn{fillFn},
+      const std::shared_ptr< RHist< D, T, STAT... > > &              obj,
+      const typename Handle< RHist< D, T, STAT... > >::FillFn_t &    fillFn,
+      const typename Handle< RHist< D, T, STAT... > >::FillNFn_t &   fillNFn,
+      const typename Handle< RHist< D, T, STAT... > >::FinalizeFn_t &finalFn )
+      : BaseHandle< RHist< D, T, STAT... > >{mem, obj}, _fillFn{fillFn},
         _fillNFn{fillNFn}, _finalFn{finalFn} {}
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    void Handle< RH< D, T, STAT... > >::fill(
-      const typename Handle< RH< D, T, STAT... > >::CoordArray_t &x,
-      const typename Handle< RH< D, T, STAT... > >::Weight_t &    w ) {
+    void Handle< RHist< D, T, STAT... > >::fill(
+      const typename Handle< RHist< D, T, STAT... > >::CoordArray_t &x,
+      const typename Handle< RHist< D, T, STAT... > >::Weight_t &    w ) {
       _fillFn( x, w ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    void Handle< RH< D, T, STAT... > >::fillN(
-      const std::span< typename Handle< RH< D, T, STAT... > >::CoordArray_t >
+    void Handle< RHist< D, T, STAT... > >::fillN(
+      const std::span< typename Handle< RHist< D, T, STAT... > >::CoordArray_t >
         &                                                                  x,
-      const std::span< typename Handle< RH< D, T, STAT... > >::Weight_t > &w ) {
+      const std::span< typename Handle< RHist< D, T, STAT... > >::Weight_t > &w ) {
       _fillNFn( x, w ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    const RH< D, T, STAT... > &Handle< RH< D, T, STAT... > >::merged() {
+    const RHist< D, T, STAT... > &Handle< RHist< D, T, STAT... > >::merged() {
       _finalFn() ;
-      return BaseHandle< RH< D, T, STAT... > >::merged() ;
+      return BaseHandle< RHist< D, T, STAT... > >::merged() ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntrySingle< RH< D, T, STAT... > >::EntrySingle( const Context &context )
+    EntrySingle< RHist< D, T, STAT... > >::EntrySingle( const Context &context )
       : _context{context} {}
 
     template < int D, typename T, template < int, class > class... STAT >
-    Handle< RH< D, T, STAT... > > EntrySingle< RH< D, T, STAT... > >::handle() {
-      using Hnd_t = RH< D, T, STAT... > ;
+    Handle< RHist< D, T, STAT... > > EntrySingle< RHist< D, T, STAT... > >::handle() {
+      using Hnd_t = RHist< D, T, STAT... > ;
       auto hist   = _context.mem->at< Type >( 0 ) ;
       return Handle< Type >(
         _context.mem,
@@ -170,14 +170,14 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryMultiCopy< RH< D, T, STAT... > >::EntryMultiCopy(
+    EntryMultiCopy< RHist< D, T, STAT... > >::EntryMultiCopy(
       const Context &context )
       : _context{context} {}
 
     template < int D, typename T, template < int, class > class... STAT >
-    Handle< RH< D, T, STAT... > >
-    EntryMultiCopy< RH< D, T, STAT... > >::handle( std::size_t idx ) {
-      using Hnd_t = RH< D, T, STAT... > ;
+    Handle< RHist< D, T, STAT... > >
+    EntryMultiCopy< RHist< D, T, STAT... > >::handle( std::size_t idx ) {
+      using Hnd_t = RHist< D, T, STAT... > ;
       auto pHist  = _context.mem->at< Type >( idx ) ;
       return Handle< Type >(
         _context.mem,
@@ -194,29 +194,29 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryMultiShared< RH< D, T, STAT... > >::EntryMultiShared(
+    EntryMultiShared< RHist< D, T, STAT... > >::EntryMultiShared(
       const Context &context )
       : _context{context},
         _fillMgr{
-          std::make_shared< RHistConcurrentFillManager< RH< D, T, STAT... > > >(
-            *context.mem->at< RH< D, T, STAT... > >( 0 ) )},
+          std::make_shared< RHistConcurrentFillManager< RHist< D, T, STAT... > > >(
+            *context.mem->at< RHist< D, T, STAT... > >( 0 ) )},
         _fillers( 0 ) {}
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    EntryMultiShared< RH< D, T, STAT... > >::~EntryMultiShared() {
+    EntryMultiShared< RHist< D, T, STAT... > >::~EntryMultiShared() {
       flush() ;
     }
 
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    Handle< RH< D, T, STAT... > >
-    EntryMultiShared< RH< D, T, STAT... > >::handle() {
-      using Hnd_t = RH< D, T, STAT... > ;
+    Handle< RHist< D, T, STAT... > >
+    EntryMultiShared< RHist< D, T, STAT... > >::handle() {
+      using Hnd_t = RHist< D, T, STAT... > ;
       auto pFiller
-        = std::make_shared< RHistConcurrentFiller< RH< D, T, STAT... > > >(
+        = std::make_shared< RHistConcurrentFiller< RHist< D, T, STAT... > > >(
           *_fillMgr ) ;
       _fillers.push_back( pFiller ) ;
       return Handle< Type >(
@@ -236,7 +236,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < int D, typename T, template < int, class > class... STAT >
-    void EntryMultiShared< RH< D, T, STAT... > >::flush() {
+    void EntryMultiShared< RHist< D, T, STAT... > >::flush() {
       for ( auto &filler : _fillers ) {
         if ( auto ptr = filler.lock() ) {
           ptr->Flush() ;

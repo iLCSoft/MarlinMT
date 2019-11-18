@@ -69,19 +69,19 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void Selection::remove( iterator itr ) { _entries.erase( itr ); }
+    void Selection::remove( const_iterator itr ) { _entries.erase( itr ); }
 
     //--------------------------------------------------------------------------
 
-    void Selection::remove( iterator begin, iterator end ) {
+    void Selection::remove( const_iterator begin, const_iterator end ) {
       _entries.erase( begin, end ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template Selection
-    Selection::find< Selection::iterator >( Selection::iterator begin,
-                                            Selection::iterator end,
+    Selection::find< Selection::const_iterator >( Selection::const_iterator begin,
+                                            Selection::const_iterator end,
                                             const Condition &   cond ) ;
 
   } // end namespace book

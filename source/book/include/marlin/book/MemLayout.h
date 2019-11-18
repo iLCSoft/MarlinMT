@@ -80,11 +80,11 @@ namespace marlin {
 
     private:
       /// Get Resource for Instance. Lazy operation.
-      std::shared_ptr< void > imp_at( std::size_t idx ) const override final {
+      std::shared_ptr< void > impAt( std::size_t idx ) const override final {
         return _objects[idx] ;
       }
 
-      std::shared_ptr< void > imp_merged() override final {
+      std::shared_ptr< void > impMerged() override final {
         _mergedObj
           = std::make_shared< T >( std::make_from_tuple< T >( _ctor_p ) ) ;
         for ( std::shared_ptr< T > &pObj : _objects ) {
@@ -115,12 +115,12 @@ namespace marlin {
 
     private:
       std::shared_ptr< void >
-      imp_at( std::size_t /*idx*/ ) const override final {
+      impAt( std::size_t /*idx*/ ) const override final {
         return _object ;
       }
 
       /// @note cheap merge
-      std::shared_ptr< void > imp_merged() override final { return _object; }
+      std::shared_ptr< void > impMerged() override final { return _object; }
 
       std::shared_ptr< T > _object{nullptr} ;
     } ;

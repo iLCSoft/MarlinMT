@@ -36,14 +36,14 @@ namespace marlin {
 
     /// trait specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >
-    struct trait< types::RH< D, T, STAT... > > {
+    struct trait< types::RHist< D, T, STAT... > > {
       /**
        *  @brief merging two histograms using Add.
        *  @note \code {RHist::GetEntries()} is broken after that.
        */
       static void
-      Merge( const std::shared_ptr< types::RH< D, T, STAT... > > &dst,
-             const std::shared_ptr< types::RH< D, T, STAT... > > &src ) {
+      Merge( const std::shared_ptr< types::RHist< D, T, STAT... > > &dst,
+             const std::shared_ptr< types::RHist< D, T, STAT... > > &src ) {
         Add( *dst, *src ) ;
       }
     } ;
@@ -52,7 +52,7 @@ namespace marlin {
      *  @brief Base for Histogram EntryData.
      */
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryDataBase< types::RH< D, T, STAT... > >
+    class EntryDataBase< types::RHist< D, T, STAT... > >
       : public EntryDataBase< void > {
       template < typename, unsigned long long >
       friend class EntryData ;
@@ -64,20 +64,20 @@ namespace marlin {
       /**
        *  @brief construct EntryData for single booking.
        */
-      EntryData< types::RH< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
+      EntryData< types::RHist< D, T, STAT... >, Flags::Book::Single.VAL_INIT >
       single() const ;
 
       /**
        *  @brief construct EntryData for multi copy booking.
        *  @param n number of memory instances which should be constructed
        */
-      EntryData< types::RH< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
+      EntryData< types::RHist< D, T, STAT... >, Flags::Book::MultiCopy.VAL_INIT >
       multiCopy( std::size_t n ) const ;
 
       /**
        *  @brief construct EntryData for multi shared booking.
        */
-      EntryData< types::RH< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
+      EntryData< types::RHist< D, T, STAT... >, Flags::Book::MultiShared.VAL_INIT >
       multiShared() const ;
 
     protected:
@@ -89,8 +89,8 @@ namespace marlin {
      *  @brief EntryData for 1 dimensional Histograms.
      */
     template < typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< 1, T, STAT... >, 0 >
-      : public EntryDataBase< types::RH< 1, T, STAT... > > {
+    class EntryData< types::RHist< 1, T, STAT... >, 0 >
+      : public EntryDataBase< types::RHist< 1, T, STAT... > > {
     public:
       /**
        *  @brief Constructor without Title.
@@ -111,8 +111,8 @@ namespace marlin {
      *  @brief EntryData for 2 dimensional Histograms.
      */
     template < typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< 2, T, STAT... >, 0 >
-      : public EntryDataBase< types::RH< 2, T, STAT... > > {
+    class EntryData< types::RHist< 2, T, STAT... >, 0 >
+      : public EntryDataBase< types::RHist< 2, T, STAT... > > {
     public:
       /**
        *  @brief Constructor without title.
@@ -137,8 +137,8 @@ namespace marlin {
      *  @brief EntryData for 3 dimensional Histograms.
      */
     template < typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< 3, T, STAT... >, 0 >
-      : public EntryDataBase< types::RH< 3, T, STAT... > > {
+    class EntryData< types::RHist< 3, T, STAT... >, 0 >
+      : public EntryDataBase< types::RHist< 3, T, STAT... > > {
     public:
       /**
        *  @brief Constructor without title.
@@ -167,27 +167,27 @@ namespace marlin {
      *  @brief EntryData for objects in Single mode.
      */
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< D, T, STAT... >,
+    class EntryData< types::RHist< D, T, STAT... >,
                      Flags::Book::Single.VAL_INIT > {
-      friend EntryDataBase< types::RH< D, T, STAT... > > ;
+      friend EntryDataBase< types::RHist< D, T, STAT... > > ;
       friend BookStore ;
 
-      EntryData( const EntryDataBase< types::RH< D, T, STAT... > > &data )
+      EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
         : _data{data} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntrySingle< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 1, EntrySingle< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookSingle< types::RH< 1, T, STAT... >,
+        return store.bookSingle< types::RHist< 1, T, STAT... >,
                                  const std::string_view &,
                                  const types::RAxisConfig & >(
           args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntrySingle< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 2, EntrySingle< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookSingle< types::RH< 2, T, STAT... >,
+        return store.bookSingle< types::RHist< 2, T, STAT... >,
                                  const std::string_view &,
                                  const types::RAxisConfig &,
                                  const types::RAxisConfig & >(
@@ -195,9 +195,9 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntrySingle< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 3, EntrySingle< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookSingle< types::RH< 3, T, STAT... >,
+        return store.bookSingle< types::RHist< 3, T, STAT... >,
                                  const std::string_view &,
                                  const types::RAxisConfig &,
                                  const types::RAxisConfig &,
@@ -208,34 +208,34 @@ namespace marlin {
           *_data._axis[1],
           *_data._axis[2] ) ;
       }
-      const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
+      const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
     } ;
 
     /**
      *  @brief EntryData for objects in MultiCopy Mode
      */
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< D, T, STAT... >,
+    class EntryData< types::RHist< D, T, STAT... >,
                      Flags::Book::MultiCopy.VAL_INIT > {
-      friend EntryDataBase< types::RH< D, T, STAT... > > ;
+      friend EntryDataBase< types::RHist< D, T, STAT... > > ;
       friend BookStore ;
-      EntryData( const EntryDataBase< types::RH< D, T, STAT... > > &data,
+      EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data,
                  std::size_t                                        n )
         : _data{data}, _n{n} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntryMultiCopy< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 1, EntryMultiCopy< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiCopy< types::RH< 1, T, STAT... >,
+        return store.bookMultiCopy< types::RHist< 1, T, STAT... >,
                                     const std::string_view &,
                                     const types::RAxisConfig & >(
           _n, args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntryMultiCopy< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 2, EntryMultiCopy< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiCopy< types::RH< 2, T, STAT... >,
+        return store.bookMultiCopy< types::RHist< 2, T, STAT... >,
                                     const std::string_view &,
                                     const types::RAxisConfig &,
                                     const types::RAxisConfig & >(
@@ -243,9 +243,9 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntryMultiCopy< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 3, EntryMultiCopy< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiCopy< types::RH< 3, T, STAT... >,
+        return store.bookMultiCopy< types::RHist< 3, T, STAT... >,
                                     const std::string_view &,
                                     const types::RAxisConfig &,
                                     const types::RAxisConfig &,
@@ -257,7 +257,7 @@ namespace marlin {
           *_data._axis[1],
           *_data._axis[2] ) ;
       }
-      const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
+      const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
       const std::size_t                                  _n ;
     } ;
 
@@ -265,26 +265,26 @@ namespace marlin {
      *  @brief  EntryData for objects in MultiShared mode
      */
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryData< types::RH< D, T, STAT... >,
+    class EntryData< types::RHist< D, T, STAT... >,
                      Flags::Book::MultiShared.VAL_INIT > {
-      friend EntryDataBase< types::RH< D, T, STAT... > > ;
+      friend EntryDataBase< types::RHist< D, T, STAT... > > ;
       friend BookStore ;
-      EntryData( const EntryDataBase< types::RH< D, T, STAT... > > &data )
+      EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
         : _data{data} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntryMultiShared< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 1, EntryMultiShared< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiShared< types::RH< 1, T, STAT... >,
+        return store.bookMultiShared< types::RHist< 1, T, STAT... >,
                                       const std::string_view &,
                                       const types::RAxisConfig & >(
           args..., _data._title, *_data._axis[0] ) ;
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntryMultiShared< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 2, EntryMultiShared< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiShared< types::RH< 2, T, STAT... >,
+        return store.bookMultiShared< types::RHist< 2, T, STAT... >,
                                       const std::string_view &,
                                       const types::RAxisConfig &,
                                       const types::RAxisConfig & >(
@@ -292,9 +292,9 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntryMultiShared< types::RH< D, T, STAT... > > >
+      std::enable_if_t< d == 3, EntryMultiShared< types::RHist< D, T, STAT... > > >
       book( BookStore &store, const Args_t &... args ) const {
-        return store.bookMultiShared< types::RH< 3, T, STAT... >,
+        return store.bookMultiShared< types::RHist< 3, T, STAT... >,
                                       const std::string_view &,
                                       const types::RAxisConfig &,
                                       const types::RAxisConfig &,
@@ -305,18 +305,18 @@ namespace marlin {
           *_data._axis[1],
           *_data._axis[2] ) ;
       }
-      const EntryDataBase< types::RH< D, T, STAT... > > &_data ;
+      const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
     } ;
 
     /// Handle specialisation for Histograms.
     template < int D, typename T, template < int, class > class... STAT >
-    class Handle< types::RH< D, T, STAT... > >
-      : private BaseHandle< types::RH< D, T, STAT... > > {
+    class Handle< types::RHist< D, T, STAT... > >
+      : private BaseHandle< types::RHist< D, T, STAT... > > {
       friend BookStore ;
 
     public:
       /// Histogram Type which is Handled
-      using Type = types::RH< D, T, STAT... > ;
+      using Type = types::RHist< D, T, STAT... > ;
       /// CoordArray_t from managed Histogram
       using CoordArray_t = typename Type::CoordArray_t ;
       /// Weigh_t from managed Histogram
@@ -372,13 +372,13 @@ namespace marlin {
 
     /// specialisation of EntrySingle for Histograms
     template < int D, typename T, template < int, class > class... STAT >
-    class EntrySingle< types::RH< D, T, STAT... > > : public EntryBase {
+    class EntrySingle< types::RHist< D, T, STAT... > > : public EntryBase {
 
       friend BookStore ;
 
     public:
       /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+      using Type = types::RHist< D, T, STAT... > ;
 
       /// constructor
       EntrySingle( const Context &context ) ;
@@ -399,13 +399,13 @@ namespace marlin {
 
     /// specialisation of EntryMultiCopy for Histograms
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiCopy< types::RH< D, T, STAT... > > : public EntryBase {
+    class EntryMultiCopy< types::RHist< D, T, STAT... > > : public EntryBase {
 
       friend BookStore ;
 
     public:
       /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+      using Type = types::RHist< D, T, STAT... > ;
 
       /// constructor
       EntryMultiCopy( const Context &context ) ;
@@ -427,12 +427,12 @@ namespace marlin {
     } ;
     /// specialisation of EntryMultiShared for Histograms
     template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiShared< types::RH< D, T, STAT... > > : public EntryBase {
+    class EntryMultiShared< types::RHist< D, T, STAT... > > : public EntryBase {
       friend BookStore ;
 
     public:
       /// Type of contained Histogram.
-      using Type = types::RH< D, T, STAT... > ;
+      using Type = types::RHist< D, T, STAT... > ;
 
       /// constructor
       EntryMultiShared( const Context &context ) ;

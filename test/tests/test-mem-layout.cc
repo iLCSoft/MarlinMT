@@ -5,12 +5,12 @@
 #include <cmath>
 
 #include <UnitTesting.h>
+#include "marlin/book/ROOTAdapter.h"
 #include "marlin/book/MemLayout.h"
-#include "ROOT/RHist.hxx"
-#include "ROOT/RAxis.hxx"
 
-using namespace ROOT::Experimental;
 using namespace marlin::book;
+using namespace marlin::book::types;
+
 struct Type1 {
   std::array<int, 5> bins;
   Type1(int a0, int a1, int a2, int a3, int a4)
@@ -29,15 +29,15 @@ public:
 };
 
 
-class SharedRH1I : public SharedMemLayout<RH1I, addHists, RAxisConfig> {
+class SharedRH1I : public SharedMemLayout<RH1I, addHists<RH1I,RH1I>, RAxisConfig> {
 public:
-  SharedRH1I (std::size_t num_inst, RAxisConfig config) : SharedMemLayout<RH1I, MergeHist, RAxisConfig>{num_inst, config} {}
+  SharedRH1I (std::size_t num_inst, RAxisConfig config) : SharedMemLayout<RH1I, addHists, RAxisConfig>{num_inst, config} {}
 };
 
 int main (int, char**) {
   std::srand(std::time(nullptr));
   marlin::test::UnitTest test(" MemLayout Test ");
-  SharedType1<Type1> sMem(3, 1, 0, 0, 0, 0);
+  SharedType1 sMem(3, 1, 0, 0, 0, 0);
   auto ptr1 = sMem.at<Type1>(0);
   auto ptr2 = sMem.at<Type1>(1);
   ptr1->bins[0] += 3;

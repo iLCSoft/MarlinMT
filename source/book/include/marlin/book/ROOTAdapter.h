@@ -27,6 +27,12 @@ namespace marlin {
         ROOT::Experimental::Add( to, from ) ;
       }
 
+      template <typename TO, typename FROM>
+      void addHists( const std::shared_ptr<TO> &to,
+                     const std::shared_ptr<FROM> &from ) {
+        ROOT::Experimental::Add(*to, *from);
+      }
+
       /// often used Histogram Instance
       using RH1D = ROOT::Experimental::RH1D ;
       /// often used Histogram Instance

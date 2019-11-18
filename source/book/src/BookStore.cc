@@ -34,7 +34,7 @@ namespace marlin {
       EntryKey key{std::type_index( typeid( T ) )} ;
       key.name  = name ;
       key.path  = path ;
-      key.amt   = 1 ;
+      key.mInstances   = 1 ;
       key.flags = Flags::Book::Single ;
 
       auto entry = std::make_shared< EntrySingle< T > >( Context(
@@ -55,7 +55,7 @@ namespace marlin {
       EntryKey key{std::type_index( typeid( T ) )} ;
       key.name   = name ;
       key.path   = path ;
-      key.amt    = n ;
+      key.mInstances    = n ;
       key.flags  = Flags::Book::MultiCopy ;
       auto entry = std::make_shared< EntryMultiCopy< T > >( Context(
         std::make_shared< SharedMemLayout< T, trait< T >::Merge, Args_t... > >(
@@ -96,7 +96,7 @@ namespace marlin {
       EntryKey key{std::type_index( typeid( T ) )} ;
       key.name  = name ;
       key.path  = path ;
-      key.amt   = 1 ;
+      key.mInstances = 1 ;
       key.flags = Flags::Book::MultiShared ;
 
       auto entry = std::make_shared< EntryMultiShared< T > >( Context(

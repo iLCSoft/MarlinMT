@@ -22,7 +22,6 @@ std::string mergedUnicStr() {
 
 using namespace marlin::book;
 using namespace marlin::book::types;
-using namespace ROOT::Experimental;
 
 
 
@@ -78,7 +77,7 @@ int main(int, char**) {
         && selection3.size() == 2
         && selection1.begin()->key().hash == selection2.begin()->key().hash);
 
-    auto subSelection = selection.find(ConditionBuilder().setPath("path"), Selection::ComposeStrategie::AND);
+    auto subSelection = selection.find(ConditionBuilder().setPath("path"), Selection::ComposeStrategy::AND);
     auto subSelection1 = store.find(subSelection.condition());
 
     test.test("Subselection composing AND", 
@@ -126,7 +125,7 @@ int main(int, char**) {
       selC[3].remove(selC[3].begin() + 5, selC[3].end());
 
       bool equal = true;
-      Selection::iterator aItr[] = {
+      Selection::const_iterator aItr[] = {
         selC[0].begin(),
         selC[1].begin(),
         selC[2].begin(),
