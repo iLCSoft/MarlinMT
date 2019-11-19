@@ -45,7 +45,7 @@ namespace marlin {
        *  @return condition which accepts a key
        *  when this \b and rhs are accepted this.
        */
-      Condition And( const Condition &rhs ) const {
+      Condition operator&( const Condition &rhs ) const {
         return Condition( [lh = _fiterFn, rh = rhs]( const EntryKey &key ) {
           return lh( key ) && rh( key ) ;
         } ) ;
@@ -57,7 +57,7 @@ namespace marlin {
        *  @return condition which accepts a key
        *  when this \b or rhs are accepted this.
        */
-      Condition Or( const Condition &rhs ) const {
+      Condition operator|( const Condition &rhs ) const {
         return Condition( [lh = _fiterFn, rh = rhs]( const EntryKey &key ) {
           return lh( key ) || rh( key ) ;
         } ) ;
@@ -68,7 +68,7 @@ namespace marlin {
        *  @return condition which accepts a key
        *  when this denied it.
        */
-      Condition Not() const {
+      Condition operator!() const {
         return Condition( [fn = _fiterFn]( const EntryKey &key ) -> bool {
           return !fn( key ) ;
         } ) ;

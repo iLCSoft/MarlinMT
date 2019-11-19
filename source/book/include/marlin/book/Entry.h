@@ -22,16 +22,10 @@ namespace marlin {
     class Handle ;
 
     /**
-     *  @brief trait for type Specific Data, Function and types.
+     *  @brief function to merge two objects.
      */
-    template < typename T >
-    struct trait {
-
-      /// Function to merge two objects of type T.
-      // static void Merge( const std::shared_ptr< T > &,
-      //                    const std::shared_ptr< T > & ) {
-      // }
-    } ;
+    template<typename T >
+    void merge(const std::shared_ptr<T>&, const std::shared_ptr<T>&);
 
     /**
      *  @brief minimal entry for Object.

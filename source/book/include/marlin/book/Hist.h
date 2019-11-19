@@ -27,26 +27,13 @@ namespace marlin {
     class EntryMultiCopy ;
     template < typename T >
     class EntryMultiShared ;
-    template < typename T >
-    struct trait ;
+    template < typename T>
+    void merge(const std::shared_ptr<T>&, const std::shared_ptr<T>&);
     template < typename >
     class EntryDataBase ;
     template < typename, unsigned long long >
     class EntryData ;
 
-    /// trait specialisation for Histograms.
-    template < int D, typename T, template < int, class > class... STAT >
-    struct trait< types::RHist< D, T, STAT... > > {
-      /**
-       *  @brief merging two histograms using Add.
-       *  @note \code {RHist::GetEntries()} is broken after that.
-       */
-      static void
-      Merge( const std::shared_ptr< types::RHist< D, T, STAT... > > &dst,
-             const std::shared_ptr< types::RHist< D, T, STAT... > > &src ) {
-        types::addHists( dst, src ) ;
-      }
-    } ;
 
     /**
      *  @brief Base for Histogram EntryData.

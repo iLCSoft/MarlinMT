@@ -211,7 +211,7 @@ namespace marlin {
       key.mInstances    = n ;
       key.flags  = Flags::Book::MultiCopy ;
       auto entry = std::make_shared< EntryMultiCopy< T > >( Context(
-        std::make_shared< SharedMemLayout< T, trait< T >::Merge, Args_t... > >(
+        std::make_shared< SharedMemLayout< T, merge<T>, Args_t... > >(
           n, ctor_p... ) ) ) ;
 
       addEntry( entry, key ) ;

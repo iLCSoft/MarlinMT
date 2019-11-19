@@ -129,7 +129,7 @@ namespace marlin {
       : Selection{find( sel.begin(), sel.end(), cond )} {
       switch ( strategy ) {
         case ComposeStrategy::AND:
-          _condition = sel.condition().And( cond ) ;
+          _condition = sel.condition() & cond ;
           break ;
         case ComposeStrategy::ONLY_CHILD:
           _condition = cond ;

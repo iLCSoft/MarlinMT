@@ -150,7 +150,7 @@ int main(int, char**) {
 
       
     Selection sel = store.find(ConditionBuilder().setName("name"));
-    Selection rem = store.find(sel.condition().Not());
+    Selection rem = store.find(!sel.condition());
 
     store.remove(rem);
 
