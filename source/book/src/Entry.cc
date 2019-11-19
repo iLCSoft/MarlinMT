@@ -7,14 +7,14 @@
 
 namespace marlin {
 	namespace book {
-		MARLIN_FN(types::RH1F);
-		MARLIN_FN(types::RH2F);
-		MARLIN_FN(types::RH3F);
-		MARLIN_FN(types::RH1D);
-		MARLIN_FN(types::RH2D);
-		MARLIN_FN(types::RH3D);
-		MARLIN_FN(types::RH1I);
-		MARLIN_FN(types::RH2I);
-		MARLIN_FN(types::RH3I);
+		MARLIN_FN(types::RH1F)
+		MARLIN_FN(types::RH2F)
+		MARLIN_FN(types::RH3F)
+		MARLIN_FN(types::RH1D)
+		MARLIN_FN(types::RH2D)
+		MARLIN_FN(types::RH3D)
+		MARLIN_FN(types::RH1I)
+		MARLIN_FN(types::RH2I)
+		MARLIN_FN(types::RH3I)
 	}
 }
