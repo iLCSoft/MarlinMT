@@ -21,14 +21,14 @@ namespace marlin {
    */
   class DumpEventProcessor : public Processor {
   public:
-  	/**
+    /**
      *  @brief Constructor
      */
-  	DumpEventProcessor() ;
+    DumpEventProcessor() ;
 
     // from Processor
-  	void init() ;
-  	void processEvent( EventStore * evt ) ;
+    void init() ;
+    void processEvent( EventStore * evt ) ;
 
   protected:
     OptionalProperty<bool> _dumpDetailed {this, "DumpDetailed",
@@ -40,8 +40,8 @@ namespace marlin {
 
   DumpEventProcessor::DumpEventProcessor() :
     Processor("DumpEvent") {
-  	// modify processor description
-  	_description = "Simple processor to dump an event" ;
+    // modify processor description
+    _description = "Simple processor to dump an event" ;
     // duplicate and don't lock. Anyway, this processor in MT mode doesn't make sense...
     forceRuntimeOption( Processor::RuntimeOption::Critical, false ) ;
     forceRuntimeOption( Processor::RuntimeOption::Clone, true ) ;
@@ -50,15 +50,15 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   void DumpEventProcessor::init() {
-  	// Print the initial parameters
-  	printParameters() ;
+    // Print the initial parameters
+    printParameters() ;
   }
 
   //--------------------------------------------------------------------------
 
   void DumpEventProcessor::processEvent( EventStore * evt ) {
     auto lcevent = evt->event<EVENT::LCEvent>() ;
-	   if( _dumpDetailed ) {
+     if( _dumpDetailed ) {
        UTIL::LCTOOLS::dumpEventDetailed( lcevent.get() ) ;
      }
      else {

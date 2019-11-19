@@ -81,9 +81,9 @@ namespace marlin {
     const bool isInList = (iter != _evtSet.end() ) ;
     //-- note: this will not be printed if compiled w/o MARLINDEBUG=1 !
     log<DEBUG>() << "   processing event: " << lcevent->getEventNumber()
-  		       << "   in run:  " << lcevent->getRunNumber()
-  		       << " - in event list : " << isInList
-  		       << std::endl ;
+             << "   in run:  " << lcevent->getRunNumber()
+             << " - in event list : " << isInList
+             << std::endl ;
     ProcessorApi::setReturnValue( this, evt, isInList ) ;
   }
 
