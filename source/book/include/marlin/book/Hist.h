@@ -44,7 +44,7 @@ namespace marlin {
       static void
       Merge( const std::shared_ptr< types::RHist< D, T, STAT... > > &dst,
              const std::shared_ptr< types::RHist< D, T, STAT... > > &src ) {
-        Add( *dst, *src ) ;
+        types::addHists( dst, src ) ;
       }
     } ;
 
