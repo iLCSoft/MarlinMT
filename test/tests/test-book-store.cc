@@ -197,10 +197,7 @@ int main(int, char**) {
 
 
     Selection sel = store.find(ConditionBuilder().setName("my Name"));
-    std::optional<Handle<RH1F>> oh = sel.begin()->handle<RH1F>();
-
-    
-    Handle<RH1F> h = oh.value();
+    Handle<RH1F> h = sel.begin()->handle<RH1F>();
     h.fill({0}, 1);
 
     test.test("Get booked entry from BookStore",

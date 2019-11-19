@@ -139,7 +139,7 @@ namespace marlin {
        *  @return empty optional if the type or the configuration not matches.
        */
       template < class T >
-      std::optional< Handle< T > > handle( std::size_t idx = -1 ) const {
+      Handle< T >handle( std::size_t idx = -1 ) const {
         if ( std::type_index( typeid( T ) ) != _key.type ) {
           MARLIN_THROW_T(BookStoreException, "Entry is not demanded type. Can't create Handle!");
         }
