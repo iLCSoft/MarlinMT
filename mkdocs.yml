@@ -14,7 +14,8 @@ nav:
       - XML parser: 'user-manual/xml-parser.md'
       - Processor API: 'user-manual/processor-api.md'
       - Multi-threading with MarlinMT: 'user-manual/marlin-mt.md'
-      - Histograms booking: 'user-manual/booking-system.md'
+    - Internal Documentation:
+      - Booking system: 'internal-documentation/booking-system.md'
     - Reference manual: 'doxygen/index.html'
 plugins:
   - search:
