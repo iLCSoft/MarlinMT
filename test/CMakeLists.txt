@@ -31,7 +31,6 @@ if( MARLIN_LCIO )
   list( APPEND library_sources processors/TestEventModifier.cc )
 endif()
 
-
 add_shared_library( MarlinUnitTest ${library_sources} )
 target_link_libraries( MarlinUnitTest Marlin )
 

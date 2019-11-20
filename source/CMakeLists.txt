@@ -35,9 +35,7 @@ ENDIF()
 IF( NOT MARLIN_GEAR )
     LIST( REMOVE_ITEM library_sources ./src/plugins/GearGeometry.cc )
 ENDIF()
-
 INCLUDE_DIRECTORIES( SYSTEM tinyxml/include )
-
 
 # create library
 ADD_SHARED_LIBRARY( Marlin ${library_sources} )

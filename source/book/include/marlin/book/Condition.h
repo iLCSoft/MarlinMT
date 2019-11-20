@@ -38,7 +38,6 @@ namespace marlin {
        */
       bool operator()( const EntryKey &key ) const { return _fiterFn( key ); }
 
-      // TODO: 'and' and 'or' are keywords in c++(and = &&, or = ||)
       /**
        *  @brief creates a composed condition.
        *  @param rhs condition to compose with.
