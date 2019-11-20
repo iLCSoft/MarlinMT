@@ -11,74 +11,74 @@ See [dependency diagram](/diagrams/BookStore-Data.html) for further information.
 
 ## Entry Types
 
-Depending on the use case, the BookStore can provide you're object in different ways.
+Depending on the use case, the BookStore can provide your object in different ways.
 
-* **Sinlge**
+* **Single**
 
-	> For usage in sequential code, minimal mangment overhead.
+	> For usage in sequential code, minimal management overhead.
 	
 * **Multi**   
-	 usage for may modifieing the object in parallel.
+	 usage for may modifying the object in parallel.
     * **MultiCopy**
-		 instanciate object mutible times to avoid synchronisation.
+		 instantiate object mutable times to avoid synchronisation.
 		 Memory overhead.  
-	 	 the number of instances must be passed to construct time.
+	 	 The number of instances must be passed to construct time.
 	 	 
-		 > **usecase:** high frequent writing operation.
+		 > **use case:** high frequent writing operation.
 		 
     * **MultiShared**
-		cretaes object accassable with writer, to keep object valid locks are used.
-		many synchronisation points.   
+		creates object accessible with writer, to keep object valid locks are used.
+		Many synchronisation points.   
 			
-		 > **usecase:** much computing and only low frequent writing.	
+		 > **use case:** much computing and only low frequent writing.	
 		 	
 
 ## Creating new objects
 
-1. construct `EnrtyData` (blueprint) for the object to book
-2. book object with `book(absolut-path, name, entryData)`
+1. Construct `EntryData` (blueprint) for the object to book
+2. Book object with `book(absolute-path, name, entry-data)`
 
 **examples**
 
-* **for an single `RH1F`**
+* **for a single `RH1F`**
 ```cpp
-	EnrtyData entryData = EntryData<RH1F>("title", {"axis titile", bins, min, max});
-	auto entry = store.book("/path/to/object/", "name", entryData.single());
+	EntryData entry-data = EntryData<RH1F>("title", {"axis title", bins, min, max});
+	auto entry = store.book("/path/to/object/", "name", entry-data.single());
 ```
-* **for an multiCopy, with 4 instances, `RH1F`**
+* **for a multi copy, with 4 instances, `RH1F`**
 ```cpp
 	auto entry = store.book("/path/", "name", EntryData<RH1F>(axis).multiCopy(4));
 ```
-* **for an single `RH2F`**
+* **for a single `RH2F`**
 ```cpp
-	auto entry = store.book("/path/", "name", EntryData<RH2F>(axis1, axis2).sinlge());
+	auto entry = store.book("/path/", "name", EntryData<RH2F>(axis1, axis2).single());
 ```
 
 ## Writing to an object
 
-### creating an handle
-`entry.handle()` will produce an new handle.  
+### creating a handle
+`entry.handle()` will produce a new handle.  
 For EntryMultiCopy you need to pass the id of the instance you want to access `entry.handle(id)`.
 
 **example `RH1F`**
 ```cpp
-	// sinlge
+	// single
 	Handle<RH1F> entrySingle.handle();
 
-	// multy copy
+	// multi copy
 	Handle<RH1F> entryMultiCopy.handle(0);
 
-	//multy shared
+	//multi shared
 	Handle<RH1F> entryMultiShared.handle();
 ```
 
 ### use the object specific modification functions.
 *	Histogram
 	 * `fill(position, weight)`  
-	    add one datum to the histogram, position array based type which fileds equal to the number of dimensons from the histogram.    
+	    add one datum to the histogram, position array based type which fields equal to the number of dimensions from the histogram.    
 	    e.g 1D `fill({x}, w)`, 2D `fill({x,y},w)`, etc.
-	 * `fillN(span<…> positisns, span<…> weights)`  
-	     add mutible dates to the histogram.
+	 * `fillN(span<…> positions, span<…> weights)`  
+	     add mutable dates to the histogram.
 
 **example `RH1F`**
 ```cpp
@@ -89,12 +89,12 @@ For EntryMultiCopy you need to pass the id of the instance you want to access `e
 
 ## reading final version of object
 
-`entry.merged()` returns an const reference to the final object.
+`entry.merged()` returns a const reference to the final object.
 
 **example `RH1F`**
 ```cpp
 	const RH1F& hist = entry.merged();
-	// now you can reading the histogram normaly
+	// now you can read the histogram normally
 	std::cout << hist.GetBinContent({0}) << '\n';
 ```
 
@@ -104,7 +104,7 @@ For EntryMultiCopy you need to pass the id of the instance you want to access `e
 ### selection
 
 Set of entries which full fill a condition. Can created from a BookStore
-or a other Selection.
+or an other Selection.
 
 **features**
 * iterate able  
@@ -113,9 +113,9 @@ or a other Selection.
 
 ### Condition
 
-An Condition for filtering entries. Constructed with `ConditionBuilder`.
+A Condition for filtering entries. Constructed with `ConditionBuilder`.
 
-**atributes to filter**
+**attributes to filter**
 
 * name: perfect match or regex
 * path: perfect match or regex
@@ -135,10 +135,10 @@ An Condition for filtering entries. Constructed with `ConditionBuilder`.
 		ConditionBuilder().setPath("/path/to/dir/")
 	);
 
-	for(const entry& : selection) {
-		auto oHandle = entry.handle<RH1F>();
-		if(oHandle)
-			handles<RH1F>.push_back(oHandle.value());
-	}
+	try {
+		for(const entry& : selection) {
+			handles<RH1F>.push_back(entry.handle<RH1F>());
+		}
+	} catch (const marlin::BookStoreException&){}
 ```
 
