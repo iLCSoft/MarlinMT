@@ -215,11 +215,11 @@ namespace marlin {
 
   void LCIOOutputProcessor::end() {
     log<MESSAGE4>() << std::endl
-              << "LCIOOutputProcessor::end()  " << name()
-              << ": " << _nEvents.load() << " events in " << _nRuns.load() << " runs written to file  "
-              <<  _lcioOutputFile
-              << std::endl
-              << std::endl ;
+  			      << "LCIOOutputProcessor::end()  " << name()
+  			      << ": " << _nEvents.load() << " events in " << _nRuns.load() << " runs written to file  "
+  			      <<  _lcioOutputFile
+  			      << std::endl
+  			      << std::endl ;
     _writer->close() ;
     _writer = nullptr ;
   }
