@@ -69,7 +69,7 @@ namespace marlin {
 
     protected:
       const std::string_view &                    _title ;
-      std::array< const types::RAxisConfig *, D > _axis{} ;
+      std::array< std::unique_ptr<types::RAxisConfig>, D > _axis{} ;
     } ;
 
     /**
@@ -313,8 +313,9 @@ namespace marlin {
       using FillFn_t
         = std::function< void( const CoordArray_t &, const Weight_t & ) > ;
       /// type of the RHist::FillN function
-      using FillNFn_t = std::function< void( const std::span< CoordArray_t > &,
-                                             const std::span< Weight_t > & ) > ;
+      using FillNFn_t = std::function< void( 
+          const types::CoordArraySpan_t<Type>&,
+          const types::WeightSpan_t<Type>& ) > ;
       using FinalizeFn_t = std::function< void() > ;
 
     public:
@@ -337,8 +338,9 @@ namespace marlin {
        *  @param x span of points to add.
        *  @param w span of weights to add.
        */
-      void fillN( const std::span< CoordArray_t > &x,
-                  const std::span< Weight_t > &    w ) ;
+      void fillN(
+          const types::CoordArraySpan_t<Type> &x,
+          const types::WeightSpan_t<Type>  &w ) ;
 
       /**
        *  @brief get completed Object.
@@ -487,7 +489,7 @@ namespace marlin {
     template < typename T, template < int, class > class... STAT >
     EntryData< types::RHist< 1, T, STAT... >, 0 >::EntryData( const types::RAxisConfig &axis )
       : EntryDataBase< types::RHist< 1, T, STAT... > >() {
-      this->_axis[0] = &axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -496,7 +498,7 @@ namespace marlin {
     EntryData< types::RHist< 1, T, STAT... >, 0 >::EntryData(
       const std::string_view &title, const types::RAxisConfig &axis )
       : EntryDataBase< types::RHist< 1, T, STAT... > >( title ) {
-      this->_axis[0] = &axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -505,8 +507,8 @@ namespace marlin {
     EntryData< types::RHist< 2, T, STAT... >, 0 >::EntryData( const types::RAxisConfig &x_axis,
                                                     const types::RAxisConfig &y_axis )
       : EntryDataBase< types::RHist< 2, T, STAT... > >() {
-      this->_axis[0] = &x_axis ;
-      this->_axis[1] = &y_axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(x_axis) ;
+      this->_axis[1] = std::make_unique<types::RAxisConfig>(y_axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -517,8 +519,8 @@ namespace marlin {
       const types::RAxisConfig &     x_axis,
       const types::RAxisConfig &     y_axis )
       : EntryDataBase< types::RHist< 2, T, STAT... > >( title ) {
-      this->_axis[0] = &x_axis ;
-      this->_axis[1] = &y_axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(x_axis) ;
+      this->_axis[1] = std::make_unique<types::RAxisConfig>(y_axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -528,9 +530,9 @@ namespace marlin {
                                                     const types::RAxisConfig &y_axis,
                                                     const types::RAxisConfig &z_axis )
       : EntryDataBase< types::RHist< 3, T, STAT... > >() {
-      this->_axis[0] = &x_axis ;
-      this->_axis[1] = &y_axis ;
-      this->_axis[2] = &z_axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(x_axis) ;
+      this->_axis[1] = std::make_unique<types::RAxisConfig>(y_axis) ;
+      this->_axis[2] = std::make_unique<types::RAxisConfig>(z_axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -542,9 +544,9 @@ namespace marlin {
       const types::RAxisConfig &     y_axis,
       const types::RAxisConfig &     z_axis )
       : EntryDataBase< types::RHist< 3, T, STAT... > >( title ) {
-      this->_axis[0] = &x_axis ;
-      this->_axis[1] = &y_axis ;
-      this->_axis[2] = &z_axis ;
+      this->_axis[0] = std::make_unique<types::RAxisConfig>(x_axis) ;
+      this->_axis[1] = std::make_unique<types::RAxisConfig>(y_axis) ;
+      this->_axis[2] = std::make_unique<types::RAxisConfig>(z_axis) ;
     }
 
     //--------------------------------------------------------------------------
@@ -572,9 +574,8 @@ namespace marlin {
 
     template < int D, typename T, template < int, class > class... STAT >
     void Handle< types::RHist< D, T, STAT... > >::fillN(
-      const std::span< typename Handle< types::RHist< D, T, STAT... > >::CoordArray_t >
-        &                                                                  x,
-      const std::span< typename Handle< types::RHist< D, T, STAT... > >::Weight_t > &w ) {
+      const types::CoordArraySpan_t<types::RHist< D, T, STAT... > >  &x,
+      const types::WeightSpan_t< types::RHist< D, T, STAT... > > &w ) {
       _fillNFn( x, w ) ;
     }
 
@@ -601,8 +602,8 @@ namespace marlin {
         hist,
         [hist]( const typename Hnd_t::CoordArray_t &x,
                 const typename Hnd_t::Weight_t &    w ) { hist->Fill( x, w ); },
-        [hist]( const std::span< typename Hnd_t::CoordArray_t > &x,
-                const std::span< typename Hnd_t::Weight_t > &    w ) {
+        [hist]( const types::CoordArraySpan_t< Hnd_t > &x,
+                const types::WeightSpan_t< Hnd_t >     &w ) {
           hist->FillN( x, w ) ;
         },
         []() {} ) ;
@@ -625,8 +626,8 @@ namespace marlin {
         pHist,
         [pHist]( const typename Hnd_t::CoordArray_t &x,
                  const typename Hnd_t::Weight_t &w ) { pHist->Fill( x, w ); },
-        [pHist]( const std::span< typename Hnd_t::CoordArray_t > &x,
-                 const std::span< typename Hnd_t::Weight_t > &    w ) {
+        [pHist]( const types::CoordArraySpan_t< Hnd_t > &x,
+                 const types::WeightSpan_t< Hnd_t >     &w ) {
           pHist->FillN( x, w ) ;
         },
         []() {} ) ;
@@ -679,8 +680,8 @@ namespace marlin {
                              const typename Hnd_t::Weight_t &    w ) {
           pFiller->Fill( x, w ) ;
         },
-        [pFiller = pFiller]( const std::span< typename Hnd_t::CoordArray_t > &x,
-                             const std::span< typename Hnd_t::Weight_t > &w ) {
+        [pFiller = pFiller]( const types::CoordArraySpan_t< Hnd_t > &x,
+                             const types::WeightSpan_t< Hnd_t >     &w ) {
           pFiller->FillN( x, w ) ;
         },
         [this]() { this->flush(); } ) ;

@@ -8,6 +8,7 @@
 #include "ROOT/RHistConcurrentFill.hxx"
 #include "ROOT/RHistData.hxx"
 #include "ROOT/RSpan.hxx"
+#include "RVersion.h"
 
 namespace marlin {
   namespace book {
@@ -52,6 +53,19 @@ namespace marlin {
       /// often used Histograms Instance.
       using RH3I = ROOT::Experimental::RH3I ;
 
+#if ROOT_VERSION_CODE > ROOT_VERSION(16,18,4)
+      template<typename T>
+      using CoordArraySpan_t = std::span<typename T::CoordArray_t const>;
+
+      template<typename T>
+      using WeightSpan_t = std::span<typename T::Weight_t const>;
+#else
+      template<typename T>
+      using CoordArraySpan_t = std::span<typename T::CoordArray_t>;
+
+      template<typename T>
+      using WeightSpan_t = std::span<typename T::Weight_t>;
+#endif
 
 #ifndef MARLIN_HIST_FILLER_BUFFER_SIZE
 #define MARLIN_HIST_FILLER_BUFFER_SIZE 1024
