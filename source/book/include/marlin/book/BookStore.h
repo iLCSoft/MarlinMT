@@ -8,6 +8,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <stdexcept>
+#include <atomic>
 
 // -- Marlin includes
 #include "marlin/Exceptions.h"
@@ -37,8 +38,33 @@ namespace marlin {
                      const std::shared_ptr< T > & ),
                typename... >
     class SharedMemLayout ;
-    class Condition ;
-    class Selection ;
+    template<typename T>
+    class Manager{};
+
+    template<typename T>
+    class Handle<Manager<T>> {
+      friend BookStore;
+      friend Selection::Hit;
+      Handle(const std::shared_ptr<const Entry>& entry)
+        : _entry{entry} {}
+      std::size_t unmap(std::size_t id) {
+        auto itr = _mapping.find(id);
+        if(itr == _mapping.end()) {
+          itr = _mapping.insert(std::make_pair(id, _n++)).first;
+        }
+        return itr->second;
+      }
+    public:
+      Handle<T> handle(std::size_t id) {
+        return _entry->handle<T>(unmap(id));  
+      }
+
+    private:
+      std::shared_ptr<const Entry> _entry;
+      std::unordered_map<std::size_t, std::size_t> _mapping{};
+      std::atomic<std::size_t> _n{0};
+    };
+
 
     /**
      *  @brief Base Class for Entry Data, for similar behavior.
@@ -70,33 +96,55 @@ namespace marlin {
      *  @brief Managed Access and creation to Objects.
      */
     class BookStore {
+      template <typename,unsigned long long>
+      friend class EntryData;
+      class Identifier {
+      public:
+        struct Hash {
+          std::size_t operator()(const Identifier& id) const {
+            std::hash<decltype(Identifier::_name)> hasher;  
+            std::size_t hash = hasher(id._name);
+            return hash ^= hasher(id._path) + 0x9e3779b9 + (hash<<6) + (hash>>2);
+          } 
+        };
+        Identifier(
+            const std::string_view& path,
+            const std::string_view& name)
+          : _path{path}, _name{name}{}
+        bool operator==(const Identifier& id) const {
+          return _name == id._name && _path == id._path;
+        }
+      private:
+        std::string _path;
+        std::string _name;
+
+      };
 
       /**
        *  @brief register Entry in store.
        *  generate id for Entry.
+       *  @return shared pointer to new Entry
        */
-      void addEntry( const std::shared_ptr< EntryBase > &entry, EntryKey &key ) ;
+      std::shared_ptr<Entry> addEntry( const std::shared_ptr< EntryBase > &entry, EntryKey &key ) ;
 
       /**
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
       Entry &get( const EntryKey &key ) { 
+        return get(key.hash);
+      }
+
+      /**
+       *  @brief get Entry from key.
+       *  @throw BookStoreException key not exist in Store.
+       */
+      Entry &get( std::size_t const key) { 
         try {
-          return _entries[key.hash]; 
+          return *_entries[key]; 
         } catch(const std::out_of_range&) {
           MARLIN_THROW_T(BookStoreException, "Invalid key.");
         }
-      
-      }
-
-    public:
-      template < class T >
-      auto book( const std::string_view &path,
-                 const std::string_view &name,
-                 const T &               data ) {
-        return data.template book< std::string_view, std::string_view >(
-          *this, path, name ) ;
       }
 
       /**
@@ -108,7 +156,7 @@ namespace marlin {
        *  @param ctor_p parameters to construct the object.
        */
       template < class T, typename... Args_t >
-      EntrySingle< T > bookSingle( const std::string_view &path,
+      std::shared_ptr<Entry> bookSingle( const std::string_view &path,
                                    const std::string_view &name,
                                    Args_t... ctor_p ) ;
 
@@ -121,7 +169,7 @@ namespace marlin {
        *  (max level of pluralism)
        */
       template < class T, typename... Args_t >
-      EntryMultiCopy< T > bookMultiCopy( std::size_t             n,
+      std::shared_ptr<Entry> bookMultiCopy( std::size_t             n,
                                          const std::string_view &path,
                                          const std::string_view &name,
                                          Args_t... ctor_p ) ;
@@ -132,9 +180,24 @@ namespace marlin {
        *  \see BookStore::book
        */
       template < class T, typename... Args_t >
-      EntryMultiShared< T > bookMultiShared( const std::string_view &path,
+      std::shared_ptr<Entry> bookMultiShared( const std::string_view &path,
                                              const std::string_view &name,
                                              Args_t... ctor_p ) ;
+
+    public:
+      template < class T>
+      Handle<Manager<typename T::Object_t>> book( const std::string_view &path,
+                 const std::string_view &name,
+                 const T &               data ) {
+        auto entry = _idToEntry.find({path, name});
+        if(entry == _idToEntry.end()) {
+          return Handle<Manager<typename T::Object_t>>
+            (data.template book< std::string_view, std::string_view >(
+            *this, path, name ) );
+        }
+        return Handle<Manager<typename T::Object_t>>(_entries[entry->second]);
+      }
+
       /**
        *  @brief select every Entry which matches the condition.
        *  @return Selection with matches Entries.
@@ -146,7 +209,7 @@ namespace marlin {
        *  the handles are keeping a reference to the result.
        *  @attention modifying removed objects results in undefined behavior.
        */
-      void remove( const Entry &e ) ;
+      void remove( const EntryKey &key ) ;
 
       /**
        *  @brief removes every Entry from the selection from the BookStore.
@@ -164,24 +227,32 @@ namespace marlin {
 
     private:
       /// stores Entries created by BookStore.
-      std::vector< Entry > _entries{} ;
+      std::vector< std::shared_ptr<Entry> > _entries{} ;
+      /// stores path+name -> Entry Id
+      std::unordered_map<Identifier, std::size_t, Identifier::Hash> _idToEntry{};
     } ;
 
 
     //--------------------------------------------------------------------------
 
 
-    void BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
+    std::shared_ptr<Entry> BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
                               EntryKey &                          key ) {
       EntryKey k = key ;
       k.hash     = _entries.size() ;
-      _entries.push_back( Entry( entry, k ) ) ;
+
+      if(!_idToEntry.insert(std::make_pair(Identifier(k.path, k.name), k.hash)).second) {
+        MARLIN_THROW_T(BookStoreException, "Object already exist. Use store.book to avoid this.");
+      }
+      _entries.push_back( std::make_shared<Entry>( Entry(entry, k) ) ) ;
+      return _entries.back();
     }
 
     //--------------------------------------------------------------------------
 
     template < class T, typename... Args_t >
-    EntrySingle< T > BookStore::bookSingle( const std::string_view &path,
+    std::shared_ptr<Entry> 
+    BookStore::bookSingle( const std::string_view &path,
                                             const std::string_view &name,
                                             Args_t... ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
@@ -190,18 +261,17 @@ namespace marlin {
       key.mInstances   = 1 ;
       key.flags = Flags::Book::Single ;
 
-      auto entry = std::make_shared< EntrySingle< T > >( Context(
+      auto entry = std::make_shared< EntrySingle< T >>( Context(
         std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) ) ) ;
 
-      addEntry( entry, key ) ;
-
-      return *std::static_pointer_cast< const EntrySingle< T > >( entry ) ;
+      return addEntry( entry, key ) ;
     }
 
     //--------------------------------------------------------------------------
 
     template < class T, typename... Args_t >
-    EntryMultiCopy< T > BookStore::bookMultiCopy( std::size_t             n,
+    std::shared_ptr<Entry>
+    BookStore::bookMultiCopy( std::size_t             n,
                                                   const std::string_view &path,
                                                   const std::string_view &name,
                                                   Args_t... ctor_p ) {
@@ -214,9 +284,7 @@ namespace marlin {
         std::make_shared< SharedMemLayout< T, merge<T>, Args_t... > >(
           n, ctor_p... ) ) ) ;
 
-      addEntry( entry, key ) ;
-
-      return *std::static_pointer_cast< const EntryMultiCopy< T > >( entry ) ;
+      return addEntry( entry, key ) ;
     }
 
     Selection BookStore::find( const Condition &cond ) {
@@ -225,13 +293,13 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void BookStore::remove( const Entry &e ) { get( e.key() ).clear(); }
+    void BookStore::remove( const EntryKey &key ) { get( key ).clear(); }
 
     //--------------------------------------------------------------------------
 
     void BookStore::remove( const Selection &selection ) {
-      for ( const Entry &e : selection ) {
-        remove( e ) ;
+      for (const Selection::Hit& e : selection ) {
+        remove( e.key() ) ;
       }
     }
 
@@ -242,7 +310,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < class T, typename... Args_t >
-    EntryMultiShared< T >
+    std::shared_ptr<Entry>
     BookStore::bookMultiShared( const std::string_view &path,
                                 const std::string_view &name,
                                 Args_t... ctor_p ) {
@@ -255,11 +323,10 @@ namespace marlin {
       auto entry = std::make_shared< EntryMultiShared< T > >( Context(
         std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) ) ) ;
 
-      addEntry( entry, key ) ;
-
-      return *std::static_pointer_cast< const EntryMultiShared< T > >( entry ) ;
+      return addEntry( entry, key ) ;
     }
 
   } // end namespace book
 
 } // end namespace marlin
+

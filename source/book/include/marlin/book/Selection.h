@@ -16,6 +16,8 @@ namespace marlin {
 
     // -- MarlinBook forward declaration
     class BookStore ;
+    template< typename >
+    class Manager;
 
     /**
      *  @brief Contains references to entries.
@@ -35,8 +37,80 @@ namespace marlin {
       template < typename T >
       static Selection find( T begin, T end, const Condition &cond ) ;
 
+      typedef typename std::vector<std::shared_ptr<const Entry>>::const_iterator ItrBase;
+      class Hit{
+        friend Selection;
+      public:
+        Hit(const std::shared_ptr<const Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
+        Hit(const std::shared_ptr<Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
+        bool valid() const {
+          return _rEntry.valid();
+        }
+        operator std::shared_ptr<const Entry>() const  {
+          return _entry.lock();
+        }
+        const EntryKey& key() const {
+          return _rEntry.key();
+        }
+        template<typename T>
+        Handle<Manager<T>> bind() const {
+          return Handle<Manager<T>>(_entry.lock());
+        }
+      private:
+        const Entry& _rEntry;
+        std::weak_ptr<const Entry> _entry;
+      };
+
       /// type for iteration through a Selection.
-      using const_iterator = typename std::vector< Entry >::const_iterator ;
+      class const_iterator {
+        friend Selection;
+        const_iterator(ItrBase itr) : _itr{itr}{}
+      public:
+        const_iterator() = default;
+        const_iterator(const const_iterator& itr) 
+          : _itr{itr.base()}{}
+        const_iterator& operator=(const const_iterator& itr) {
+          _itr = itr.base();
+          return *this;
+        }
+        const_iterator operator+(std::size_t n) {
+          return const_iterator(_itr + n);
+        }
+        const_iterator& operator+=(std::size_t n) {
+          _itr += n;
+          return *this;
+        }
+        bool operator==( const const_iterator& itr) const {
+          return _itr == itr._itr;
+        }
+        bool operator!=(const const_iterator& itr) const {
+          return !(*this == itr);
+        }
+        const std::unique_ptr<Hit>& operator->() {
+          _hit = std::make_unique<Hit>(Hit(*_itr));
+          return _hit;
+        }
+        const Hit operator*() {
+          _hit = std::make_unique<Hit>(Hit(*_itr));
+          return *_hit;
+        }
+        const_iterator operator++(int){
+          const_iterator last = *this;
+          operator++();
+          return last;
+        } 
+
+        const_iterator& operator++() {
+          ++_itr;
+          return *this; 
+        }
+        ItrBase base() const {
+          return _itr;
+        }
+      private:
+        std::unique_ptr<Hit> _hit{}; // FIXME: performance
+        ItrBase _itr{};
+      };
 
       /// Possibilities to compose Conditions when creating sub selections.
       /// Composed the new condition with the condition from the super
@@ -85,7 +159,7 @@ namespace marlin {
        *  @brief get entry at position.
        *  @param i position of entry of interest.
        */
-      const Entry &get( std::size_t i ) { return _entries[i]; }
+      const Entry &get( std::size_t i ) { return *_entries[i]; }
 
       /**
        *  @brief remove entry at position.
@@ -116,7 +190,7 @@ namespace marlin {
 
     private:
       /// entries which included in selection.
-      std::vector< Entry > _entries{}; // FIXME: no key copying
+      std::vector< std::shared_ptr<const Entry> > _entries{};
       /// condition which every entry full fill.
       Condition _condition{} ;
     } ;
@@ -152,8 +226,8 @@ namespace marlin {
       std::copy_if( begin,
                     end,
                     std::back_inserter( res._entries ),
-                    [&c = cond]( const Entry &e ) -> bool {
-                      return e.valid() && c( e.key() ) ;
+                    [&c = cond]( const Selection::Hit& h ) -> bool {
+                      return h.valid() && c( h.key() ) ;
                     } ) ;
       return res ;
     }
@@ -180,12 +254,12 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void Selection::remove( const_iterator itr ) { _entries.erase( itr ); }
+    void Selection::remove( const_iterator itr ) { _entries.erase( itr.base() ); }
 
     //--------------------------------------------------------------------------
 
     void Selection::remove( const_iterator begin, const_iterator end ) {
-      _entries.erase( begin, end ) ;
+      _entries.erase( begin.base(), end.base() ) ;
     }
 
     //--------------------------------------------------------------------------

@@ -163,7 +163,7 @@ namespace marlin {
         : _data{data} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntrySingle< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 1, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookSingle< types::RHist< 1, T, STAT... >,
                                  const std::string_view &,
@@ -172,7 +172,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntrySingle< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 2, std::shared_ptr<Entry>>
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookSingle< types::RHist< 2, T, STAT... >,
                                  const std::string_view &,
@@ -182,7 +182,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntrySingle< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 3, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookSingle< types::RHist< 3, T, STAT... >,
                                  const std::string_view &,
@@ -196,6 +196,7 @@ namespace marlin {
           *_data._axis[2] ) ;
       }
       const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
+      typedef types::RHist< D, T, STAT...> Object_t;
     } ;
 
     /**
@@ -211,7 +212,7 @@ namespace marlin {
         : _data{data}, _n{n} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntryMultiCopy< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 1, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RHist< 1, T, STAT... >,
                                     const std::string_view &,
@@ -220,7 +221,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntryMultiCopy< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 2, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RHist< 2, T, STAT... >,
                                     const std::string_view &,
@@ -230,7 +231,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntryMultiCopy< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 3, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiCopy< types::RHist< 3, T, STAT... >,
                                     const std::string_view &,
@@ -246,6 +247,7 @@ namespace marlin {
       }
       const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
       const std::size_t                                  _n ;
+      typedef types::RHist< D, T, STAT...> Object_t;
     } ;
 
     /**
@@ -260,7 +262,7 @@ namespace marlin {
         : _data{data} {}
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, EntryMultiShared< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 1, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RHist< 1, T, STAT... >,
                                       const std::string_view &,
@@ -269,7 +271,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, EntryMultiShared< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 2, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RHist< 2, T, STAT... >,
                                       const std::string_view &,
@@ -279,7 +281,7 @@ namespace marlin {
       }
 
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, EntryMultiShared< types::RHist< D, T, STAT... > > >
+      std::enable_if_t< d == 3, std::shared_ptr<Entry> >
       book( BookStore &store, const Args_t &... args ) const {
         return store.bookMultiShared< types::RHist< 3, T, STAT... >,
                                       const std::string_view &,
@@ -293,6 +295,7 @@ namespace marlin {
           *_data._axis[2] ) ;
       }
       const EntryDataBase< types::RHist< D, T, STAT... > > &_data ;
+      typedef types::RHist< D, T, STAT...> Object_t;
     } ;
 
     /// Handle specialisation for Histograms.

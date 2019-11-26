@@ -19,7 +19,7 @@ namespace marlin {
     struct EntryKey {
 
       /// default constructor.
-      EntryKey() : type{std::type_index( typeid( void ) )} {}
+      EntryKey() : type(typeid( void ) ) {}
 
       /// Construct typed EntryKey.
       EntryKey( const std::type_index &t ) : type{t} {}

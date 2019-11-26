@@ -29,13 +29,15 @@ using namespace marlin::book::types;
 int main(int, char**) {
   marlin::test::UnitTest test(" Memory Filler Test ");
   BookStore store{};
-  
-  {
+	{
+		Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
+		Handle<RH1F> handle = entry.handle(1);
+	} {
 
-    // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ;  
-    EntrySingle entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
+    // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ; 
+    Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
 
-    auto hnd = entry.handle();
+    Handle<RH1F> hnd = entry.handle(0);
     hnd.fill({0}, 1);
     std::vector<typename decltype(hnd)::CoordArray_t> xs;
     std::vector<typename decltype(hnd)::Weight_t> ws;
@@ -49,7 +51,7 @@ int main(int, char**) {
     test.test("Single Hist Filling", hist.GetEntries() == 11);
 
   }{
-    EntryMultiCopy entry = store.book("path2", "name", EntryData<RH1I>({"a", 2, -1, 2}).multiCopy(2));
+    Handle<Manager<RH1I>> entry = store.book("path2", "name", EntryData<RH1I>({"a", 2, -1, 2}).multiCopy(2));
 
     auto hnd = entry.handle(0);
     hnd.fill({0}, 1);
@@ -88,11 +90,11 @@ int main(int, char**) {
 
   } {
   
-    EntryMultiShared entry = store.book("path3", "name", EntryData<RH1I>({"a", 3, 1.0, 2.0}).multiShared());
-    auto hnd = entry.handle();
+    Handle<Manager<RH1I>> entry = store.book("path3", "name", EntryData<RH1I>({"a", 3, 1.0, 2.0}).multiShared());
+    auto hnd = entry.handle(1);
     hnd.fill({0}, 1);
 
-    auto hnd2 = entry.handle();
+    auto hnd2 = entry.handle(2);
     hnd2.fill({0}, 1);
 
     auto hist = hnd.merged();
@@ -101,8 +103,9 @@ int main(int, char**) {
   }{
     
     std::string path = mergedUnicStr();
+		EntryData config = EntryData<RH1I>({"a", 2, 0.0, 2.0}).single();
     for(int i = 0; i < 10; ++i) {
-      store.bookSingle<RH1I, const RAxisConfig&>(path, mergedUnicStr(), {"a", 2, 0.0, 2.0});
+      store.book(path, mergedUnicStr(), config);
     }
     
     Selection sel = store.find(ConditionBuilder().setPath(path));
@@ -192,23 +195,23 @@ int main(int, char**) {
 
     test.test("BookHelper usage", n + 5 == n2);
   } {
-    EntrySingle e = store.book("path", "my Name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
-    e.handle().fill({0}, 1);
+    Handle<Manager<RH1F>> e = store.book("path", "my Name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
+    e.handle(1).fill({0}, 1);
 
 
     Selection sel = store.find(ConditionBuilder().setName("my Name"));
-    Handle<RH1F> h = sel.begin()->handle<RH1F>();
+    Handle<RH1F> h = sel.begin()->bind<RH1F>().handle(1);
     h.fill({0}, 1);
 
     test.test("Get booked entry from BookStore",
-      e.handle().merged().GetBinContent({0}) == 2
+      e.handle(1).merged().GetBinContent({0}) == 2
       && h.merged().GetBinContent({0}) == 2);   
 
   } {
-    EntrySingle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", {"x", 2, -1.0, 5.0}).single());
-    e.handle().fill({0}, 1);
-    test.test("Named Histograms", e.handle().merged().GetEntries() == 1);
-  }
+    Handle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", {"x", 2, -1.0, 5.0}).single());
+    e.handle(1).fill({0}, 1);
+    test.test("Named Histograms", e.handle(1).merged().GetEntries() == 1);
+  }	
 
 
   return 0;
