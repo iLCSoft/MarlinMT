@@ -211,8 +211,18 @@ int main(int, char**) {
     Handle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", {"x", 2, -1.0, 5.0}).single());
     e.handle(1).fill({0}, 1);
     test.test("Named Histograms", e.handle(1).merged().GetEntries() == 1);
-  }	
-
+  } {
+		bool errorThrown = false;
+		std::thread t1([&store, &errorThrown](){
+					try{
+						store.book("path", "name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
+					} catch (const marlin::BookStoreException&) {
+						errorThrown = true;
+					}
+				});
+		t1.join();
+		test.test("prevent booking from other threads", errorThrown);
+	}
 
   return 0;
 }
