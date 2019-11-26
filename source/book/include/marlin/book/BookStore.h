@@ -9,12 +9,13 @@
 #include <typeinfo>
 #include <stdexcept>
 #include <atomic>
+#include <thread>
 
 // -- Marlin includes
 #include "marlin/Exceptions.h"
+#include "marlin/book/ROOTAdapter.h"
 
 // -- MarlinBook includes
-#include "marlin/book/ROOTAdapter.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/Condition.h"
 #include "marlin/book/EntryData.h"
@@ -185,10 +186,20 @@ namespace marlin {
                                              Args_t... ctor_p ) ;
 
     public:
+      BookStore(bool allowMoving = false) : 
+        _constructThread(std::this_thread::get_id()),
+        _allowMoving{allowMoving}{}
+
       template < class T>
       Handle<Manager<typename T::Object_t>> book( const std::string_view &path,
                  const std::string_view &name,
                  const T &               data ) {
+
+        if( !_allowMoving && std::this_thread::get_id() != _constructThread) {
+          MARLIN_THROW_T(BookStoreException, "Booking is only allowed "
+          "from the construction Thread");    
+        }
+
         auto entry = _idToEntry.find({path, name});
         if(entry == _idToEntry.end()) {
           return Handle<Manager<typename T::Object_t>>
@@ -230,6 +241,8 @@ namespace marlin {
       std::vector< std::shared_ptr<Entry> > _entries{} ;
       /// stores path+name -> Entry Id
       std::unordered_map<Identifier, std::size_t, Identifier::Hash> _idToEntry{};
+      std::thread::id _constructThread;
+      const bool _allowMoving{false};
     } ;
 
 
