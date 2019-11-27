@@ -1,12 +1,21 @@
 #!/bin/bash
 
-ILCSOFT=/cvmfs/clicdp.cern.ch/iLCSoft/builds/current/CI_${COMPILER}
-source $ILCSOFT/init_ilcsoft.sh
+source setup.sh
 
-cd /Package
+cd Package
 mkdir build
 cd build
-cmake -GNinja -C $ILCSOFT/ILCSoft.cmake -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always -Werror" .. && \
+# TODO enable 'warning as error' asap
+cmake -GNinja \
+  -C ../../CMakeCache.cmake 
+  -DCMAKE_INSTALL_PREFIX=$PWD/../install \
+  -DCMAKE_CXX_STANDARD=17 \
+  -DMARLIN_BOOK=ON \
+  -DMARLIN_LCIO=ON \
+  -DMARLIN_DD4HEP=ON \
+  -DMARLIN_GEAR=ON \
+  -DBUILD_TESTING=ON \
+  ../../../local/soft/MarlinMT && \
 ninja -k0 && \
 ninja install && \
 ctest --output-on-failure

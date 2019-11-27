@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Should we run coverity scan ? To be investigated...
+exit
 ILCSOFT=/cvmfs/clicdp.cern.ch/iLCSoft/builds/current/CI_${COMPILER}
 source $ILCSOFT/init_ilcsoft.sh
 
