@@ -68,7 +68,7 @@ marlin_add_processor_test (
   STEERING_FILE ${CMAKE_CURRENT_SOURCE_DIR}/steer/eventmodifier.xml
   INPUT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/simjob.slcio
   REGEX_PASS "TestEventModifier modified 3 events in 1 run"
-  MARLIN_DLL Marlin::LCIOPlugins
+  MARLIN_DLL Marlin::CorePlugins Marlin::LCIOPlugins
 )
 
 marlin_add_processor_test (
@@ -77,7 +77,7 @@ marlin_add_processor_test (
   INPUT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/simjob.slcio
   REGEX_PASS "TestProcessorEventSeeder failed to register processor to event seed generator"
   REGEX_FAIL "ERROR .TestProcessorEventSeeder.* Seeds don't match"
-  MARLIN_DLL Marlin::LCIOPlugins
+  MARLIN_DLL Marlin::CorePlugins Marlin::LCIOPlugins
 )
 
 marlin_add_processor_test (
@@ -88,5 +88,5 @@ marlin_add_processor_test (
     ${CMAKE_CURRENT_SOURCE_DIR}/steer/include-eventmodifier.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/steer/constants-eventmodifier.xml
   REGEX_PASS "TestEventModifier modified 3 events in 1 run"
-  MARLIN_DLL Marlin::LCIOPlugins
+  MARLIN_DLL Marlin::CorePlugins Marlin::LCIOPlugins
 )
