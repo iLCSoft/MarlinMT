@@ -6,16 +6,15 @@ services:
 
 language: cpp
 
-# command to install dependencies
-install:
-  - mkdir Package
-  - mv !(Package) Package
-  - export PKGDIR=${PWD}/Package
-
 # command to run tests
 script:
-  - docker run -it --name CI_container -v $PKGDIR:/home/ilc/Package -d rete/marlinmt-ci
-  - docker exec -it CI_container /bin/bash -c "./Package/.travis-ci.d/compile_and_test.sh"
+  - shopt -s extglob dotglob
+  - mkdir Package
+  - mv !(Package) Package
+  - shopt -u dotglob
+  - export PKGDIR=${PWD}/Package
+  - docker run -it --name CI_container -v $PKGDIR:/Package -d rete/marlinmt-ci
+  - docker exec -it CI_container /bin/bash -c "/Package/.travis-ci.d/compile_and_test.sh"
 
 # Don't send e-mail notifications
 notifications:
