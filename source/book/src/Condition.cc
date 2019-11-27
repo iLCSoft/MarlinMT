@@ -25,11 +25,18 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     Condition::Condition()
-      : _fiterFn{[]( const EntryKey & ) { return true; }} {}
+      : _fiterFn{[]( const EntryKey & /*key*/) { return true; }} {}
 
     //--------------------------------------------------------------------------
 
-    Condition::Condition( const FilterFn_t &filterFn ) : _fiterFn{filterFn} {}
+    Condition::Condition( FilterFn_t filterFn ) : _fiterFn{std::move(filterFn)} {}
+
+		//--------------------------------------------------------------------------
+		
+		Condition& Condition::operator=( const FilterFn_t &filterFn ) {
+			_fiterFn = filterFn;
+			return *this;
+		}
 
     //--------------------------------------------------------------------------
 
@@ -40,7 +47,7 @@ namespace marlin {
     // FIXME: performance
     Condition ConditionBuilder::condition() const {
       typename Condition::FilterFn_t fn
-        = []( const EntryKey & ) { return true; } ;
+        = []( const EntryKey & /*key*/) { return true; } ;
 
       if ( _name ) {
         fn = [fn, rgx = _name.value()]( const EntryKey &e ) {
@@ -63,7 +70,7 @@ namespace marlin {
       }
 
       if ( _type ) {
-        fn = [fn, type = _type.value()]( const EntryKey &e ) {
+        fn = [fn, type = _type.value()]( const EntryKey &e ) -> bool{
           return fn( e ) && type == e.type ;
         } ;
       }

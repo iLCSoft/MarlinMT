@@ -6,44 +6,39 @@
 namespace marlin {
   namespace book {
 
+		class Flag_t;
+		namespace Flags {	
+			constexpr unsigned long long value(const Flag_t& flag);
+		}
+
     /** Flag type for flags in marlin::book */
-    template < unsigned long long INIT = 0 >
     class Flag_t {
       static constexpr std::size_t AmtFlags = 8 ;
-      template < unsigned long long >
-      friend class Flag_t ;
 
     public:
-      static constexpr unsigned long long VAL_INIT = INIT ;
 
       /**
        *  @brief constructor flag from number.
        */
-      constexpr Flag_t( unsigned long long val ) : _val{val} {}
+      constexpr Flag_t( unsigned long long val ) : _val{val}, _initValue{val} {}
 
       /**
        *  @brief Construct flag from bitset.
        */
       Flag_t( const std::bitset< AmtFlags > &val ) : _val{val} {}
 
-      /**
-       *  @brief Default Constructor ;
-       */
-      constexpr Flag_t() : _val{INIT} {} ;
 
       /**
        *  @brief logical  AND on tow set of Flags.
        */
-      template < unsigned long long I >
-      Flag_t operator&( const Flag_t< I > &f ) const {
+      Flag_t operator&( const Flag_t &f ) const {
         return Flag_t( _val & f._val ) ;
       }
 
       /**
        *  @brief logical OR on tow set of Flags.
        */
-      template < unsigned long long I >
-      Flag_t operator|( const Flag_t< I > &f ) const {
+      Flag_t operator|( const Flag_t &f ) const {
         return Flag_t( _val & f._val ) ;
       }
 
@@ -61,16 +56,14 @@ namespace marlin {
       /**
        *  @brief check for equality.
        */
-      template < unsigned long long I >
-      bool operator==( const Flag_t< I > &f ) const {
+      bool operator==( const Flag_t &f ) const {
         return _val == f._val ;
       }
 
       /**
        *  @brief check for inequality.
        */
-      template < unsigned long long I >
-      bool operator!=( const Flag_t< I > &f ) const {
+      bool operator!=( const Flag_t &f ) const {
         return _val != f._val ;
       }
 
@@ -79,38 +72,49 @@ namespace marlin {
        *  @param flag which is may/mayn't the subset
        *  @return true if f is a subset of this
        */
-      template < unsigned long long I >
-      bool Contains( const Flag_t< I > &f ) const {
+			[[nodiscard]]
+      bool contains( const Flag_t &f ) const {
         return ( _val & f._val ) == f._val ;
       }
 
-      template < unsigned long long I >
-      Flag_t< INIT > &operator=( const Flag_t< I > &f ) {
-        _val = f._val ;
-        return *this ;
-      }
-
       operator unsigned long long() const { return _val.to_ullong(); }
+			Flag_t() = default ;
+			Flag_t(const Flag_t&) = default;
+			Flag_t& operator=(const Flag_t& flag) {
+				_val = flag._val;
+				return *this;
+			} 
+			Flag_t(Flag_t &&) noexcept = default ;
+			Flag_t& operator=(Flag_t && flag) noexcept {
+				_val = flag._val;
+				return *this;
+			}
+			~Flag_t() = default;
 
     private:
       /// flags saved as bits
       std::bitset< AmtFlags > _val{0} ;
+			const unsigned long long _initValue{0};
+			friend constexpr unsigned long long Flags::value(const Flag_t &/*flag*/);
     } ;
 
     /// Flags for different purposes in marlin::book
     namespace Flags {
+			constexpr unsigned long long value(const Flag_t& flag) {
+				return flag._initValue;	
+			}
       /// flags for booking
       namespace Book {
-
         /// create multiple instances of booked object (if possible) to avoid
         /// sync points
-        constexpr Flag_t< ( 1 << 2 ) > MultiCopy{} ;
+				constexpr Flag_t MultiCopy(1 << 2);
         /// vanilla object.
-        constexpr Flag_t< ( 1 << 0 ) > Single{} ;
+				constexpr Flag_t Single(1 << 0);
         /// create one instance witch concurrent access.
-        constexpr Flag_t< ( 1 << 1 ) > MultiShared{} ;
+				constexpr Flag_t MultiShared(1 << 1);
       } // end namespace Book
 
     } // end namespace Flags
+
   } // end namespace book
 } // end namespace marlin

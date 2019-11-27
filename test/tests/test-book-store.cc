@@ -10,6 +10,7 @@
 #include "ROOT/RHistData.hxx" 
 #include "ROOT/RHist.hxx"
 #include "marlin/book/ROOTAdapter.h"
+#include "marlin/Exceptions.h"
 
 #include <memory>
 #include <string>
@@ -24,34 +25,37 @@ using namespace marlin::book;
 using namespace marlin::book::types;
 
 
-
-
-int main(int, char**) {
+int main(int /*argc*/, char** /*argv*/) {
   marlin::test::UnitTest test(" Memory Filler Test ");
+	constexpr std::size_t bins = 3;
+	constexpr float min = -1.F;
+	constexpr float max = 5.F;
+	constexpr int nItrerations = 10;
+	RAxisConfig axis("a", bins, min, max);
   BookStore store{};
+	try{
 	{
-		Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
+		Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
 		Handle<RH1F> handle = entry.handle(1);
 	} {
 
     // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ; 
-    Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>({"a", 3, 1.0, 2.0}).single());
+    Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
 
     Handle<RH1F> hnd = entry.handle(0);
-    hnd.fill({0}, 1);
     std::vector<typename decltype(hnd)::CoordArray_t> xs;
     std::vector<typename decltype(hnd)::Weight_t> ws;
-    for(int i = 0; i < 10; ++i) {
-      xs.push_back({1});
-      ws.push_back(1);
+    for(int i = 0; i < nItrerations; ++i) {
+      xs.emplace_back(1);
+      ws.emplace_back(1);
     }
     hnd.fillN(xs, ws);
 
     auto hist = hnd.merged();
-    test.test("Single Hist Filling", hist.GetEntries() == 11);
+    test.test("Single Hist Filling", hist.GetEntries() == nItrerations);
 
   }{
-    Handle<Manager<RH1I>> entry = store.book("path2", "name", EntryData<RH1I>({"a", 2, -1, 2}).multiCopy(2));
+    Handle<Manager<RH1I>> entry = store.book("path2", "name", EntryData<RH1I>(axis).multiCopy(2));
 
     auto hnd = entry.handle(0);
     hnd.fill({0}, 1);
@@ -90,7 +94,7 @@ int main(int, char**) {
 
   } {
   
-    Handle<Manager<RH1I>> entry = store.book("path3", "name", EntryData<RH1I>({"a", 3, 1.0, 2.0}).multiShared());
+    Handle<Manager<RH1I>> entry = store.book("path3", "name", EntryData<RH1I>(axis).multiShared());
     auto hnd = entry.handle(1);
     hnd.fill({0}, 1);
 
@@ -103,8 +107,8 @@ int main(int, char**) {
   }{
     
     std::string path = mergedUnicStr();
-		EntryData config = EntryData<RH1I>({"a", 2, 0.0, 2.0}).single();
-    for(int i = 0; i < 10; ++i) {
+		EntryData config = EntryData<RH1I>(axis).single();
+    for(int i = 0; i < nItrerations; ++i) {
       store.book(path, mergedUnicStr(), config);
     }
     
@@ -112,32 +116,32 @@ int main(int, char**) {
 
     {
       Condition all = ConditionBuilder();
-      Selection selC[] = {
+			std::array selC = {
         sel.find(all),
         sel.find(all),
         sel.find(all),
         sel.find(all)
       };
 
-      auto itr = selC[2].begin() + 5;
-      for(int i = 5; i < 10; ++i, ++itr) {
+      auto itr = selC[2].begin() + nItrerations / 2;
+      for(int i = nItrerations / 2; i < nItrerations; ++i, ++itr) {
         selC[0].remove(i);
         selC[2].remove(itr);
       }
-      selC[1].remove(5, 5);
-      selC[3].remove(selC[3].begin() + 5, selC[3].end());
+      selC[1].remove(nItrerations / 2, nItrerations / 2);
+      selC[3].remove(selC[3].begin() + nItrerations / 2, selC[3].end());
 
       bool equal = true;
-      Selection::const_iterator aItr[] = {
+			std::array aItr = {
         selC[0].begin(),
         selC[1].begin(),
         selC[2].begin(),
         selC[3].begin()};
       for(;equal && aItr[0] != selC[0].end();) {
-        for(int i = 0; i < 4; ++aItr[i++]) {
+        for(int i = 0; i < nItrerations / 2 - 1; ++aItr.at(i++)) {
           if(
             i < 3 &&
-            aItr[i]->key().hash != aItr[i + 1]->key().hash) {
+            aItr.at(i)->key().hash != aItr.at(i + 1)->key().hash) {
             equal = false;
             break;
           }
@@ -168,7 +172,7 @@ int main(int, char**) {
         break;
       }
     }
-    if(sel2.size() != sel.size()) equal = false;
+    if(sel2.size() != sel.size()) { equal = false; }
 
     store.clear();
     Selection selAll = store.find(ConditionBuilder());
@@ -181,7 +185,6 @@ int main(int, char**) {
   } {
     std::size_t n = store.find(ConditionBuilder()).size();
 
-    RAxisConfig axis{"x", 2, 1.0, 2.0};
     EntryData<RH1F> entry1(axis);
     EntryData<RH2F> entry2(axis, axis);
     EntryData<RH3F> entry3(axis, axis, axis);
@@ -193,9 +196,9 @@ int main(int, char**) {
 
     std::size_t n2 = store.find(ConditionBuilder()).size();
 
-    test.test("BookHelper usage", n + 5 == n2);
+    test.test("BookHelper usage", n + nItrerations / 2 == n2);
   } {
-    Handle<Manager<RH1F>> e = store.book("path", "my Name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
+    Handle<Manager<RH1F>> e = store.book("path", "my Name", EntryData<RH1F>(axis).single());
     e.handle(1).fill({0}, 1);
 
 
@@ -208,14 +211,14 @@ int main(int, char**) {
       && h.merged().GetBinContent({0}) == 2);   
 
   } {
-    Handle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", {"x", 2, -1.0, 5.0}).single());
+    Handle e = store.book("path", mergedUnicStr(), EntryData<RH1F>("title", axis).single());
     e.handle(1).fill({0}, 1);
     test.test("Named Histograms", e.handle(1).merged().GetEntries() == 1);
   } {
 		bool errorThrown = false;
-		std::thread t1([&store, &errorThrown](){
+		std::thread t1([&store, &errorThrown, &axis](){
 					try{
-						store.book("path", "name", EntryData<RH1F>({"x", 2, -1.0, 5.0}).single());
+						store.book("path", "name", EntryData<RH1F>(axis).single());
 					} catch (const marlin::BookStoreException&) {
 						errorThrown = true;
 					}
@@ -223,6 +226,8 @@ int main(int, char**) {
 		t1.join();
 		test.test("prevent booking from other threads", errorThrown);
 	}
-
+	} catch(const marlin::BookStoreException& excp){
+		test.test(std::string("Not expected error") + excp.what(), false);
+	}
   return 0;
 }

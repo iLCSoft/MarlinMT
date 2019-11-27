@@ -37,22 +37,25 @@ namespace marlin {
       template < typename T >
       static Selection find( T begin, T end, const Condition &cond ) ;
 
-      typedef typename std::vector<std::shared_ptr<const Entry>>::const_iterator ItrBase;
+      using ItrBase = typename std::vector<std::shared_ptr<const Entry>>::const_iterator;
       class Hit{
         friend Selection;
       public:
         Hit(const std::shared_ptr<const Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
         Hit(const std::shared_ptr<Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
+				[[nodiscard]]
         bool valid() const {
           return _rEntry.valid();
         }
         operator std::shared_ptr<const Entry>() const  {
           return _entry.lock();
         }
+				[[nodiscard]]
         const EntryKey& key() const {
           return _rEntry.key();
         }
         template<typename T>
+				[[nodiscard]]
         Handle<Manager<T>> bind() const {
           return Handle<Manager<T>>(_entry.lock());
         }
@@ -73,6 +76,10 @@ namespace marlin {
           _itr = itr.base();
           return *this;
         }
+        const_iterator(const_iterator && )                 = default;
+        const_iterator & operator=(const_iterator && )      = default ;
+        ~const_iterator() = default;
+
         const_iterator operator+(std::size_t n) {
           return const_iterator(_itr + n);
         }
@@ -90,7 +97,7 @@ namespace marlin {
           _hit = std::make_unique<Hit>(Hit(*_itr));
           return _hit;
         }
-        const Hit operator*() {
+        Hit operator*() {
           _hit = std::make_unique<Hit>(Hit(*_itr));
           return *_hit;
         }
@@ -104,6 +111,7 @@ namespace marlin {
           ++_itr;
           return *this; 
         }
+				[[nodiscard]]
         ItrBase base() const {
           return _itr;
         }
@@ -121,10 +129,13 @@ namespace marlin {
       Selection() = default ;
 
       Selection( const Selection & ) = delete ;
+      Selection& operator=( const Selection & ) = delete ;
 
       /// move constructor. Default
       Selection( Selection && ) = default ;
+      Selection& operator=(Selection&&) = default;
 
+      ~Selection() = default;
       /**
        *  @brief construct sub selection.
        *  @param sel super selection
@@ -136,15 +147,19 @@ namespace marlin {
                  ComposeStrategy strategy = ComposeStrategy::AND ) ;
 
       /// getter for Condition which every Entry full fill.
+			[[nodiscard]]
       const Condition &condition() const { return _condition; }
 
       /// begin iterator to iterate through entries.
+			[[nodiscard]]
       const_iterator begin() const { return _entries.cbegin(); }
 
       /// end iterator for entries. First not valid iterator.
+			[[nodiscard]]
       const_iterator end() const { return _entries.cend(); }
 
       /// @return number of entries included in the selection.
+			[[nodiscard]]
       std::size_t size() const { return _entries.size(); }
 
       /**
@@ -178,7 +193,7 @@ namespace marlin {
        *  @brief remove entry.
        *  @param itr iterator from entry which should be removed.
        */
-      void remove( const_iterator itr ) ;
+      void remove( const const_iterator& itr ) ;
 
       /**
        *  @brief remove entry range.
@@ -186,7 +201,7 @@ namespace marlin {
        *  @param begin first entry which should be removed.
        *  @param end first entry which should not be removed.
        */
-      void remove( const_iterator begin, const_iterator end ) ;
+      void remove( const const_iterator& begin, const const_iterator& end ) ;
 
     private:
       /// entries which included in selection.
@@ -254,11 +269,11 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    void Selection::remove( const_iterator itr ) { _entries.erase( itr.base() ); }
+    void Selection::remove( const const_iterator& itr ) { _entries.erase( itr.base() ); }
 
     //--------------------------------------------------------------------------
 
-    void Selection::remove( const_iterator begin, const_iterator end ) {
+    void Selection::remove( const const_iterator& begin, const const_iterator& end ) {
       _entries.erase( begin.base(), end.base() ) ;
     }
 

@@ -26,11 +26,19 @@ namespace marlin {
       /// default constructor.
       Condition() ;
 
+      ~Condition() = default;
+
       /// construct Condition from filter function.
-      Condition( const FilterFn_t &filterFn ) ;
+      Condition( FilterFn_t filterFn ) ;
+      Condition& operator=(const FilterFn_t &filterFn);
+
+      /// move constructor. 
+      Condition( Condition && ) = default ;
+      Condition& operator=(Condition&&) = default;
 
       /// copy constructor.
       Condition( const Condition & ) = default ;
+      Condition& operator=(const Condition&) = default;
 
       /**
        *  @brief test Condition on key.
@@ -87,7 +95,8 @@ namespace marlin {
       operator Condition() const ;
 
       /// construct new Condition.
-      Condition condition() const ;
+			[[nodiscard]]
+      Condition condition() const;
 
       /**
        *  @brief only accept when key.name is perfect match to name.

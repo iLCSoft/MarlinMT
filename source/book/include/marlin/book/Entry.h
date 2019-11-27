@@ -21,11 +21,6 @@ namespace marlin {
     template < typename T >
     class Handle ;
 
-    /**
-     *  @brief function to merge two objects.
-     */
-    template<typename T >
-    void merge(const std::shared_ptr<T>&, const std::shared_ptr<T>&);
 
     /**
      *  @brief minimal entry for Object.
@@ -36,7 +31,7 @@ namespace marlin {
       friend BookStore ;
 
       /// constructor
-      EntrySingle( const Context &context ) : _context{context} {}
+      EntrySingle( Context context ) : _context{std::move(context)} {}
 
     public:
       /// default constructor
@@ -62,7 +57,7 @@ namespace marlin {
       friend BookStore ;
 
       /// constructor
-      EntryMultiCopy( const Context &context ) : _context{context} {}
+      EntryMultiCopy( Context context ) : _context{std::move(context)} {}
 
     public:
       /// default constructor
@@ -92,7 +87,7 @@ namespace marlin {
       friend BookStore ;
 
       /// constructor
-      EntryMultiShared( const Context &context ) : _context{context} {}
+      EntryMultiShared( Context context ) : _context{std::move(context)} {}
 
     public:
       /// default constructor
@@ -118,8 +113,8 @@ namespace marlin {
       friend BookStore ;
 
       /// constructor
-      Entry( const std::shared_ptr< EntryBase > &entry, const EntryKey &key )
-        : _key{key}, _entry{entry} {}
+      Entry( std::shared_ptr< EntryBase > entry, EntryKey key )
+        : _key{std::move(key)}, _entry{std::move(entry)} {}
 
       /// reduce Entry to default constructed version.
       void clear() {
@@ -139,20 +134,23 @@ namespace marlin {
        *  @return empty optional if the type or the configuration not matches.
        */
       template < class T >
-      Handle< T >handle( std::size_t idx = -1 ) const {
+			[[nodiscard]]
+      Handle< T > handle( std::size_t idx = -1 ) const{
         if ( std::type_index( typeid( T ) ) != _key.type ) {
           MARLIN_THROW_T(BookStoreException, "Entry is not demanded type. Can't create Handle!");
         }
 
-        if ( _key.flags.Contains( Flags::Book::Single ) ) {
+        if ( _key.flags.contains( Flags::Book::Single ) ) {
           return std::static_pointer_cast< EntrySingle< T > >( _entry )
             ->handle() ;
 
-        } else if ( _key.flags.Contains( Flags::Book::MultiCopy ) ) {
+        }
+        if ( _key.flags.contains( Flags::Book::MultiCopy ) ) {
           return std::static_pointer_cast< EntryMultiCopy< T > >( _entry )
             ->handle( idx ) ;
 
-        } else if ( _key.flags.Contains( Flags::Book::MultiShared ) ) {
+        }
+        if ( _key.flags.contains( Flags::Book::MultiShared ) ) {
           return std::static_pointer_cast< EntryMultiShared< T > >( _entry )
             ->handle() ;
         }
@@ -161,6 +159,7 @@ namespace marlin {
       }
 
       /// access key data from entry.
+			[[nodiscard]]
       const EntryKey &key() const { return _key; }
 
       /**
@@ -168,6 +167,7 @@ namespace marlin {
        *  check if there is a reference stored or not.
        *  @return true if entry is valid.
        */
+			[[nodiscard]]
       bool valid() const { return _entry != nullptr ; }
 
     private:

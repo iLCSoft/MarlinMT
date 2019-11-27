@@ -5,6 +5,9 @@
 #include <string>
 #include <typeindex>
 
+// -- Marlin includes
+#include "marlin/Exceptions.h"
+
 // -- MarlinBook includes
 #include "marlin/book/Flags.h"
 
@@ -14,12 +17,20 @@ namespace marlin {
     class MemLayout ;
 
     /**
+     *  @brief function to merge two objects.
+     */
+    /*template < typename T >
+    void merge(T&, T&) {
+      MARLIN_THROW_T(BookStoreException, "No merge function defined for this data type"); 
+    }*/
+
+    /**
      *  @brief Data selection to identify and manage an Entry.
      */
     struct EntryKey {
 
       /// default constructor.
-      EntryKey() : type(typeid( void ) ) {}
+      EntryKey() = default;
 
       /// Construct typed EntryKey.
       EntryKey( const std::type_index &t ) : type{t} {}
@@ -31,12 +42,39 @@ namespace marlin {
       /// number of memory instances
       std::size_t mInstances{0} ;
       /// Type of object stored in Entry.
-      std::type_index type ;
+      std::type_index type{typeid(void)};
       /// Status flags from Entry.
-      Flag_t< 0 > flags{} ;
+      Flag_t flags{} ;
       /// unique number for Entry
       std::size_t hash{0} ;
     } ;
+
+    /**
+     *  @brief Base Class for Entry Data, for similar behavior.
+     */
+    template < class T >
+    class EntryDataBase {} ;
+
+    template <>
+    class EntryDataBase< void > {
+    public:
+      EntryDataBase()                                   = default ;
+      EntryDataBase( const EntryDataBase & )            = delete ;
+      EntryDataBase &operator=( const EntryDataBase & ) = delete ;
+      EntryDataBase( EntryDataBase && )                 = delete ;
+      EntryDataBase &operator=( EntryDataBase && )      = delete ;
+      ~EntryDataBase() = default ;
+
+      // template<typename ... Args_t>
+      // void book(BookStore & store, Args_t... args){
+      // }
+    } ;
+
+    /**
+     * @brief Container for data to construct and setup booked object.
+     */
+    template < class T, unsigned long long = 0 >
+    class EntryData : public EntryDataBase< void > {} ;
 
     /**
      *  @brief Data selection for the Entry to work properly.
@@ -47,8 +85,8 @@ namespace marlin {
       Context() = default ;
 
       /// constructor
-      Context( const std::shared_ptr< MemLayout > &memLayout )
-        : mem{memLayout} {}
+      Context( std::shared_ptr< MemLayout > memLayout )
+        : mem{std::move(memLayout)} {}
 
       /// reference to Memory object. For editing and reading data.
       std::shared_ptr< MemLayout > mem{nullptr} ;

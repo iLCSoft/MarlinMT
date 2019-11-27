@@ -20,7 +20,6 @@
 #include "marlin/book/Condition.h"
 #include "marlin/book/EntryData.h"
 #include "marlin/book/Flags.h"
-#include "marlin/book/Hist.h"
 #include "marlin/book/MemLayout.h"
 #include "marlin/book/Selection.h"
 
@@ -29,13 +28,11 @@ namespace marlin {
   namespace book {
 
     // -- MarlinBook forward declaration
-    template < unsigned long long >
-    class Flag_t ;
     class MemLayout ;
     template < typename, typename... >
     class SingleMemLayout ;
     template < typename T,
-               void( const std::shared_ptr< T > &,
+               void(*)( const std::shared_ptr< T > &,
                      const std::shared_ptr< T > & ),
                typename... >
     class SharedMemLayout ;
@@ -46,52 +43,46 @@ namespace marlin {
     class Handle<Manager<T>> {
       friend BookStore;
       friend Selection::Hit;
-      Handle(const std::shared_ptr<const Entry>& entry)
-        : _entry{entry} {}
+      using IdMap_t = std::unordered_map<std::size_t, std::size_t>;
+      Handle(std::shared_ptr<const Entry> entry)
+        : _entry{std::move(entry)},
+          _mapping(std::make_unique<IdMap_t>()){}
       std::size_t unmap(std::size_t id) {
-        auto itr = _mapping.find(id);
-        if(itr == _mapping.end()) {
-          itr = _mapping.insert(std::make_pair(id, _n++)).first;
+        auto itr = _mapping->find(id);
+        if(itr == _mapping->end()) {
+          itr = _mapping->insert(std::make_pair(id, _n++)).first;
         }
         return itr->second;
       }
     public:
+      Handle(const Handle&) = delete;
+      Handle& operator=(const Handle &) = delete ;
+      Handle(Handle && hnd) noexcept
+      : _entry(nullptr), _mapping(nullptr), _n(hnd._n){
+        _entry = hnd._entry;
+        _mapping = std::move(hnd._mapping);
+
+        hnd._entry.reset();
+      }
+      Handle &operator=(Handle && hnd) noexcept {
+        _entry = hnd._entry;
+        _mapping = std::move(hnd._mapping);
+        _n = hnd.load();
+
+        hnd._entry.reset();
+      }
+      ~Handle() = default;
       Handle<T> handle(std::size_t id) {
-        return _entry->handle<T>(unmap(id));  
+          return _entry->handle<T>(unmap(id));  
       }
 
     private:
-      std::shared_ptr<const Entry> _entry;
-      std::unordered_map<std::size_t, std::size_t> _mapping{};
+      std::shared_ptr<const Entry> _entry{nullptr};
+      std::unique_ptr<IdMap_t> _mapping{};
       std::atomic<std::size_t> _n{0};
     };
 
 
-    /**
-     *  @brief Base Class for Entry Data, for similar behavior.
-     */
-    template < class T >
-    class EntryDataBase {} ;
-
-    template <>
-    class EntryDataBase< void > {
-    public:
-      EntryDataBase()                                   = default ;
-      EntryDataBase( const EntryDataBase & )            = delete ;
-      EntryDataBase &operator=( const EntryDataBase & ) = delete ;
-      EntryDataBase( EntryDataBase && )                 = delete ;
-      EntryDataBase &operator=( EntryDataBase && )      = delete ;
-
-      // template<typename ... Args_t>
-      // void book(BookStore & store, Args_t... args){
-      // }
-    } ;
-
-    /**
-     * @brief Container for data to construct and setup booked object.
-     */
-    template < class T, unsigned long long = 0 >
-    class EntryData : public EntryDataBase< void > {} ;
 
     /**
      *  @brief Managed Access and creation to Objects.
@@ -105,7 +96,9 @@ namespace marlin {
           std::size_t operator()(const Identifier& id) const {
             std::hash<decltype(Identifier::_name)> hasher;  
             std::size_t hash = hasher(id._name);
-            return hash ^= hasher(id._path) + 0x9e3779b9 + (hash<<6) + (hash>>2);
+            constexpr std::size_t salt = 0x9e3779b9;
+            constexpr std::array offsets = {6, 2};
+            return hash ^= hasher(id._path) + salt + (hash<<offsets[0]) + (hash>>offsets[1]);
           } 
         };
         Identifier(
@@ -169,7 +162,10 @@ namespace marlin {
        *  @param n number of instances which should be created.
        *  (max level of pluralism)
        */
-      template < class T, typename... Args_t >
+      template < 
+          class T, 
+          void(*MERGE)(const std::shared_ptr<T>&,const std::shared_ptr<T>&),   
+          typename... Args_t >
       std::shared_ptr<Entry> bookMultiCopy( std::size_t             n,
                                          const std::string_view &path,
                                          const std::string_view &name,
@@ -282,19 +278,24 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    template < class T, typename... Args_t >
+    template <
+             class T,
+             void(*MERGE)(const std::shared_ptr<T>&,const std::shared_ptr<T>&),
+             typename... Args_t >
     std::shared_ptr<Entry>
     BookStore::bookMultiCopy( std::size_t             n,
-                                                  const std::string_view &path,
-                                                  const std::string_view &name,
-                                                  Args_t... ctor_p ) {
+                              const std::string_view &path,
+                              const std::string_view &name,
+                              Args_t... ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
       key.name   = name ;
       key.path   = path ;
       key.mInstances    = n ;
       key.flags  = Flags::Book::MultiCopy ;
       auto entry = std::make_shared< EntryMultiCopy< T > >( Context(
-        std::make_shared< SharedMemLayout< T, merge<T>, Args_t... > >(
+        std::make_shared< SharedMemLayout< T, 
+        MERGE
+        , Args_t... > >(
           n, ctor_p... ) ) ) ;
 
       return addEntry( entry, key ) ;
