@@ -247,7 +247,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 1, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::Single)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -260,7 +260,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 2, std::shared_ptr<Entry>>
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::Single)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -274,7 +274,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 3, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::Single)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -293,7 +293,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 1, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiCopy)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -308,7 +308,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 2, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiCopy)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -324,7 +324,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 3, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiCopy)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -346,7 +346,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 1, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiShared)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -359,7 +359,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 2, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiShared)>
 			::book( BookStore &store, const Args_t &... args ) const {
@@ -373,7 +373,7 @@ namespace marlin {
 		//--------------------------------------------------------------------------
 		
 		template<int D, typename T, template < int, class > class... STAT>
-		template < typename... Args_t, int d = D >
+		template < typename... Args_t, int d >
 		std::enable_if_t< d == 3, std::shared_ptr<Entry> >
 		EntryData<types::RHist< D, T, STAT... >, Flags::value(Flags::Book::MultiShared)>
 			::book( BookStore &store, const Args_t &... args ) const {
