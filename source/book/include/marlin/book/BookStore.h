@@ -35,41 +35,37 @@ namespace marlin {
       friend BookStore;
       friend Selection::Hit;
       using IdMap_t = std::unordered_map<std::size_t, std::size_t>;
+
+			/// constructor
       explicit Handle(std::shared_ptr<const Entry> entry)
         : _entry{std::move(entry)},
           _mapping(std::make_unique<IdMap_t>()){}
-      std::size_t unmap(std::size_t id) {
-        auto itr = _mapping->find(id);
-        if(itr == _mapping->end()) {
-          itr = _mapping->insert(std::make_pair(id, _n++)).first;
-        }
-        return itr->second;
-      }
+
+			/// maps outside id to internal id
+      std::size_t unmap(std::size_t id);
+
     public:
+			/// no copy
       Handle(const Handle&) = delete;
+			/// no copy
       Handle& operator=(const Handle &) = delete ;
-      Handle(Handle && hnd) noexcept
-      : _entry(nullptr), _mapping(nullptr), _n(hnd._n){
-        _entry = hnd._entry;
-        _mapping = std::move(hnd._mapping);
 
-        hnd._entry.reset();
-      }
-      Handle &operator=(Handle && hnd) noexcept {
-        _entry = hnd._entry;
-        _mapping = std::move(hnd._mapping);
-        _n = hnd.load();
-
-        hnd._entry.reset();
-      }
       ~Handle() = default;
-      Handle<T> handle(std::size_t id) {
-          return _entry->handle<T>(unmap(id));  
-      }
+
+			/// custom move (atomic is not movable)
+      Handle(Handle && hnd) noexcept;
+
+			/// custom move (atomic is not movable)
+      Handle &operator=(Handle && hnd) noexcept;
+
+      Handle<T> handle(std::size_t id);
 
     private:
+			/// reference to handled Entry.
       std::shared_ptr<const Entry> _entry{nullptr};
+			/// maps ids to Handle instances.
       std::unique_ptr<IdMap_t> _mapping{};
+			/// count number of Handle instances.
       std::atomic<std::size_t> _n{0};
     };
 
@@ -359,6 +355,47 @@ namespace marlin {
 			MARLIN_THROW_T(BookStoreException, std::string("Entry path:'") 
 					+ static_cast<std::string>(path) + "' name:'" 
 					+ static_cast<std::string>(name) + "' is already booked!");
+		}
+
+		//--------------------------------------------------------------------------
+	
+		template<typename T>
+		std::size_t Handle<Manager<T>>::unmap(std::size_t id) {
+			auto itr = _mapping->find(id);
+			if(itr == _mapping->end()) {
+				itr = _mapping->insert(std::make_pair(id, _n++)).first;
+			}
+			return itr->second;
+		}
+
+		//--------------------------------------------------------------------------
+		
+		template<typename T>
+		Handle<Manager<T>>::Handle(Handle && hnd) noexcept
+		: _entry(nullptr), _mapping(nullptr), _n(hnd._n){
+			_entry = hnd._entry;
+			_mapping = std::move(hnd._mapping);
+
+			hnd._entry.reset();
+		}
+
+		//--------------------------------------------------------------------------
+
+		template< typename T>
+		Handle<Manager<T>>& Handle<Manager<T>>::operator=(Handle && hnd) noexcept {
+			_entry = hnd._entry;
+			_mapping = std::move(hnd._mapping);
+			_n = hnd.load();
+
+			hnd._entry.reset();
+			return *this;
+		}
+
+		//--------------------------------------------------------------------------
+
+		template<typename T>
+		Handle<T> Handle<Manager<T>>::handle(std::size_t id) {
+				return _entry->handle<T>(unmap(id));  
 		}
 
   } // end namespace book
