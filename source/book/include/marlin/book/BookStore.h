@@ -182,8 +182,8 @@ namespace marlin {
        */
       template < class T >
       Handle< Manager< typename T::Object_t > >
-      book( const std::string_view path,
-            const std::string_view name,
+      book( const std::string_view& path,
+            const std::string_view& name,
             const T               &data ) ;
 
       /**
@@ -342,8 +342,8 @@ namespace marlin {
 
     template < class T >
     Handle< Manager< typename T::Object_t > >
-    BookStore::book( const std::string_view path,
-                     const std::string_view name,
+    BookStore::book( const std::string_view &path,
+                     const std::string_view &name,
                      const T                &data ) {
 
       if ( !_allowMoving && std::this_thread::get_id() != _constructThread ) {
