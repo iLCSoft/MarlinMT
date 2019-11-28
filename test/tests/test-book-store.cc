@@ -37,6 +37,14 @@ int main(int /*argc*/, char** /*argv*/) {
 		Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
 		Handle<RH1F> handle = entry.handle(1);
 	} {
+		/* bool error = false;
+		try {
+			Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
+		} catch (const marlin::BookStoreException&) {
+			error = true;
+		}
+		test.test("No Double booking.", error); */
+	}{
 
     // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ; 
     Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());

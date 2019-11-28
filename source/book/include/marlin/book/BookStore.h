@@ -27,15 +27,6 @@ namespace marlin {
   /// contains classes needed to book and managed booked objects.
   namespace book {
 
-    // -- MarlinBook forward declaration
-    class MemLayout ;
-    template < typename, typename... >
-    class SingleMemLayout ;
-    template < typename T,
-               void(*)( const std::shared_ptr< T > &,
-                     const std::shared_ptr< T > & ),
-               typename... >
-    class SharedMemLayout ;
     template<typename T>
     class Manager{};
 
@@ -85,21 +76,19 @@ namespace marlin {
 
 
     /**
-     *  @brief Managed Access and creation to Objects.
+     *  @brief Managed Access and creation of Objects.
      */
     class BookStore {
       template <typename,unsigned long long>
       friend class EntryData;
+
+			/**
+			 *	@brief holds references for identify an entry.
+			 */
       class Identifier {
       public:
         struct Hash {
-          std::size_t operator()(const Identifier& id) const {
-            std::hash<decltype(Identifier::_name)> hasher;  
-            std::size_t hash = hasher(id._name);
-            constexpr std::size_t salt = 0x9e3779b9;
-            constexpr std::array<std::size_t, 2> offsets = {6, 2};
-            return hash ^= hasher(id._path) + salt + (hash<<offsets[0]) + (hash>>offsets[1]);
-          } 
+          std::size_t operator()(const Identifier& id) const;
         };
         Identifier(
             const std::string_view& path,
@@ -186,24 +175,21 @@ namespace marlin {
         _constructThread(std::this_thread::get_id()),
         _allowMoving{allowMoving}{}
 
-      template < class T>
+
+			/**
+			 *	@brief book new object. 
+			 *	@param path to store object.
+			 *	@param name of object.
+			 *	@note path + name must be unique in the store.
+			 *	@param data describing access and construction of object. 
+			 *	@throw BookStoreException when: 
+			 *		- object with same path + name already exist
+			 *		- book was constructed in different thread. \see{_allowMoving}
+			 */
+			template < class T>
       Handle<Manager<typename T::Object_t>> book( const std::string_view path,
                  const std::string_view name,
-                 const T &               data ) {
-
-        if( !_allowMoving && std::this_thread::get_id() != _constructThread) {
-          MARLIN_THROW_T(BookStoreException, "Booking is only allowed "
-          "from the construction Thread");    
-        }
-
-        auto entry = _idToEntry.find({path, name});
-        if(entry == _idToEntry.end()) {
-          return Handle<Manager<typename T::Object_t>>
-            (data.template book< std::string_view, std::string_view >(
-            *this, path, name ) );
-        }
-        return Handle<Manager<typename T::Object_t>>(_entries[entry->second]);
-      }
+                 const T &               data );
 
       /**
        *  @brief select every Entry which matches the condition.
@@ -238,6 +224,7 @@ namespace marlin {
       /// stores path+name -> Entry Id
       std::unordered_map<Identifier, std::size_t, Identifier::Hash> _idToEntry{};
       std::thread::id _constructThread;
+			/// when false only allow booking from construction thread. Avoid races.
       const bool _allowMoving{false};
     } ;
 
@@ -338,6 +325,41 @@ namespace marlin {
 
       return addEntry( entry, key ) ;
     }
+
+		//--------------------------------------------------------------------------
+		
+		std::size_t BookStore::Identifier::Hash::operator()(const Identifier& id) const {
+			std::hash<decltype(Identifier::_name)> hasher;  
+			std::size_t hash = hasher(id._name);
+			constexpr std::size_t salt = 0x9e3779b9;
+			constexpr std::array<std::size_t, 2> offsets = {6, 2};
+			return hash ^= hasher(id._path) + salt + (hash<<offsets[0]) + (hash>>offsets[1]);
+		} 
+
+		//--------------------------------------------------------------------------
+		
+		template < class T>
+		Handle<Manager<typename T::Object_t>> 
+		BookStore::book( const std::string_view path,
+							 const std::string_view name,
+							 const T &               data ) {
+
+			if( !_allowMoving && std::this_thread::get_id() != _constructThread) {
+				MARLIN_THROW_T(BookStoreException, "Booking is only allowed "
+				"from the construction Thread");    
+			}
+
+			auto entry = _idToEntry.find({path, name});
+			if(entry == _idToEntry.end()) {
+				return Handle<Manager<typename T::Object_t>>
+					(data.template book< std::string_view, std::string_view >(
+					*this, path, name ) );
+			}
+
+			MARLIN_THROW_T(BookStoreException, std::string("Entry path:'") 
+					+ static_cast<std::string>(path) + "' name:'" 
+					+ static_cast<std::string>(name) + "' is already booked!");
+		}
 
   } // end namespace book
 
