@@ -21,7 +21,8 @@ namespace marlin {
      */
     /*template < typename T >
     void merge(T&, T&) {
-      MARLIN_THROW_T(BookStoreException, "No merge function defined for this data type"); 
+      MARLIN_THROW_T(BookStoreException, "No merge function defined for this
+    data type") ;
     }*/
 
     /**
@@ -30,7 +31,7 @@ namespace marlin {
     struct EntryKey {
 
       /// default constructor.
-      EntryKey() = default;
+      EntryKey() = default ;
 
       /// Construct typed EntryKey.
       explicit EntryKey( const std::type_index &t ) : type{t} {}
@@ -42,7 +43,7 @@ namespace marlin {
       /// number of memory instances
       std::size_t mInstances{0} ;
       /// Type of object stored in Entry.
-      std::type_index type{typeid(void)};
+      std::type_index type{typeid( void )} ;
       /// Status flags from Entry.
       Flag_t flags{} ;
       /// unique number for Entry
@@ -63,7 +64,7 @@ namespace marlin {
       EntryDataBase &operator=( const EntryDataBase & ) = delete ;
       EntryDataBase( EntryDataBase && )                 = delete ;
       EntryDataBase &operator=( EntryDataBase && )      = delete ;
-      ~EntryDataBase() = default ;
+      ~EntryDataBase()                                  = default ;
 
       // template<typename ... Args_t>
       // void book(BookStore & store, Args_t... args){
@@ -86,7 +87,7 @@ namespace marlin {
 
       /// constructor
       explicit Context( std::shared_ptr< MemLayout > memLayout )
-        : mem{std::move(memLayout)} {}
+        : mem{std::move( memLayout )} {}
 
       /// reference to Memory object. For editing and reading data.
       std::shared_ptr< MemLayout > mem{nullptr} ;
