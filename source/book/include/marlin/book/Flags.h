@@ -20,12 +20,12 @@ namespace marlin {
 			/**
 			 *  @brief constructor flag from number.
 			 */
-			constexpr Flag_t( unsigned long long val ) : _val{val}, _initValue{val} {}
+			explicit constexpr Flag_t( unsigned long long val ) : _val{val}, _initValue{val} {}
 
 			/**
 			 *  @brief Construct flag from bitset.
 			 */
-			Flag_t( const std::bitset< AmtFlags > &val ) : _val{val} {}
+			explicit Flag_t( const std::bitset< AmtFlags > &val ) : _val{val} {}
 
 
 			/**
@@ -46,12 +46,12 @@ namespace marlin {
 			 *  @brief cast to bool.
 			 *  @return true if any flag is set.
 			 */
-			operator bool() const { return _val.any(); }
+			explicit operator bool() const { return _val.any(); }
 
 			/**
 			 *  @brief cast to bitset.
 			 */
-			operator const std::bitset< AmtFlags > &() const { return _val; }
+			explicit operator const std::bitset< AmtFlags > &() const { return _val; }
 
 			/**
 			 *  @brief check for equality.
@@ -77,7 +77,7 @@ namespace marlin {
 				return ( _val & f._val ) == f._val ;
 			}
 
-			operator unsigned long long() const { return _val.to_ullong(); }
+			explicit operator unsigned long long() const { return _val.to_ullong(); }
 			Flag_t() = default ;
 			Flag_t(const Flag_t&) = default;
 			Flag_t& operator=(const Flag_t& flag) {
@@ -107,11 +107,11 @@ namespace marlin {
 			namespace Book {
 				/// create multiple instances of booked object (if possible) to avoid
 				/// sync points
-				constexpr Flag_t MultiCopy(1 << 2);
+				constexpr Flag_t MultiCopy(1U << 2U);
 				/// vanilla object.
-				constexpr Flag_t Single(1 << 0);
+				constexpr Flag_t Single(1U << 0U);
 				/// create one instance witch concurrent access.
-				constexpr Flag_t MultiShared(1 << 1);
+				constexpr Flag_t MultiShared(1U << 1U);
 			} // end namespace Book
 
 		} // end namespace Flags

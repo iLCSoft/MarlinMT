@@ -29,7 +29,7 @@ namespace marlin {
 			~Condition() = default;
 
 			/// construct Condition from filter function.
-			Condition( FilterFn_t filterFn ) ;
+			explicit Condition( FilterFn_t filterFn ) ;
 			Condition& operator=(const FilterFn_t &filterFn);
 
 			/// move constructor. 

@@ -33,7 +33,7 @@ namespace marlin {
       EntryKey() = default;
 
       /// Construct typed EntryKey.
-      EntryKey( const std::type_index &t ) : type{t} {}
+      explicit EntryKey( const std::type_index &t ) : type{t} {}
 
       /// virtual Entry path
       std::string path{""} ;
@@ -85,7 +85,7 @@ namespace marlin {
       Context() = default ;
 
       /// constructor
-      Context( std::shared_ptr< MemLayout > memLayout )
+      explicit Context( std::shared_ptr< MemLayout > memLayout )
         : mem{std::move(memLayout)} {}
 
       /// reference to Memory object. For editing and reading data.

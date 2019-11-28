@@ -37,22 +37,18 @@ namespace marlin {
 			template < typename T >
 			static Selection find( T begin, T end, const Condition &cond ) ;
 
-			using ItrBase = typename std::vector<std::shared_ptr<const Entry>>::const_iterator;
 			class Hit{
 				friend Selection;
 			public:
-				Hit(const std::shared_ptr<const Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
-				Hit(const std::shared_ptr<Entry>& entry) : _rEntry{*entry}, _entry{entry}{}
+				explicit Hit(const std::shared_ptr<const Entry>& entry) : _entry{entry}{}
+				explicit Hit(const std::shared_ptr<Entry>& entry) : _entry{entry}{}
 				[[nodiscard]]
 				bool valid() const {
-					return _rEntry.valid();
-				}
-				operator std::shared_ptr<const Entry>() const  {
-					return _entry.lock();
+					return !_entry.expired() && _entry.lock()->valid();
 				}
 				[[nodiscard]]
 				const EntryKey& key() const {
-					return _rEntry.key();
+					return _entry.lock()->key();
 				}
 				template<typename T>
 				[[nodiscard]]
@@ -60,15 +56,17 @@ namespace marlin {
 					return Handle<Manager<T>>(_entry.lock());
 				}
 			private:
-				const Entry& _rEntry;
 				std::weak_ptr<const Entry> _entry;
 			};
+		
+			using ItrBase = typename std::vector<Hit>::const_iterator;
 
 			/// type for iteration through a Selection.
 			class const_iterator {
 				friend Selection;
-				const_iterator(ItrBase itr) : _itr{itr}{}
+				explicit const_iterator(ItrBase itr) : _itr{itr}{}
 			public:
+				using value_type = Hit;
 				const_iterator() = default;
 				const_iterator(const const_iterator& itr) 
 					: _itr{itr.base()}{}
@@ -97,9 +95,8 @@ namespace marlin {
 					_hit = std::make_unique<Hit>(Hit(*_itr));
 					return _hit;
 				}
-				Hit operator*() {
-					_hit = std::make_unique<Hit>(Hit(*_itr));
-					return *_hit;
+				Hit operator*() const {
+					return Hit(*_itr);
 				}
 				const_iterator operator++(int){
 					const_iterator last = *this;
@@ -152,11 +149,11 @@ namespace marlin {
 
 			/// begin iterator to iterate through entries.
 			[[nodiscard]]
-			const_iterator begin() const { return _entries.cbegin(); }
+			const_iterator begin() const { return const_iterator(_entries.cbegin()); }
 
 			/// end iterator for entries. First not valid iterator.
 			[[nodiscard]]
-			const_iterator end() const { return _entries.cend(); }
+			const_iterator end() const { return const_iterator(_entries.cend()); }
 
 			/// @return number of entries included in the selection.
 			[[nodiscard]]
@@ -171,10 +168,10 @@ namespace marlin {
 											ComposeStrategy strategy = ComposeStrategy::AND ) ;
 
 			/**
-			 *  @brief get entry at position.
+			 *  @brief get Hit at position.
 			 *  @param i position of entry of interest.
 			 */
-			const Entry &get( std::size_t i ) { return *_entries[i]; }
+			const Hit &get( std::size_t i ) { return _entries[i]; }
 
 			/**
 			 *  @brief remove entry at position.
@@ -205,7 +202,7 @@ namespace marlin {
 
 		private:
 			/// entries which included in selection.
-			std::vector< std::shared_ptr<const Entry> > _entries{};
+			std::vector< Hit  > _entries{};
 			/// condition which every entry full fill.
 			Condition _condition{} ;
 		} ;
@@ -238,12 +235,18 @@ namespace marlin {
 			Selection res{} ;
 			res._condition = cond ;
 
-			std::copy_if( begin,
-										end,
-										std::back_inserter( res._entries ),
-										[&c = cond]( const Selection::Hit& h ) -> bool {
-											return h.valid() && c( h.key() ) ;
-										} ) ;
+			auto dst = std::back_inserter(res._entries);
+
+			auto fn = [&c = cond](const typename T::value_type& i ) -> bool {
+				const Hit h = static_cast<Hit>(i);
+				return h.valid() && c( h.key() ) ;
+			};
+
+			for(auto itr = begin; itr != end; ++itr) {
+				if(fn(*itr)) {
+					*dst++ = static_cast<Hit>(*itr);
+				}
+			}
 			return res ;
 		}
 

@@ -15,7 +15,6 @@
 #include <memory>
 #include <string>
 
-
 std::string mergedUnicStr() {
   static std::size_t num = 0;
   return std::to_string(++num);
@@ -107,9 +106,11 @@ int main(int /*argc*/, char** /*argv*/) {
   }{
     
     std::string path = mergedUnicStr();
-		EntryData config = EntryData<RH1I>(axis).single();
+		std::string name;
+		EntryData config = EntryData<RH1I>(axis);
     for(int i = 0; i < nItrerations; ++i) {
-      store.book(path, mergedUnicStr(), config);
+			name = mergedUnicStr(); 
+      store.book(path, name, config.single());
     }
     
     Selection sel = store.find(ConditionBuilder().setPath(path));

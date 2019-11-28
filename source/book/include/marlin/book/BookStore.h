@@ -44,7 +44,7 @@ namespace marlin {
       friend BookStore;
       friend Selection::Hit;
       using IdMap_t = std::unordered_map<std::size_t, std::size_t>;
-      Handle(std::shared_ptr<const Entry> entry)
+      explicit Handle(std::shared_ptr<const Entry> entry)
         : _entry{std::move(entry)},
           _mapping(std::make_unique<IdMap_t>()){}
       std::size_t unmap(std::size_t id) {
@@ -97,7 +97,7 @@ namespace marlin {
             std::hash<decltype(Identifier::_name)> hasher;  
             std::size_t hash = hasher(id._name);
             constexpr std::size_t salt = 0x9e3779b9;
-            constexpr std::array offsets = {6, 2};
+            constexpr std::array<std::size_t, 2> offsets = {6, 2};
             return hash ^= hasher(id._path) + salt + (hash<<offsets[0]) + (hash>>offsets[1]);
           } 
         };
@@ -119,7 +119,7 @@ namespace marlin {
        *  generate id for Entry.
        *  @return shared pointer to new Entry
        */
-      std::shared_ptr<Entry> addEntry( const std::shared_ptr< EntryBase > &entry, EntryKey &key ) ;
+      std::shared_ptr<Entry> addEntry( const std::shared_ptr< EntryBase > &entry, EntryKey key ) ;
 
       /**
        *  @brief get Entry from key.
@@ -182,13 +182,13 @@ namespace marlin {
                                              Args_t... ctor_p ) ;
 
     public:
-      BookStore(bool allowMoving = false) : 
+      explicit BookStore(bool allowMoving = false) : 
         _constructThread(std::this_thread::get_id()),
         _allowMoving{allowMoving}{}
 
       template < class T>
-      Handle<Manager<typename T::Object_t>> book( const std::string_view &path,
-                 const std::string_view &name,
+      Handle<Manager<typename T::Object_t>> book( const std::string_view path,
+                 const std::string_view name,
                  const T &               data ) {
 
         if( !_allowMoving && std::this_thread::get_id() != _constructThread) {
@@ -246,14 +246,13 @@ namespace marlin {
 
 
     std::shared_ptr<Entry> BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
-                              EntryKey &                          key ) {
-      EntryKey k = key ;
-      k.hash     = _entries.size() ;
+                              EntryKey                          key ) {
+      key.hash     = _entries.size() ;
 
-      if(!_idToEntry.insert(std::make_pair(Identifier(k.path, k.name), k.hash)).second) {
+      if(!_idToEntry.insert(std::make_pair(Identifier(key.path, key.name), key.hash)).second) {
         MARLIN_THROW_T(BookStoreException, "Object already exist. Use store.book to avoid this.");
       }
-      _entries.push_back( std::make_shared<Entry>( Entry(entry, k) ) ) ;
+      _entries.push_back( std::make_shared<Entry>( Entry(entry, key) ) ) ;
       return _entries.back();
     }
 

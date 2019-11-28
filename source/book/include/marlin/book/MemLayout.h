@@ -77,7 +77,7 @@ namespace marlin {
 			 *  @param amount of instances amount of Resource Instances
 			 *  @param args Arguments for Object Construction
 			 */
-			SharedMemLayout( std::size_t num_instances, Args_t... args )
+			explicit SharedMemLayout( std::size_t num_instances, Args_t... args )
 				: _objects{num_instances, nullptr}, _ctor_p{std::make_unique<typename decltype(_ctor_p)::element_type>(args...)} {
 				for ( std::shared_ptr< T > &pObj : _objects ) {
 					pObj = std::make_shared< T >( args... ) ;
@@ -122,7 +122,7 @@ namespace marlin {
 		template < typename T, typename... Args_t >
 		class SingleMemLayout : public MemLayout {
 		public:
-			SingleMemLayout( Args_t... args )
+			explicit SingleMemLayout( Args_t... args )
 				: _object{std::make_shared< T >( args... )} {}
 	
 			SingleMemLayout( const SingleMemLayout& ) = default ;

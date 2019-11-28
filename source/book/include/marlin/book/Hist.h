@@ -53,7 +53,7 @@ namespace marlin {
 			static constexpr std::string_view empty{""} ;
 
 		public:
-			EntryDataBase( const std::string_view &title = empty ) ;
+			explicit EntryDataBase( const std::string_view &title = empty ) ;
 
 			/**
 			 *  @brief construct EntryData for single booking.
@@ -99,7 +99,7 @@ namespace marlin {
 			 *  @brief Constructor without Title.
 			 *  @param axis configuration.
 			 */
-			EntryData( const types::RAxisConfig &axis ) ;
+			explicit EntryData( const types::RAxisConfig &axis ) ;
 
 			/**
 			 *  @brief Constructor.
@@ -175,7 +175,7 @@ namespace marlin {
 			friend EntryDataBase< types::RHist< D, T, STAT... > > ;
 			friend BookStore ;
 
-			EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
+			explicit EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
 				: _data{data} {}
 
 			template < typename... Args_t, int d = D >
@@ -280,7 +280,7 @@ namespace marlin {
 										 Flags::value(Flags::Book::MultiShared)> {
 			friend EntryDataBase< types::RHist< D, T, STAT... > > ;
 			friend BookStore ;
-			EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
+			explicit EntryData( const EntryDataBase< types::RHist< D, T, STAT... > > &data )
 				: _data{data} {}
 
 			template < typename... Args_t, int d = D >
@@ -395,7 +395,7 @@ namespace marlin {
 			using Type = types::RHist< D, T, STAT... > ;
 
 			/// constructor
-			EntrySingle( Context context ) ;
+			explicit EntrySingle( Context context ) ;
 
 			/// default constructor. Constructs invalid Entry.
 			EntrySingle() = default ;
@@ -422,7 +422,7 @@ namespace marlin {
 			using Type = types::RHist< D, T, STAT... > ;
 
 			/// constructor
-			EntryMultiCopy( Context context ) ;
+			explicit EntryMultiCopy( Context context ) ;
 
 			/// default constructor. Constructs invalid Entry.
 			EntryMultiCopy() = default ;
@@ -449,7 +449,7 @@ namespace marlin {
 			using Type = types::RHist< D, T, STAT... > ;
 
 			/// constructor
-			EntryMultiShared( Context context ) ;
+			explicit EntryMultiShared( Context context ) ;
 
 			// EntryMultiShared() = default ;
 			/// destructor. Flush filler.
@@ -683,7 +683,7 @@ namespace marlin {
 			: _context{std::move(context)},
 				_fillMgr{
 					std::make_shared< types::RHistConcurrentFillManager< types::RHist< D, T, STAT... > > >(
-						*context.mem->at< types::RHist< D, T, STAT... > >( 0 ) )},
+						*_context.mem->at< types::RHist< D, T, STAT... > >( 0 ) )},
 				_fillers( 0 ) {}
 
 		//--------------------------------------------------------------------------

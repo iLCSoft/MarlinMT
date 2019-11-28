@@ -31,7 +31,7 @@ namespace marlin {
 			friend BookStore ;
 
 			/// constructor
-			EntrySingle( Context context ) : _context{std::move(context)} {}
+			explicit EntrySingle( Context context ) : _context{std::move(context)} {}
 
 		public:
 			/// default constructor
@@ -57,7 +57,7 @@ namespace marlin {
 			friend BookStore ;
 
 			/// constructor
-			EntryMultiCopy( Context context ) : _context{std::move(context)} {}
+			explicit EntryMultiCopy( Context context ) : _context{std::move(context)} {}
 
 		public:
 			/// default constructor
@@ -87,7 +87,7 @@ namespace marlin {
 			friend BookStore ;
 
 			/// constructor
-			EntryMultiShared( Context context ) : _context{std::move(context)} {}
+			explicit EntryMultiShared( Context context ) : _context{std::move(context)} {}
 
 		public:
 			/// default constructor
