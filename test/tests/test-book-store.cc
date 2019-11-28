@@ -34,17 +34,6 @@ int main(int /*argc*/, char** /*argv*/) {
   BookStore store{};
 	try{
 	{
-		Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
-		Handle<RH1F> handle = entry.handle(1);
-	} {
-		/* bool error = false;
-		try {
-			Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
-		} catch (const marlin::BookStoreException&) {
-			error = true;
-		}
-		test.test("No Double booking.", error); */
-	}{
 
     // EntrySingle entry = store.book<RH1F, RAxisConfig>("path", "name", {"a", 3, 1.0, 2.0}) ; 
     Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
@@ -61,7 +50,15 @@ int main(int /*argc*/, char** /*argv*/) {
     auto hist = hnd.merged();
     test.test("Single Hist Filling", hist.GetEntries() == nItrerations);
 
-  }{
+  }	{
+		bool error = false;
+		try {
+			Handle<Manager<RH1F>> entry = store.book("path", "name", EntryData<RH1F>(axis).single());
+		} catch (const marlin::BookStoreException&) {
+			error = true;
+		}
+		test.test("No Double booking.", error);
+	}{
     Handle<Manager<RH1I>> entry = store.book("path2", "name", EntryData<RH1I>(axis).multiCopy(2));
 
     auto hnd = entry.handle(0);
