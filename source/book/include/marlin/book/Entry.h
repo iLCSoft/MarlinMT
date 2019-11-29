@@ -1,6 +1,7 @@
 #pragma once
 
 // -- std includes
+#include <charconv>
 #include <iostream>
 #include <memory>
 #include <typeinfo>
@@ -147,6 +148,16 @@ namespace marlin {
             ->handle() ;
         }
         if ( _key.flags.contains( Flags::Book::MultiCopy ) ) {
+          if(idx < 0 || idx >= key().mInstances) {
+            std::array<char, 8> n;
+            auto itoa = [&n](std::size_t id){
+              return std::to_string(id);
+            };
+            MARLIN_THROW_T(
+                BookStoreException,
+                (std::string("Try to access instances '") + itoa(idx) 
+                + "', which is outside of [0;" + itoa(key().mInstances) + "]"));
+          }
           return std::static_pointer_cast< EntryMultiCopy< T > >( _entry )
             ->handle( idx ) ;
         }

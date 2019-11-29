@@ -2,6 +2,7 @@
 
 // -- std includes
 #include <atomic>
+#include <filesystem>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -218,7 +219,7 @@ namespace marlin {
        *  @throw BookStoreException when:
        *    - directory to store not exist.
        */
-      void store(const std::string& path) const ;
+      void store(const std::filesystem::path& path) const ;
 
     private:
       /// stores Entries created by BookStore.
@@ -230,35 +231,6 @@ namespace marlin {
       /// when false only allow booking from construction thread. Avoid races.
       const bool _allowMoving{false} ;
     } ;
-
-    //--------------------------------------------------------------------------
-    
-    void BookStore::store(const std::string& path) const {
-      static const types::RFile::Options_t opt{};
-      TH1F hist("t", "x", 2, -1, 5);
-      hist.Fill(0., 1.);
-      types::RFilePtr file = types::RFile::Create(path, opt); 
-      file->Write("test", hist);
-      file->Close();
-    }
-
-    //--------------------------------------------------------------------------
-
-    std::shared_ptr< Entry >
-    BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
-                         EntryKey                            key ) {
-      key.hash = _entries.size() ;
-
-      if ( !_idToEntry
-              .insert(
-                std::make_pair( Identifier( key.path, key.name ), key.hash ) )
-              .second ) {
-        MARLIN_THROW_T( BookStoreException,
-                        "Object already exist. Use store.book to avoid this." ) ;
-      }
-      _entries.push_back( std::make_shared< Entry >( Entry( entry, key ) ) ) ;
-      return _entries.back() ;
-    }
 
     //--------------------------------------------------------------------------
 
@@ -305,28 +277,6 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    Selection BookStore::find( const Condition &cond ) {
-      return Selection::find( _entries.cbegin(), _entries.cend(), cond ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    void BookStore::remove( const EntryKey &key ) { get( key ).clear(); }
-
-    //--------------------------------------------------------------------------
-
-    void BookStore::remove( const Selection &selection ) {
-      for ( const Selection::Hit &e : selection ) {
-        remove( e.key() ) ;
-      }
-    }
-
-    //--------------------------------------------------------------------------
-
-    void BookStore::clear() { _entries.resize( 0 ); }
-
-    //--------------------------------------------------------------------------
-
     template < class T, typename... Args_t >
     std::shared_ptr< Entry >
     BookStore::bookMultiShared( const std::string_view &path,
@@ -342,20 +292,6 @@ namespace marlin {
         std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) ) ) ;
 
       return addEntry( entry, key ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    std::size_t BookStore::Identifier::Hash::
-                operator()( const Identifier &id ) const {
-
-      std::hash< decltype( Identifier::_name ) > hasher ;
-      std::size_t                                hash    = hasher( id._name ) ;
-      constexpr std::size_t                      salt    = 0x9e3779b9 ;
-      constexpr std::array< std::size_t, 2 >     offsets = {6, 2} ;
-
-      return hash ^= hasher( id._path ) + salt + ( hash << offsets[0] )
-                     + ( hash >> offsets[1] ) ;
     }
 
     //--------------------------------------------------------------------------

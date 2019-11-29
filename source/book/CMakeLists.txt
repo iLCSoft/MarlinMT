@@ -6,6 +6,7 @@
 
 # Find ROOT package
 set( ROOT_COMPONENTS Hist RIO )
+find_package(Filesystem REQUIRED )
 find_package( ROOT 6.18 COMPONENTS ${ROOT_COMPONENTS} REQUIRED )
 foreach( comp ${ROOT_COMPONENTS} )
   list( APPEND ROOT_COMPONENTS_LIBRARIES ${ROOT_${comp}_LIBRARY} )
@@ -36,6 +37,10 @@ target_link_libraries(
   Book PUBLIC
   Marlin::Core
   ROOT::Core ROOT::RIO ROOT::Hist
+)
+target_link_libraries(
+	Book PRIVATE
+	std::filesystem
 )
 install( DIRECTORY include/marlin TYPE INCLUDE )
 
