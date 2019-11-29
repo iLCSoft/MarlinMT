@@ -1,19 +1,25 @@
-
-#include <UnitTesting.h>
+// -- std includes
 #include <typeinfo>
+#include <memory>
+#include <string>
 
+// -- Test includes
+#include <UnitTesting.h>
+
+// -- ROOT includes
+#include "ROOT/RHistData.hxx" 
+#include "ROOT/RHist.hxx"
+
+// -- Marlin includes
+#include "marlin/Exceptions.h"
+
+// -- MarlinBook includes
 #include "marlin/book/Hist.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Condition.h"
 #include "marlin/book/Selection.h"
-#include "ROOT/RHistData.hxx" 
-#include "ROOT/RHist.hxx"
 #include "marlin/book/ROOTAdapter.h"
-#include "marlin/Exceptions.h"
-
-#include <memory>
-#include <string>
 
 std::string mergedUnicStr() {
   static std::size_t num = 0;
