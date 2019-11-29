@@ -10,6 +10,8 @@
 #include "ROOT/RHistConcurrentFill.hxx"
 #include "ROOT/RHistData.hxx"
 #include "ROOT/RSpan.hxx"
+#include "ROOT/RFile.hxx"
+#include "TH1.h"
 
 namespace marlin {
   namespace book {
@@ -96,6 +98,17 @@ namespace marlin {
       template < class T >
       using RHistConcurrentFiller = ROOT::Experimental::
         RHistConcurrentFiller< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
+
+
+      using RFilePtr = ROOT::Experimental::RFilePtr;
+
+      namespace RFile {
+        using Options_t = ROOT::Experimental::RFile::Options_t;
+        constexpr auto Create =
+          static_cast<RFilePtr (*)(std::string_view, const Options_t&)>(
+            ROOT::Experimental::RFile::Create
+          );
+      } // end namespace RFile
 
     } // end namespace types
   } // end namespace book

@@ -14,7 +14,6 @@
 // -- Marlin includes
 #include "marlin/Exceptions.h"
 
-
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
@@ -213,6 +212,14 @@ namespace marlin {
        */
       void clear() ;
 
+      /**
+       *  @brief saves all Objects in one Root-File. 
+       *  @param path where save Root-File. 
+       *  @throw BookStoreException when:
+       *    - directory to store not exist.
+       */
+      void store(const std::string& path) const ;
+
     private:
       /// stores Entries created by BookStore.
       std::vector< std::shared_ptr< Entry > > _entries{} ;
@@ -223,6 +230,17 @@ namespace marlin {
       /// when false only allow booking from construction thread. Avoid races.
       const bool _allowMoving{false} ;
     } ;
+
+    //--------------------------------------------------------------------------
+    
+    void BookStore::store(const std::string& path) const {
+      static const types::RFile::Options_t opt{};
+      TH1F hist("t", "x", 2, -1, 5);
+      hist.Fill(0., 1.);
+      types::RFilePtr file = types::RFile::Create(path, opt); 
+      file->Write("test", hist);
+      file->Close();
+    }
 
     //--------------------------------------------------------------------------
 
@@ -284,6 +302,8 @@ namespace marlin {
 
       return addEntry( entry, key ) ;
     }
+
+    //--------------------------------------------------------------------------
 
     Selection BookStore::find( const Condition &cond ) {
       return Selection::find( _entries.cbegin(), _entries.cend(), cond ) ;
