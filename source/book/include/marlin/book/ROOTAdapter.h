@@ -4,11 +4,12 @@
 #include <type_traits>
 
 // -- ROOT includes
+#include "RVersion.h"
+
 #include "ROOT/RHist.hxx"
 #include "ROOT/RHistConcurrentFill.hxx"
 #include "ROOT/RHistData.hxx"
 #include "ROOT/RSpan.hxx"
-#include "RVersion.h"
 
 namespace marlin {
   namespace book {
@@ -28,10 +29,10 @@ namespace marlin {
         ROOT::Experimental::Add( to, from ) ;
       }
 
-      template <typename TO, typename FROM>
-      void addHists( const std::shared_ptr<TO> &to,
-                     const std::shared_ptr<FROM> &from ) {
-        ROOT::Experimental::Add(*to, *from);
+      template < typename TO, typename FROM >
+      void addHists( const std::shared_ptr< TO > &  to,
+                     const std::shared_ptr< FROM > &from ) {
+        ROOT::Experimental::Add( *to, *from ) ;
       }
 
       /// often used Histogram Instance
@@ -53,46 +54,48 @@ namespace marlin {
       /// often used Histograms Instance.
       using RH3I = ROOT::Experimental::RH3I ;
 
-#if ROOT_VERSION_CODE > ROOT_VERSION(6,18,4)
-      template<typename T>
-      using CoordArraySpan_t = std::span<typename T::CoordArray_t const>;
+#if ROOT_VERSION_CODE > ROOT_VERSION( 6, 18, 4 )
+      template < typename T >
+      using CoordArraySpan_t = std::span< typename T::CoordArray_t const > ;
 
-      template<typename T>
-      using WeightSpan_t = std::span<typename T::Weight_t const>;
+      template < typename T >
+      using WeightSpan_t = std::span< typename T::Weight_t const > ;
 #else
-      template<typename T>
-      using CoordArraySpan_t = std::span<typename T::CoordArray_t>;
+      template < typename T >
+      using CoordArraySpan_t = std::span< typename T::CoordArray_t > ;
 
-      template<typename T>
-      using WeightSpan_t = std::span<typename T::Weight_t>;
+      template < typename T >
+      using WeightSpan_t = std::span< typename T::Weight_t > ;
 #endif
 
 #ifndef MARLIN_HIST_FILLER_BUFFER_SIZE
-#define MARLIN_HIST_FILLER_BUFFER_SIZE 1024
+# define MARLIN_HIST_FILLER_BUFFER_SIZE 1024
 #endif
       /**
        *  @brief Buffer size for Histograms used in Shared mode.
        *  - larger →  less synchronisation points
        *  - larger →  more memory consumption.
-       *  @note can set with the CMAKE  Variable \cod {MARLIN_HIST_FILLER_BUFFER_SIZE}
+       *  @note can set with the CMAKE  Variable \cod
+       * {MARLIN_HIST_FILLER_BUFFER_SIZE}
        */
-      constexpr std::size_t HistogramFillerBufferSize = MARLIN_HIST_FILLER_BUFFER_SIZE;
+      constexpr std::size_t HistogramFillerBufferSize
+        = MARLIN_HIST_FILLER_BUFFER_SIZE ;
 
       /**
        *  @brief produce concurrent filler for one Histogram.
        *  @tparam T Histogram type
        */
       template < class T >
-      using RHistConcurrentFillManager
-        = ROOT::Experimental::RHistConcurrentFillManager< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
+      using RHistConcurrentFillManager = ROOT::Experimental::
+        RHistConcurrentFillManager< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
 
       /**
        *  @brief to fill a Histogram concurrent.
        *  @tparam T Histogram type
        */
       template < class T >
-      using RHistConcurrentFiller
-        = ROOT::Experimental::RHistConcurrentFiller< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
+      using RHistConcurrentFiller = ROOT::Experimental::
+        RHistConcurrentFiller< T, MARLIN_HIST_FILLER_BUFFER_SIZE > ;
 
     } // end namespace types
   } // end namespace book
