@@ -21,6 +21,10 @@ if( MARLIN_LCIO )
 endif()
 # NOTE: The unit test library is not installed
 
+if (MARLIN_BOOK)
+	find_package(Filesystem REQUIRED)
+endif()
+
 # Add unit tests
 marlin_add_test (
   test-thread-pool
@@ -38,7 +42,7 @@ marlin_add_test (
 	test-book-store
 	BUILD_EXEC
 	REGEX_FAIL "TEST_FAILED"
-  COMPONENTS Marlin::Book
+  COMPONENTS Marlin::Book std::filesystem
 )
 
 marlin_add_test (

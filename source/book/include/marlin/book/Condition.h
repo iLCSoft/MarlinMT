@@ -13,7 +13,7 @@
 namespace marlin {
   namespace book {
     // -- MarlinBook forward declaration
-    class EntryKey ;
+    struct EntryKey ;
 
     /**
      *  @brief wrapper class for an Entry filter function.

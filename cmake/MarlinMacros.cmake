@@ -147,7 +147,14 @@ function ( MARLIN_ADD_TEST test_name )
         COMPILE_FLAGS ${MARLIN_COMPILE_OPTIONS}
     )
     foreach( component ${ARG_COMPONENTS} )
-      target_include_directories( ${test_name} SYSTEM BEFORE PUBLIC $<TARGET_PROPERTY:${component},INCLUDE_DIRECTORIES> )
+			get_target_property(target_type ${component} TYPE)
+			if(	   target_type STREQUAL STATIC_LIBRARY 
+					OR target_type STREQUAL SHARED_LIBRARY
+					OR target_type STREQUAL MODULE_LIBRARY)
+				message("${component} include")
+				target_include_directories( ${test_name} SYSTEM BEFORE PUBLIC $<TARGET_PROPERTY:${component},INCLUDE_DIRECTORIES> )
+			endif()
+
       target_link_libraries( ${test_name} ${component} )
     endforeach()
     target_include_directories( ${test_name} BEFORE PUBLIC include ) 
