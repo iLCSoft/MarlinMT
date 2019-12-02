@@ -61,6 +61,8 @@ namespace marlin {
 
       Handle< T > handle( std::size_t id ) ;
 
+      const T& merged() const ;
+
     private:
       /// reference to handled Entry.
       std::shared_ptr< const Entry > _entry{nullptr} ;
@@ -223,7 +225,7 @@ namespace marlin {
        *  @throw BookStoreException when:
        *    - directory to store not exist.
        */
-      void store(const std::filesystem::path& path) const ;
+      void store(ISerelizeStore& serelizer) const ;
 
     private:
       /// stores Entries created by BookStore.
@@ -330,6 +332,13 @@ namespace marlin {
         itr = _mapping->insert( std::make_pair( id, _n++ ) ).first ;
       }
       return itr->second ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template< typename T >
+    const T& Handle< Manager< T > >::merged() const {
+      return _entry->handle<T>(0).merged();     
     }
 
     //--------------------------------------------------------------------------

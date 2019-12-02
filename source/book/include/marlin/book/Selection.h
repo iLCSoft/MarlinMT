@@ -18,6 +18,7 @@ namespace marlin {
     class BookStore ;
     template < typename >
     class Manager ;
+    class ISerelizeStore;
 
     /**
      *  @brief Contains references to entries.
@@ -29,36 +30,31 @@ namespace marlin {
     public:
       class Hit {
         friend Selection ;
-
+        
       public:
         // constructor
-        explicit Hit( const std::shared_ptr< const Entry > &entry )
-          : _entry{entry} {}
+        explicit Hit( const std::shared_ptr< const Entry > &entry ) ;
         // constructor
-        explicit Hit( const std::shared_ptr< Entry > &entry ) : _entry{entry} {}
+        explicit Hit( const std::shared_ptr< Entry > &entry ) ;
 
         /**
          *  @brief check if Hit is usable.
          *  @return false when Entry referenced by Hit no longer exist
          */
-        [[nodiscard]] bool valid() const {
-          return !_entry.expired() && _entry.lock()->valid() ;
-        }
+        [[nodiscard]] bool valid() const ;
 
         /**
          *  @brief get key from Entry.
          */
-        [[nodiscard]] const EntryKey &key() const {
-          return _entry.lock()->key() ;
-        }
+        [[nodiscard]] const EntryKey &key() const ;
 
         /**
          *  @brief bind Entry to new Handle, for further usage.
          *  @attention don't use old Handle to the Entry after this.
          */
-        template < typename T >
-        [[nodiscard]] Handle< Manager< T > > bind() const {
-          return Handle< Manager< T > >( _entry.lock() ) ;
+        template <typename T>
+        Handle<Manager<T>> bind() const {
+          return Handle<Manager<T>>(_entry.lock());
         }
 
       private:
@@ -108,20 +104,16 @@ namespace marlin {
                  ComposeStrategy  strategy = ComposeStrategy::AND ) ;
 
       /// getter for Condition which every Entry full fill.
-      [[nodiscard]] const Condition &condition() const { return _condition; }
+      [[nodiscard]] const Condition &condition() const ;
 
       /// begin iterator to iterate through entries.
-      [[nodiscard]] const_iterator begin() const {
-        return const_iterator( _entries.cbegin() ) ;
-      }
+      [[nodiscard]] const_iterator begin() const ;
 
       /// end iterator for entries. First not valid iterator.
-      [[nodiscard]] const_iterator end() const {
-        return const_iterator( _entries.cend() ) ;
-      }
+      [[nodiscard]] const_iterator end() const ;
 
       /// @return number of entries included in the selection.
-      [[nodiscard]] std::size_t size() const { return _entries.size(); }
+      [[nodiscard]] std::size_t size() const ;
 
       /**
        *  @brief construct sub selection.
@@ -173,28 +165,6 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    Selection::Selection( const Selection &sel,
-                          const Condition &cond,
-                          ComposeStrategy  strategy )
-      : Selection{find( sel.begin(), sel.end(), cond )} {
-      switch ( strategy ) {
-        case ComposeStrategy::AND:
-          _condition = sel.condition() & cond ;
-          break ;
-        case ComposeStrategy::ONLY_CHILD:
-          _condition = cond ;
-          break ;
-        case ComposeStrategy::ONLY_PARENT:
-          _condition = sel.condition() ;
-          break ;
-        default:
-          MARLIN_THROW_T( BookStoreException,
-                          "Condition compose strategy is not defined." ) ;
-      }
-    }
-
-    //--------------------------------------------------------------------------
-
     template < typename T >
     Selection Selection::find( T begin, T end, const Condition &cond ) {
       Selection res{} ;
@@ -215,45 +185,7 @@ namespace marlin {
       return res ;
     }
 
-    //--------------------------------------------------------------------------
 
-    Selection Selection::find( const Condition &cond,
-                               ComposeStrategy  strategy ) {
-      return Selection( *this, cond, strategy ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    void Selection::remove( std::size_t id ) {
-      _entries.erase( _entries.cbegin() + id ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    void Selection::remove( std::size_t id, std::size_t n ) {
-      auto beg = _entries.cbegin() + id ;
-      _entries.erase( beg, beg + n ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    void Selection::remove( const const_iterator &itr ) {
-      _entries.erase( itr ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    void Selection::remove( const const_iterator &begin,
-                            const const_iterator &end ) {
-      _entries.erase( begin, end ) ;
-    }
-
-    //--------------------------------------------------------------------------
-
-    template Selection Selection::find< Selection::const_iterator >(
-      Selection::const_iterator begin,
-      Selection::const_iterator end,
-      const Condition &         cond ) ;
 
   } // end namespace book
 } // end namespace marlin

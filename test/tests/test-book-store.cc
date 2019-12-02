@@ -20,6 +20,7 @@
 #include "marlin/book/Condition.h"
 #include "marlin/book/Selection.h"
 #include "marlin/book/ROOTAdapter.h"
+#include "marlin/book/Serelize.h"
 
 std::string mergedUnicStr() {
   static std::size_t num = 0;
@@ -238,7 +239,8 @@ int main(int /*argc*/, char** /*argv*/) {
       t1.join();
       test.test("prevent booking from other threads", errorThrown);
     } {
-      store.store("./test.root");
+      auto ser = ToRoot6("./test.root");
+      store.store(ser);
     
     }
   } catch(const marlin::BookStoreException& excp){
