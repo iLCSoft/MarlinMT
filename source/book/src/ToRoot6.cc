@@ -50,7 +50,11 @@ TDirectory* mkdir(TDirectory* root, const std::filesystem::path& path) {
   }
 
   for(auto itr = stack.crbegin(); itr != stack.crend(); ++itr) {
-    dir = dir->mkdir(itr->string().c_str());
+    std::string name = itr->string();
+    TDirectory* next = dir->GetDirectory(name.c_str());
+    dir = next == nullptr
+      ? dir->mkdir(name.c_str())
+      : next;
   }
   return dir;
 }
@@ -84,6 +88,7 @@ namespace marlin {
 
         const EntryKey& key = h.key();
         const std::type_index type = key.type;
+        std::cout << "\twriting: " << key.path.filename() << '\n';
         TDirectory* file = getDirectory(dirs, root, key.path);
 
         if (type == std::type_index(typeid(types::RH1F))) {

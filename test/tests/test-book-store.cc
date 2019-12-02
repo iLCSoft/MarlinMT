@@ -2,6 +2,7 @@
 #include <typeinfo>
 #include <memory>
 #include <string>
+#include <cstring>
 
 // -- Test includes
 #include <UnitTesting.h>
@@ -9,6 +10,15 @@
 // -- ROOT includes
 #include "ROOT/RHistData.hxx" 
 #include "ROOT/RHist.hxx"
+
+// -- ROOT v 6 includes
+#include "TH1.h"
+#include "TH2.h"
+#include "TH3.h"
+#include "TFile.h"
+#include "TDirectory.h"
+#include "TList.h"
+#include "TKey.h"
 
 // -- Marlin includes
 #include "marlin/Exceptions.h"
@@ -239,9 +249,114 @@ int main(int /*argc*/, char** /*argv*/) {
       t1.join();
       test.test("prevent booking from other threads", errorThrown);
     } {
-      auto ser = ToRoot6("./test.root");
-      store.store(ser);
+      BookStore testStore{};
+      {
+        Handle entry 
+          = testStore.book(
+              "/path/", "hist_1",
+              EntryData<RH1I>("title_1", {"axis_1", 5, -5, 5}).single());
+        Handle hist = entry.handle(0); 
+        for( unsigned int i=0; i< 20; ++i) { hist.fill({0}, 1); }
+      } {
+        Handle entry 
+          = testStore.book(
+              "/", "hist_2",
+              EntryData<RH1F>(
+                "title_2",
+                {"axis_2", 5, -5, 5}
+                ).single());
+        Handle hist = entry.handle(0);
+        hist.fill({1}, 1);
+      } {
+        Handle entry = testStore.book("/", "hist_d", EntryData<RH1F>({"a", 3, 0, 3}).single());
+        Handle hist = entry.handle(0);
+        hist.fill({1}, 1);
+        testStore.remove(testStore.find(ConditionBuilder().setName("hist_d")));
+      } {
+        Handle entry
+          = testStore.book(
+              "/path/sub-path/sub-sub/", "hist_3",
+              EntryData<RH1D>(
+                {"axis_3", 5, -5, 5}
+                ).single());
+      }
     
+      std::cout << "start writing\n";
+      auto ser = ToRoot6("./test.root");
+      testStore.store(ser);
+
+      std::cout << "start reading\n";
+      TFile* file = TFile::Open("./test.root", "READ");
+      TDirectory* dir = file;
+      TList* keys = dir->GetListOfKeys();
+      TKey* key;
+      TObject * obj;
+      TAxis * axis;
+      std::optional<std::string> error = std::nullopt;
+      try {
+        // check key 1 at level 0 -- folder 'path'
+        key = reinterpret_cast<TKey*>(keys->At(0));
+        if(key == nullptr) { 
+          throw "expected 2 entries at level 0, 0 found"; 
+        }
+        if(strcmp(key->GetName(), "path") != 0) {
+          throw std::string("expected first entry at level 0 has name 'path', but '")
+            + key->GetName() + "' found!";
+        }
+        if(!key->IsFolder()) {
+          throw "expected /path to be a folder!";
+        }
+
+        TList* pathKeys = dir->GetDirectory("./path")->GetListOfKeys();
+        key = reinterpret_cast<TKey *>(pathKeys->At(0));
+        if(key == nullptr) {
+          throw "expected 2 entries at /path, 0 found";
+        }
+        if(strcmp(key->GetName(), "hist_1") != 0) {
+          throw std::string("expected first entry at '/path' has name 'hist_1', but '")
+            + key->GetName() + "' found!";  
+        }
+        // TODO: check hist
+        
+        key = reinterpret_cast<TKey*>(pathKeys->At(1));
+        if(key == nullptr) {
+          throw "expected 2 entries at /path, 1 found";
+        }
+
+        // check key 2 at level 0 -- H1F 'hist_2'
+        key = reinterpret_cast<TKey*>(keys->At(1));
+        if(key == nullptr) { 
+          throw "expected 2 entries at level 0, 1 found"; 
+        }
+        if(strcmp(key->GetName(), "hist_2") != 0) {
+          throw std::string("expected second entry at level 0 has name 'hist_2', but '")
+            + key->GetName() + "' found!";
+        }
+        TH1F* h1f = key->ReadObject<TH1F>();
+        if(h1f == nullptr) {
+          throw "expected '/hist_2' to be an TH1F";
+        }
+        if(strcmp(h1f->GetTitle(), "title_2") != 0) {
+          throw std::string("expect '/hist_2' to have title 'title_2'");
+        }
+        if(h1f->GetNbinsX() != 5) {
+          throw std::string("expected '/hist_2' to have 5 bins, but found: ")
+            + std::to_string(h1f->GetNbinsX());
+        } 
+        axis = h1f->GetXaxis();
+        if(strcmp(axis->GetTitle(), "axis_2") != 0) {
+          throw std::string("expected axis title: 'axis_2', but '")
+            + key->GetName() + "' found!";
+        } 
+        // TODO: check entries
+      } catch (const std::string & msg) {
+          error.emplace(msg);
+      }
+      test.test(
+          std::string("Writing Store to Root-6 File: ")
+          + (error
+            ? error.value()
+            : ""), !error );
     }
   } catch(const marlin::BookStoreException& excp){
     test.test(std::string("Not expected error") + excp.what(), false);
