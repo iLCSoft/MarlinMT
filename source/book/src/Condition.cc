@@ -31,12 +31,12 @@ namespace marlin {
 
     Condition::Condition( FilterFn_t filterFn ) : _fiterFn{std::move(filterFn)} {}
 
-		//--------------------------------------------------------------------------
-		
-		Condition& Condition::operator=( const FilterFn_t &filterFn ) {
-			_fiterFn = filterFn;
-			return *this;
-		}
+    //--------------------------------------------------------------------------
+    
+    Condition& Condition::operator=( const FilterFn_t &filterFn ) {
+      _fiterFn = filterFn;
+      return *this;
+    }
 
     //--------------------------------------------------------------------------
 
@@ -51,21 +51,21 @@ namespace marlin {
 
       if ( _name ) {
         fn = [fn, rgx = _name.value()]( const EntryKey &e ) {
-          return fn( e ) && rgxEvaluation( rgx, e.name ) ;
+          return fn( e ) && rgxEvaluation( rgx, e.path.filename().string() ) ;
         } ;
       } else {
         fn = [fn, rgx = _rgxName]( const EntryKey &e ) {
-          return fn( e ) && rgxEvaluation( rgx, e.name ) ;
+          return fn( e ) && rgxEvaluation( rgx, e.path.filename().string() ) ;
         } ;
       }
 
       if ( _path ) {
         fn = [fn, rgx = _path.value()]( const EntryKey &e ) {
-          return fn( e ) && rgxEvaluation( rgx, e.path ) ;
+          return fn( e ) && rgxEvaluation( rgx, e.path.parent_path().string()  + "/" ) ;
         } ;
       } else {
         fn = [fn, rgx = _rgxPath]( const EntryKey &e ) {
-          return fn( e ) && rgxEvaluation( rgx, e.path ) ;
+          return fn( e ) && rgxEvaluation( rgx, e.path.parent_path().string() + "/" ) ;
         } ;
       }
 

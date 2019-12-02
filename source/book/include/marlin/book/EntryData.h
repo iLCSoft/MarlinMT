@@ -1,6 +1,7 @@
 #pragma once
 
 // -- std includes
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <typeindex>
@@ -37,9 +38,7 @@ namespace marlin {
       explicit EntryKey( const std::type_index &t ) : type{t} {}
 
       /// virtual Entry path
-      std::string path{""} ;
-      /// Entry name
-      std::string name{""} ;
+      std::filesystem::path path{""} ;
       /// number of memory instances
       std::size_t mInstances{0} ;
       /// Type of object stored in Entry.

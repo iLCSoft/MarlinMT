@@ -87,16 +87,15 @@ namespace marlin {
           std::size_t operator()( const Identifier &id ) const ;
         } ;
 
-        Identifier( const std::string_view &path, const std::string_view &name )
-          : _path{path}, _name{name} {}
+        explicit Identifier( std::filesystem::path path)
+          : _path{std::move(path)} {}
 
         bool operator==( const Identifier &id ) const {
-          return _name == id._name && _path == id._path ;
+          return _path == id._path ;
         }
 
       private:
-        std::string _path ;
-        std::string _name ;
+        std::filesystem::path _path;
       } ;
 
       /**
@@ -134,8 +133,7 @@ namespace marlin {
        *  @param ctor_p parameters to construct the object.
        */
       template < class T, typename... Args_t >
-      std::shared_ptr< Entry > bookSingle( const std::string_view &path,
-                                           const std::string_view &name,
+      std::shared_ptr< Entry > bookSingle( std::filesystem::path path,
                                            Args_t... ctor_p ) ;
 
       /**
@@ -150,9 +148,8 @@ namespace marlin {
                  void ( *MERGE )( const std::shared_ptr< T > &,
                                   const std::shared_ptr< T > & ),
                  typename... Args_t >
-      std::shared_ptr< Entry > bookMultiCopy( std::size_t             n,
-                                              const std::string_view &path,
-                                              const std::string_view &name,
+      std::shared_ptr< Entry > bookMultiCopy( std::size_t           n,
+                                              std::filesystem::path path,
                                               Args_t... ctor_p ) ;
 
       /**
@@ -161,9 +158,16 @@ namespace marlin {
        *  \see BookStore::book
        */
       template < class T, typename... Args_t >
-      std::shared_ptr< Entry > bookMultiShared( const std::string_view &path,
-                                                const std::string_view &name,
+      std::shared_ptr< Entry > bookMultiShared( std::filesystem::path path,
                                                 Args_t... ctor_p ) ;
+
+      /**
+       *  @brief normalize and check path for internal usage. 
+       *  @throw BookStoreException if path is no absolute path to a directory.
+       *  @param path absolute directory path.
+       */
+      static std::filesystem::path normalizeDirPath(const std::filesystem::path& path);
+
 
     public:
       explicit BookStore( bool allowMoving = false )
@@ -182,9 +186,9 @@ namespace marlin {
        */
       template < class T >
       Handle< Manager< typename T::Object_t > >
-      book( const std::string_view& path,
-            const std::string_view& name,
-            const T               &data ) ;
+      book( const std::filesystem::path& path,
+            const std::string_view&      name,
+            const T                     &data ) ;
 
       /**
        *  @brief select every Entry which matches the condition.
@@ -236,12 +240,10 @@ namespace marlin {
 
     template < class T, typename... Args_t >
     std::shared_ptr< Entry >
-    BookStore::bookSingle( const std::string_view &path,
-                           const std::string_view &name,
+    BookStore::bookSingle( std::filesystem::path path,
                            Args_t...              ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
-      key.name       = name ;
-      key.path       = path ;
+      key.path       = std::move( path ) ;
       key.mInstances = 1 ;
       key.flags      = Flags::Book::Single ;
 
@@ -258,13 +260,11 @@ namespace marlin {
                                 const std::shared_ptr< T > & ),
                typename... Args_t >
     std::shared_ptr< Entry >
-    BookStore::bookMultiCopy( std::size_t             n,
-                              const std::string_view &path,
-                              const std::string_view &name,
+    BookStore::bookMultiCopy( std::size_t           n,
+                              std::filesystem::path path,
                               Args_t... ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
-      key.name       = name ;
-      key.path       = path ;
+      key.path       = std::move( path ) ;
       key.mInstances = n ;
       key.flags      = Flags::Book::MultiCopy ;
 
@@ -279,12 +279,10 @@ namespace marlin {
 
     template < class T, typename... Args_t >
     std::shared_ptr< Entry >
-    BookStore::bookMultiShared( const std::string_view &path,
-                                const std::string_view &name,
+    BookStore::bookMultiShared( std::filesystem::path path,
                                 Args_t...              ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
-      key.name       = name ;
-      key.path       = path ;
+      key.path       = std::move(path) ;
       key.mInstances = 1 ;
       key.flags      = Flags::Book::MultiShared ;
 
@@ -298,26 +296,27 @@ namespace marlin {
 
     template < class T >
     Handle< Manager< typename T::Object_t > >
-    BookStore::book( const std::string_view &path,
-                     const std::string_view &name,
-                     const T                &data ) {
-
+    BookStore::book( const std::filesystem::path &path,
+                     const std::string_view      &name,
+                     const T                     &data ) {
+      std::filesystem::path nPath = normalizeDirPath(path);
+      nPath /= name;
       if ( !_allowMoving && std::this_thread::get_id() != _constructThread ) {
         MARLIN_THROW_T( BookStoreException,
                         "Booking is only allowed "
                         "from the construction Thread" ) ;
       }
 
-      auto entry = _idToEntry.find( {path, name} ) ;
+      auto entry = _idToEntry.find( Identifier(nPath)) ;
       if ( entry == _idToEntry.end() ) {
         return Handle< Manager< typename T::Object_t > >(
-          data.template book< std::string_view, std::string_view >(
-            *this, path, name ) ) ;
+          data.template book< std::filesystem::path >(
+            *this, nPath ) ) ;
       }
 
       MARLIN_THROW_T( BookStoreException,
                       std::string( "Entry path:'" )
-                        + static_cast< std::string >( path ) + "' name:'"
+                        + static_cast< std::string >( nPath ) + "' name:'"
                         + static_cast< std::string >( name )
                         + "' is already booked!" ) ;
     }
