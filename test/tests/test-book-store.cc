@@ -40,6 +40,51 @@ std::string mergedUnicStr() {
 using namespace marlin::book;
 using namespace marlin::book::types;
 
+const std::string expected("expected: ");
+
+template<std::size_t N, const char*const* Name, void(*Test)(TKey*), void(*...Rest)(TKey*)>
+void TestDirectoryItr(TList* keys) {
+  TKey * key = reinterpret_cast<TKey*>(keys->At(N)) ;
+  if (key == nullptr) {
+    throw expected + std::to_string(N + 1 + sizeof...(Rest)) + " elements in '" + (*Name) + "' but only found " + std::to_string(N) + "!";
+  }
+  Test(key);
+  if constexpr (sizeof...(Rest) > 0) {
+    TestDirectoryItr<N+1, Name, Rest...>(keys);
+  } else {
+    void* empty = static_cast<void*>(keys->At(N+1)) ;
+    if(empty != nullptr) {
+      throw expected + std::to_string(N + 1) + " elements in ''" + (*Name) + "' but found more!";
+    }
+  }
+}
+
+template<const char*const* Name, void(*...Tests)(TKey*)>
+void TestDirectory(TKey* key) {
+  TDirectory* dir = key->ReadObject<TDirectory>();
+  if (dir == nullptr) {
+    throw expected + (*Name) + "to be exist, but it don't!" ;
+  }
+  if(strcmp(dir->GetTitle(), *Name) != 0) {
+    throw expected + " folder Name: '" + (*Name) + "' but found: '" + dir->GetTitle() + "' !";
+  }
+  TList* keys = dir->GetListOfKeys();
+  TestDirectoryItr<0, Name, Tests...>(keys);
+}
+
+void DummyTest(TKey* /*key*/) {
+}
+
+constexpr const char* rootPath = "/";
+template<void(*...Tests)(TKey*)>
+void RootTestFile(TFile* file) {
+  TDirectory* dir = static_cast<TDirectory*>(file);
+  if (dir == nullptr) {
+    throw expected + rootPath + "to be exist, but it don't!"  ;
+  }
+  TList* keys = dir->GetListOfKeys();
+  TestDirectoryItr<0, &rootPath, Tests...>(keys);
+}
 
 int main(int /*argc*/, char** /*argv*/) {
   marlin::test::UnitTest test(" Memory Filler Test ");
@@ -285,67 +330,21 @@ int main(int /*argc*/, char** /*argv*/) {
       testStore.store(ser);
 
       TFile* file = TFile::Open("./test.root", "READ");
-      TDirectory* dir = file;
-      TList* keys = dir->GetListOfKeys();
-      TKey* key;
-      TAxis * taxis;
       std::optional<std::string> error = std::nullopt;
       try {
-        // check key 1 at level 0 -- folder 'path'
-        key = reinterpret_cast<TKey*>(keys->At(0));
-        if(key == nullptr) { 
-          throw "expected 2 entries at level 0, 0 found"; 
-        }
-        if(strcmp(key->GetName(), "path") != 0) {
-          throw std::string("expected first entry at level 0 has name 'path', but '")
-            + key->GetName() + "' found!";
-        }
-        if(!key->IsFolder()) {
-          throw "expected /path to be a folder!";
-        }
+        static constexpr const char* p = "path";
+        static constexpr const char* sub_path = "sub-path";
+        static constexpr const char* sub_sub = "sub-sub";
 
-        TList* pathKeys = key->ReadObject<TDirectory>()->GetListOfKeys();
-        key = reinterpret_cast<TKey *>(pathKeys->At(0));
-        if(key == nullptr) {
-          throw "expected 2 entries at /path, 0 found";
-        }
-        if(strcmp(key->GetName(), "hist_1") != 0) {
-          throw std::string("expected first entry at '/path' has name 'hist_1', but '")
-            + key->GetName() + "' found!";  
-        }
-        // TODO: check hist
-        
-        key = reinterpret_cast<TKey*>(pathKeys->At(1));
-        if(key == nullptr) {
-          throw "expected 2 entries at /path, 1 found";
-        }
-
-        // check key 2 at level 0 -- H1F 'hist_2'
-        key = reinterpret_cast<TKey*>(keys->At(1));
-        if(key == nullptr) { 
-          throw "expected 2 entries at level 0, 1 found"; 
-        }
-        if(strcmp(key->GetName(), "hist_2") != 0) {
-          throw std::string("expected second entry at level 0 has name 'hist_2', but '")
-            + key->GetName() + "' found!";
-        }
-        TH1F* h1f = key->ReadObject<TH1F>();
-        if(h1f == nullptr) {
-          throw "expected '/hist_2' to be an TH1F";
-        }
-        if(strcmp(h1f->GetTitle(), "title_2") != 0) {
-          throw std::string("expect '/hist_2' to have title 'title_2'");
-        }
-        if(h1f->GetNbinsX() != 5) {
-          throw std::string("expected '/hist_2' to have 5 bins, but found: ")
-            + std::to_string(h1f->GetNbinsX());
-        } 
-        taxis = h1f->GetXaxis();
-        if(strcmp(taxis->GetTitle(), "axis_2") != 0) {
-          throw std::string("expected axis title: 'axis_2', but '")
-            + key->GetName() + "' found!";
-        } 
-        // TODO: check entries
+        RootTestFile<
+          TestDirectory<&p,
+            DummyTest,
+            TestDirectory<&sub_path,
+              TestDirectory<&sub_sub,
+                DummyTest>
+              >
+            >,
+          DummyTest>(file);
       } catch (const std::string & msg) {
           error.emplace(msg);
       }
