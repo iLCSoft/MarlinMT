@@ -69,7 +69,7 @@ namespace marlin {
       /// maps ids to Handle instances.
       std::unique_ptr< IdMap_t > _mapping{} ;
       /// count number of Handle instances.
-      std::atomic< std::size_t > _n{0} ;
+      std::atomic< std::size_t > _count{0} ;
     } ;
 
     /**
@@ -329,7 +329,7 @@ namespace marlin {
     std::size_t Handle< Manager< T > >::unmap( std::size_t id ) {
       auto itr = _mapping->find( id ) ;
       if ( itr == _mapping->end() ) {
-        itr = _mapping->insert( std::make_pair( id, _n++ ) ).first ;
+        itr = _mapping->insert( std::make_pair( id, _count++ ) ).first ;
       }
       return itr->second ;
     }
@@ -345,7 +345,7 @@ namespace marlin {
 
     template < typename T >
     Handle< Manager< T > >::Handle( Handle &&hnd ) noexcept
-      : _entry( nullptr ), _mapping( nullptr ), _n( hnd._n ) {
+      : _entry( nullptr ), _mapping( nullptr ), _count( hnd._count ) {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
 
@@ -359,7 +359,7 @@ namespace marlin {
                             operator=( Handle &&hnd ) noexcept {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
-      _n       = hnd.load() ;
+      _count       = hnd.load() ;
 
       hnd._entry.reset() ;
       return *this ;

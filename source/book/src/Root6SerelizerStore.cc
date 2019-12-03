@@ -76,7 +76,7 @@ getDirectory(DirectoryMap& dirs,
 namespace marlin {
   namespace book {
 
-    void ToRoot6::WriteSelection(
+    void Root6SerelizerStore::WriteSelection(
       const Selection             &selection
     ) {
       DirectoryMap dirs{};

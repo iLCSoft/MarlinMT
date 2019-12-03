@@ -19,11 +19,11 @@ namespace marlin {
       ) = 0;
     };
 
-    class ToRoot6 : public ISerelizeStore {
+    class Root6SerelizerStore : public ISerelizeStore {
     public:
-      ToRoot6(std::filesystem::path path)
+      Root6SerelizerStore(std::filesystem::path path)
         : _path(std::move(path)){}
-      ToRoot6() = default ;
+      Root6SerelizerStore() = default ;
       void WriteSelection (
         const Selection             &sel
       ) final;

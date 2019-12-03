@@ -335,7 +335,7 @@ int main(int /*argc*/, char** /*argv*/) {
                 ).single());
       }
     
-      auto ser = ToRoot6("./test.root");
+      auto ser = Root6SerelizerStore("./test.root");
       testStore.store(ser);
       std::filesystem::path pRootFile = "./test.root";
       TFile* file = TFile::Open(pRootFile.string().c_str(), "READ");
