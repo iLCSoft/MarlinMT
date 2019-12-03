@@ -28,7 +28,7 @@ private:
   unsigned int _id {0} ;
 };
 
-int main( int argc, char **argv ) {
+int main( int /*argc*/, char ** /*argv*/ ) {
   
   UnitTest test( "ThreadPool" ) ;
   test.test( "obvious", true ) ;
