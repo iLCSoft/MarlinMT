@@ -337,8 +337,8 @@ int main(int /*argc*/, char** /*argv*/) {
     
       auto ser = ToRoot6("./test.root");
       testStore.store(ser);
-
-      TFile* file = TFile::Open("./test.root", "READ");
+      std::filesystem::path pRootFile = "./test.root";
+      TFile* file = TFile::Open(pRootFile.string().c_str(), "READ");
       std::optional<std::string> error = std::nullopt;
       try {
         static constexpr const char* p = "path";
@@ -359,6 +359,10 @@ int main(int /*argc*/, char** /*argv*/) {
       } catch (const std::string & msg) {
           error.emplace(msg);
       }
+      // clean up
+      if(std::filesystem::exists(pRootFile)) {
+        std::filesystem::remove(pRootFile);
+      } 
       test.test(
           std::string("Writing Store to Root-6 File: ")
           + (error

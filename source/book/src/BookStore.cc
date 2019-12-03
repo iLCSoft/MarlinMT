@@ -65,7 +65,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     void BookStore::remove( const Selection &selection ) {
-      for ( const Selection::Hit &e : selection ) {
+      for ( const WeakEntry &e : selection ) {
         remove( e.key() ) ;
       }
     }

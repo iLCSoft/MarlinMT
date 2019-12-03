@@ -5,17 +5,17 @@
 
 namespace marlin {
   namespace book {
-    Selection::Hit::Hit( const std::shared_ptr< const Entry > &entry )
+    WeakEntry::WeakEntry( const std::shared_ptr< const Entry > &entry )
       : _entry{entry}{}
 
-    Selection::Hit::Hit( const std::shared_ptr< Entry > &entry )
+    WeakEntry::WeakEntry( const std::shared_ptr< Entry > &entry )
       : _entry{entry}{}
 
-    bool Selection::Hit::valid() const {
+    bool WeakEntry::valid() const {
       return !_entry.expired() && _entry.lock()->valid() ;
     }
 
-    const EntryKey& Selection::Hit::key() const {
+    const EntryKey& WeakEntry::key() const {
       return _entry.lock()->key() ;
     }
 

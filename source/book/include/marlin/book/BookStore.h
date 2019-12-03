@@ -34,7 +34,7 @@ namespace marlin {
     template < typename T >
     class Handle< Manager< T > > {
       friend BookStore ;
-      friend Selection::Hit ;
+      friend WeakEntry ;
       using IdMap_t = std::unordered_map< std::size_t, std::size_t > ;
 
       /// constructor

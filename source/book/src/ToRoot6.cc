@@ -83,7 +83,7 @@ namespace marlin {
 
       TFile* root = TFile::Open(_path.string().c_str(), "new");
 
-      for(const Selection::Hit& h : selection) {
+      for(const WeakEntry& h : selection) {
         if(!h.valid()) { continue; }
 
         const EntryKey& key = h.key();
