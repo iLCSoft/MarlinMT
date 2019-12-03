@@ -15,6 +15,7 @@ cmake \
   -DMARLIN_DD4HEP=ON \
   -DMARLIN_GEAR=ON \
   -DBUILD_TESTING=ON \
+  -DMARLIN_WERROR=ON \
   .. && \
 make install && \
 ctest --output-on-failure
