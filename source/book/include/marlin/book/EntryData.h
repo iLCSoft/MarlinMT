@@ -18,15 +18,6 @@ namespace marlin {
     class MemLayout ;
 
     /**
-     *  @brief function to merge two objects.
-     */
-    /*template < typename T >
-    void merge(T&, T&) {
-      MARLIN_THROW_T(BookStoreException, "No merge function defined for this
-    data type") ;
-    }*/
-
-    /**
      *  @brief Data selection to identify and manage an Entry.
      */
     struct EntryKey {
