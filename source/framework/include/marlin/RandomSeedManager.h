@@ -41,7 +41,7 @@ namespace marlin {
      *
      *  @param  globalSeed the global seed
      */
-    RandomSeedManager( SeedType globalSeed = time(nullptr) ) ;
+    RandomSeedManager( SeedType globalSeed = static_cast<unsigned int>(time(nullptr)) ) ;
 
     /**
      *  @brief  Add an entry to the random seed manager
