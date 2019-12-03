@@ -36,7 +36,7 @@ target_link_libraries(
   ROOT::Core ROOT::RIO ROOT::Hist
 )
 target_link_libraries(
-	Book PRIVATE
+	Book PUBLIC
 	std::filesystem
 )
 install( DIRECTORY include/marlin TYPE INCLUDE )
