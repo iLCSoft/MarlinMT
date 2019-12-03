@@ -39,10 +39,10 @@ target_include_directories(
 )
 target_link_libraries( 
   Core PUBLIC
+  Threads::Threads
   ${streamlog_LIBRARIES} 
   ${TinyXML_LIBRARY}
   ${CMAKE_DL_LIBS} 
-  ${CMAKE_THREAD_LIBS_INIT}
 )
 set_target_properties( 
   Core
