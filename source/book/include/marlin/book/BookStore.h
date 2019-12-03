@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <typeindex>
 #include <typeinfo>
 #include <unordered_map>

@@ -28,7 +28,7 @@ namespace marlin {
         const Selection             &sel
       ) final;
     private:
-      std::filesystem::path _path{"./store.root"};
+      std::filesystem::path _path{""};
     };
 
   } // end namespace book

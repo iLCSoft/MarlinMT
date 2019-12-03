@@ -9,9 +9,6 @@
 #include "marlin/book/Serelizer.h"
 #include "marlin/book/Selection.h"
 
-// -- histogram conversion include 
-#include "histConv.hpp"
-
 // -- ROOT includes
 #include "TDirectory.h"
 #include "TFile.h"

@@ -30,7 +30,7 @@
 #include "marlin/book/Condition.h"
 #include "marlin/book/Selection.h"
 #include "marlin/book/ROOTAdapter.h"
-#include "marlin/book/Serelize.h"
+#include "marlin/book/Serelizer.h"
 
 std::string mergedUnicStr() {
   static std::size_t num = 0;
@@ -42,15 +42,17 @@ using namespace marlin::book::types;
 
 const std::string expected("expected: ");
 
-template<std::size_t N, const char*const* Name, void(*Test)(TKey*), void(*...Rest)(TKey*)>
-void TestDirectoryItr(TList* keys) {
+using TestFn = void(*)(const std::filesystem::path& path, std::size_t n, TKey*);
+
+template<std::size_t N, const char*const* Name, TestFn Test, TestFn ...Rest>
+void TestDirectoryItr(const std::filesystem::path& path, TList* keys) {
   TKey * key = reinterpret_cast<TKey*>(keys->At(N)) ;
   if (key == nullptr) {
     throw expected + std::to_string(N + 1 + sizeof...(Rest)) + " elements in '" + (*Name) + "' but only found " + std::to_string(N) + "!";
   }
-  Test(key);
+  Test(path, N, key);
   if constexpr (sizeof...(Rest) > 0) {
-    TestDirectoryItr<N+1, Name, Rest...>(keys);
+    TestDirectoryItr<N+1, Name, Rest...>(path, keys);
   } else {
     void* empty = static_cast<void*>(keys->At(N+1)) ;
     if(empty != nullptr) {
@@ -59,31 +61,38 @@ void TestDirectoryItr(TList* keys) {
   }
 }
 
-template<const char*const* Name, void(*...Tests)(TKey*)>
-void TestDirectory(TKey* key) {
+template<const char*const* Name, TestFn ... Tests>
+void TestDirectory(const std::filesystem::path& path, std::size_t n, TKey* key) {
+  const std::filesystem::path tPath = path / *Name;
   TDirectory* dir = key->ReadObject<TDirectory>();
   if (dir == nullptr) {
-    throw expected + (*Name) + "to be exist, but it don't!" ;
+    throw expected + (*Name) + "to be exist, at position " + std::to_string(n) + " in " + path.string() + " but it don't!" ;
   }
   if(strcmp(dir->GetTitle(), *Name) != 0) {
-    throw expected + " folder Name: '" + (*Name) + "' but found: '" + dir->GetTitle() + "' !";
+    throw expected + " folder Name: '" + tPath.string() + "' but found: '" + dir->GetTitle() + "' !";
   }
   TList* keys = dir->GetListOfKeys();
-  TestDirectoryItr<0, Name, Tests...>(keys);
+  TestDirectoryItr<0, Name, Tests...>(tPath, keys);
 }
 
-void DummyTest(TKey* /*key*/) {
+void DummyTest(const std::filesystem::path&,std::size_t,TKey* /*key*/) {
+
 }
 
-constexpr const char* rootPath = "/";
-template<void(*...Tests)(TKey*)>
+template<const char*const* Name, const char*const* Title, typename T>
+void TestHist(const std::filesystem::path& path, std::size_t n, TKey* key) {
+
+}
+
+template<TestFn ... Tests>
 void RootTestFile(TFile* file) {
+  static constexpr const char* rootPath = "/";
   TDirectory* dir = static_cast<TDirectory*>(file);
   if (dir == nullptr) {
-    throw expected + rootPath + "to be exist, but it don't!"  ;
+    throw expected + " an valid TFile*, but got nullptr!";
   }
   TList* keys = dir->GetListOfKeys();
-  TestDirectoryItr<0, &rootPath, Tests...>(keys);
+  TestDirectoryItr<0, &rootPath, Tests...>(rootPath, keys);
 }
 
 int main(int /*argc*/, char** /*argv*/) {
@@ -335,10 +344,12 @@ int main(int /*argc*/, char** /*argv*/) {
         static constexpr const char* p = "path";
         static constexpr const char* sub_path = "sub-path";
         static constexpr const char* sub_sub = "sub-sub";
-
+        
+        static constexpr const char* hist_1 = "hist_1";
+        static constexpr const char* title_1 = "title_1";
         RootTestFile<
           TestDirectory<&p,
-            DummyTest,
+          TestHist<&hist_1, &title_1, float>,
             TestDirectory<&sub_path,
               TestDirectory<&sub_sub,
                 DummyTest>

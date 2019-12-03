@@ -12,7 +12,7 @@
 #include "marlin/book/Entry.h"
 
 // -- histogram conversion include 
-#include "histConv.hpp"
+#include "marlin/book/RootHistV7ToV6Conversion.h"
 
 // -- ROOT includes
 #include "TDirectory.h"
