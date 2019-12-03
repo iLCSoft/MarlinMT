@@ -62,7 +62,7 @@ namespace marlin {
       // from IScheduler interface
       void init( Application *app ) override ;
       void end() override ;
-      void processRunHeader( std::shared_ptr<RunHeader> rhdr ) ;
+      void processRunHeader( std::shared_ptr<RunHeader> rhdr ) override ;
       void pushEvent( std::shared_ptr<EventStore> event ) override ;
       void popFinishedEvents( std::vector<std::shared_ptr<EventStore>> &events ) override ;
       std::size_t freeSlots() const override ;

@@ -18,11 +18,11 @@ namespace marlin {
     EmptyGeometry() : GeometryPlugin( "Empty" ) { /* nop */ }
 
   protected:
-    void loadGeometry() { /* nop */ }
-    const void *handle() const { return nullptr ; }
-    void destroy() { /* nop */ }
-    std::type_index typeIndex() const { return std::type_index( typeid(nullptr) ) ; }
-    void dumpGeometry() const { /* nop */ }
+    void loadGeometry() override { /* nop */ }
+    const void *handle() const override { return nullptr ; }
+    void destroy() override { /* nop */ }
+    std::type_index typeIndex() const override { return std::type_index( typeid(nullptr) ) ; }
+    void dumpGeometry() const override { /* nop */ }
   };
 
   MARLIN_DECLARE_GEOPLUGIN( EmptyGeometry )

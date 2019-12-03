@@ -17,7 +17,7 @@ class TestWorker : public WorkerBase<Function,void> {
 public:
   TestWorker(unsigned int id) : _id(id) {}
   
-  void process( Function && f ) {
+  void process( Function && f ) override {
     SAFE_LOG( "TestWorker: thread id " << std::this_thread::get_id() << ", worker id " << _id ) ;
     SAFE_LOG( "TestWorker: Executing function now " ) ;
     f() ;

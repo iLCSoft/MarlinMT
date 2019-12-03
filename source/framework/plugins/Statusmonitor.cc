@@ -29,19 +29,19 @@ namespace marlin {
    public:
     Statusmonitor() ;
 
-    void init() ;
+    void init() override ;
 
     /** Called for every run.
      */
-    void processRunHeader( RunHeader* run ) ;
+    void processRunHeader( RunHeader* run ) override ;
 
     /** Called for every event - the working horse.
      */
-    void processEvent( EventStore * evt ) ;
+    void processEvent( EventStore * evt ) override ;
 
     /** Called after data processing for clean up.
      */
-    void end() ;
+    void end() override ;
 
   private:
     Property<int> _howOften {this, "howOften",

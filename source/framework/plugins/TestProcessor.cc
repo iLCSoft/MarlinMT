@@ -34,22 +34,19 @@ namespace marlin {
     /** Called at the begin of the job before anything is read.
      * Use to initialize the processor, e.g. book histograms.
      */
-    void init() ;
+    void init() override ;
 
     /** Called for every run.
      */
-    void processRunHeader( RunHeader* run ) ;
+    void processRunHeader( RunHeader* run ) override ;
 
     /** Called for every event - the working horse.
      */
-    void processEvent( EventStore * evt ) ;
-
-
-    void check( EventStore * evt ) ;
+    void processEvent( EventStore * evt ) override ;
 
     /** Called after data processing for clean up.
      */
-    void end() ;
+    void end() override ;
 
   protected:
 

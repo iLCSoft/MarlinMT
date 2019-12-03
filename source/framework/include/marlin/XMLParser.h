@@ -152,18 +152,18 @@ namespace marlin{
     virtual ~XMLParser() ; 
 
     /** set command line parameters */
-    void setCmdLineParameters( const CommandLineParametersMap & cmdlineparams ){
+    void setCmdLineParameters( const CommandLineParametersMap & cmdlineparams ) override {
         _cmdlineparams = cmdlineparams ;
     }
 
     /** Parse the input file */
-    void parse() ;
+    void parse() override ;
 
     /** Return the StringParameters for the section as read from the xml file */
-    std::shared_ptr<StringParameters> getParameters( const std::string& sectionName ) const ;
+    std::shared_ptr<StringParameters> getParameters( const std::string& sectionName ) const override ;
     
     /** Write the parsed XML tree in an other file */
-    void write(const std::string &filen) const ;
+    void write(const std::string &filen) const override ;
     
     std::vector<std::string> getSections() const ;
   protected:

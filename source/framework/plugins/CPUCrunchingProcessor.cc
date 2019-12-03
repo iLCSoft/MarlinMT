@@ -26,8 +26,8 @@ namespace marlin {
 
    public:
     CPUCrunchingProcessor() ;
-    void init() ;
-    void processEvent( EventStore * evt ) ;
+    void init() override ;
+    void processEvent( EventStore * evt ) override ;
 
   private:
     Property<int> _crunchTime {this, "CrunchTime",

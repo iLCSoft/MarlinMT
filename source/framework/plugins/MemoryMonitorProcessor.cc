@@ -36,8 +36,8 @@ namespace marlin {
   	MemoryMonitorProcessor() ;
 
     // from Processor
-  	void init() ;
-  	void processEvent( EventStore * evt ) ;
+  	void init() override ;
+  	void processEvent( EventStore * evt ) override ;
 
   protected:
     Property<int> _howOften {this, "howOften",

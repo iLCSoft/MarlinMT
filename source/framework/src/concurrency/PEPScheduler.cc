@@ -41,7 +41,7 @@ namespace marlin {
 
     private:
       // from WorkerBase<IN,OUT>
-      Output process( Input && event ) ;
+      Output process( Input && event ) override ;
 
     private:
       ///< The processor sequence to run in the worker thread
