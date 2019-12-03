@@ -35,7 +35,7 @@ public:
 };
 
 int main (int, char**) {
-  std::srand(std::time(nullptr));
+  std::srand(static_cast<unsigned int>(std::time(nullptr)));
   marlin::test::UnitTest test(" MemLayout Test ");
   SharedType1 sMem(3, 1, 0, 0, 0, 0);
   auto ptr1 = sMem.at<Type1>(0);

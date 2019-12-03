@@ -334,13 +334,13 @@ namespace marlin {
       std::string procName = clockMeasure.first ;
       procName.resize(40, ' ') ;
       clockTotal += clockMeasure.second._procClock ;
-      int lockTimeFraction = ((clockMeasure.second._appClock - clockMeasure.second._procClock) / clockMeasure.second._appClock) * 100. ;
+      int lockTimeFraction = static_cast<int>(((clockMeasure.second._appClock - clockMeasure.second._procClock) / clockMeasure.second._appClock) * 100.) ;
       if( clockMeasure.second._counter > eventTotal ){
         eventTotal = clockMeasure.second._counter ;
       }
       std::stringstream ss ;
       if ( clockMeasure.second._counter > 0 ) {
-        ss << clockMeasure.second._procClock / clockMeasure.second._counter ;
+        ss << clockMeasure.second._procClock / static_cast<float>(clockMeasure.second._counter) ;
       }
       else {
         ss << "NaN" ;

@@ -111,7 +111,7 @@ namespace marlin {
       _logger->log<MESSAGE>() << "--   N threads:                      " << _superSequence->size() << std::endl ;
       _logger->log<MESSAGE>() << "--   Speedup (serial/parallel):      " << totalProcessorClock << " / " << parallelTime << " = " << speedup << std::endl ;
       if( _superSequence->size() > 1 ) {
-        double speedupPercent = (speedup - 1) * 100 / ( _superSequence->size() - 1 ) ;
+        double speedupPercent = (speedup - 1) * 100 / static_cast<double>( _superSequence->size() - 1 ) ;
         if( speedupPercent < 0 ) {
           speedupPercent = 0. ;
         }

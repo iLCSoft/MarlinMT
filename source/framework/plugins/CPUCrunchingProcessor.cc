@@ -61,7 +61,7 @@ namespace marlin {
     auto randomSeed = ProcessorApi::getRandomSeed( this, event ) ;
     std::default_random_engine generator( randomSeed );
     std::normal_distribution<clock::duration_rep> distribution(0, _crunchSigma);
-    clock::duration_rep totalCrunchTime = _crunchTime + distribution(generator) ;
+    clock::duration_rep totalCrunchTime = static_cast<clock::duration_rep>(_crunchTime) + distribution(generator) ;
     log<MESSAGE>() << "Will use total crunch time of " << totalCrunchTime << " ms" << std::endl ;
     // crunch for n milliseconds !
     clock::crunchFor<clock::milliseconds>(totalCrunchTime) ;
