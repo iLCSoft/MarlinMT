@@ -281,17 +281,14 @@ int main(int /*argc*/, char** /*argv*/) {
                 ).single());
       }
     
-      std::cout << "start writing\n";
       auto ser = ToRoot6("./test.root");
       testStore.store(ser);
 
-      std::cout << "start reading\n";
       TFile* file = TFile::Open("./test.root", "READ");
       TDirectory* dir = file;
       TList* keys = dir->GetListOfKeys();
       TKey* key;
-      TObject * obj;
-      TAxis * axis;
+      TAxis * taxis;
       std::optional<std::string> error = std::nullopt;
       try {
         // check key 1 at level 0 -- folder 'path'
@@ -307,7 +304,7 @@ int main(int /*argc*/, char** /*argv*/) {
           throw "expected /path to be a folder!";
         }
 
-        TList* pathKeys = dir->GetDirectory("./path")->GetListOfKeys();
+        TList* pathKeys = key->ReadObject<TDirectory>()->GetListOfKeys();
         key = reinterpret_cast<TKey *>(pathKeys->At(0));
         if(key == nullptr) {
           throw "expected 2 entries at /path, 0 found";
@@ -343,8 +340,8 @@ int main(int /*argc*/, char** /*argv*/) {
           throw std::string("expected '/hist_2' to have 5 bins, but found: ")
             + std::to_string(h1f->GetNbinsX());
         } 
-        axis = h1f->GetXaxis();
-        if(strcmp(axis->GetTitle(), "axis_2") != 0) {
+        taxis = h1f->GetXaxis();
+        if(strcmp(taxis->GetTitle(), "axis_2") != 0) {
           throw std::string("expected axis title: 'axis_2', but '")
             + key->GetName() + "' found!";
         } 
