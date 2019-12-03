@@ -267,13 +267,13 @@ namespace marlin{
               auto cloneProc = getAttribute( section , "clone" ) ;
               _current->add( "ProcessorClone", cloneProc ) ;
             }
-            catch( ParseException ) {
+            catch( ParseException& ) {
             }
             try{
               auto criticalProc = getAttribute( section , "critical" ) ;
               _current->add( "ProcessorCritical", criticalProc ) ;
             }
-            catch( ParseException ) {
+            catch( ParseException& ) {
             }
 
             // exit if processor defined more than once in the execute section
@@ -447,7 +447,7 @@ namespace marlin{
 
             try{  inputLine = getAttribute( par , "value" )  ;
             }
-            catch( ParseException ) {
+            catch( ParseException& ) {
 
                 if( par->FirstChild() )
                     inputLine =  par->FirstChild()->Value() ;
@@ -497,7 +497,7 @@ namespace marlin{
         if( par->ToElement() )
           par->ToElement()->SetAttribute( "value", inputLine );
       }
-      catch( ParseException ) {
+      catch( ParseException& ) {
 
           if( par->FirstChild() )
               par->FirstChild()->SetValue( inputLine ) ;
@@ -543,7 +543,7 @@ namespace marlin{
                 lcioInTypes.push_back( colType ) ;
 
             }
-            catch( ParseException ) { }
+            catch( ParseException& ) { }
 
             try{
 
@@ -553,7 +553,7 @@ namespace marlin{
                 lcioOutTypes.push_back( colType ) ;
 
             }
-            catch( ParseException ) { }
+            catch( ParseException& ) { }
 
 
 
