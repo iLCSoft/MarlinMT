@@ -151,7 +151,6 @@ function ( MARLIN_ADD_TEST test_name )
 			if(	   target_type STREQUAL STATIC_LIBRARY 
 					OR target_type STREQUAL SHARED_LIBRARY
 					OR target_type STREQUAL MODULE_LIBRARY)
-				message("${component} include")
 				target_include_directories( ${test_name} SYSTEM BEFORE PUBLIC $<TARGET_PROPERTY:${component},INCLUDE_DIRECTORIES> )
 			endif()
 
