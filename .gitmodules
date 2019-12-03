@@ -1,4 +1,0 @@
-[submodule "source/book/hists-mt"]
-	path = source/book/hists-mt
-	url = https://github.com/HadrienG2/hists-mt.git
-	shallow = true
