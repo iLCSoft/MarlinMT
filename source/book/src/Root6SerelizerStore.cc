@@ -66,23 +66,23 @@ namespace marlin {
           throw std::string("failed create: ") + path + '\n';
         }
         if (type == std::type_index(typeid(types::RH1F))) {
-          writeObject<types::RH1F>(file, key.path.filename().string(), h.bind<types::RH1F>().merged());
+          writeObject<types::RH1F>(file, key.path.filename().string(), h.handle<types::RH1F>().merged());
         } else if (type == std::type_index(typeid(types::RH1D))){ 
-          writeObject<types::RH1D>(file, key.path.filename().string(), h.bind<types::RH1D>().merged());
+          writeObject<types::RH1D>(file, key.path.filename().string(), h.handle<types::RH1D>().merged());
         } else if (type == std::type_index(typeid(types::RH1I))){
-          writeObject<types::RH1I>(file, key.path.filename().string(), h.bind<types::RH1I>().merged());
+          writeObject<types::RH1I>(file, key.path.filename().string(), h.handle<types::RH1I>().merged());
         } else if (type == std::type_index(typeid(types::RH2F))){ 
-          writeObject<types::RH2F>(file, key.path.filename().string(), h.bind<types::RH2F>().merged());
+          writeObject<types::RH2F>(file, key.path.filename().string(), h.handle<types::RH2F>().merged());
         } else if (type == std::type_index(typeid(types::RH2D))){
-          writeObject<types::RH2D>(file, key.path.filename().string(), h.bind<types::RH2D>().merged());
+          writeObject<types::RH2D>(file, key.path.filename().string(), h.handle<types::RH2D>().merged());
         } else if (type == std::type_index(typeid(types::RH2I))){ 
-          writeObject<types::RH2I>(file, key.path.filename().string(), h.bind<types::RH2I>().merged());
+          writeObject<types::RH2I>(file, key.path.filename().string(), h.handle<types::RH2I>().merged());
         } else if (type == std::type_index(typeid(types::RH3F))){
-          writeObject<types::RH3F>(file, key.path.filename().string(), h.bind<types::RH3F>().merged());
+          writeObject<types::RH3F>(file, key.path.filename().string(), h.handle<types::RH3F>().merged());
         } else if (type == std::type_index(typeid(types::RH3D))){ 
-          writeObject<types::RH3D>(file, key.path.filename().string(), h.bind<types::RH3D>().merged());
+          writeObject<types::RH3D>(file, key.path.filename().string(), h.handle<types::RH3D>().merged());
         } else if (type == std::type_index(typeid(types::RH3I))){
-          writeObject<types::RH3I>(file, key.path.filename().string(), h.bind<types::RH3I>().merged());
+          writeObject<types::RH3I>(file, key.path.filename().string(), h.handle<types::RH3I>().merged());
         } else {
           MARLIN_THROW_T( BookStoreException, "can't store object, no known operation");
         }

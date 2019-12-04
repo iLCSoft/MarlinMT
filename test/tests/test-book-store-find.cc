@@ -129,7 +129,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       e.handle( 1 ).fill( {0}, 1 ) ;
 
       Selection sel    = store.find( ConditionBuilder().setName( "my Name" ) ) ;
-      Handle< RH1F > h = sel.begin()->bind< RH1F >().handle( 1 ) ;
+      Handle< RH1F > h = sel.begin()->handle< RH1F >().handle( 1 ) ;
       h.fill( {0}, 1 ) ;
 
       test.test( "Get booked entry from BookStore",

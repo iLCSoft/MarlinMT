@@ -6,6 +6,9 @@
 #include <iterator>
 #include <vector>
 
+// -- Marlin includes
+#include  "marlin/Exceptions.h"
+
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
@@ -45,11 +48,15 @@ namespace marlin {
       [[nodiscard]] const EntryKey &key() const ;
 
       /**
-       *  @brief bind Entry to new Handle, for further usage.
+       *  @brief create  new Handle for Entry.
        *  @attention don't use old Handle to the Entry after this.
+       *  @throws BookStoreException when WeakEntry is invalid.
        */
       template <typename T>
-      Handle<Manager<T>> bind() const {
+      Handle<Manager<T>> handle() const {
+        if( ! valid() ) {
+          MARLIN_THROW_T( BookStoreException, "Try to bind an expired WeakEntry");  
+        }
         return Handle<Manager<T>>(_entry.lock());
       }
 
