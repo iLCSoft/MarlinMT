@@ -45,7 +45,7 @@ void writeObject( TDirectory* file, const std::string& name, const T& obj) {
 namespace marlin {
   namespace book {
 
-    void Root6SerializerStore::WriteSelection(
+    void Root6SerializerStore::writeSelection(
       const Selection             &selection
     ) {
       DirectoryMap dirs{};

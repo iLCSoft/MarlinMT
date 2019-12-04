@@ -14,7 +14,7 @@ namespace marlin {
     class ISerializerStore {
     public:
       virtual void 
-      WriteSelection  (
+      writeSelection  (
         const Selection             &sel
       ) = 0;
     };
@@ -24,7 +24,7 @@ namespace marlin {
       Root6SerializerStore(std::filesystem::path path)
         : _path(std::move(path)){}
       Root6SerializerStore() = default ;
-      void WriteSelection (
+      void writeSelection (
         const Selection             &sel
       ) final;
     private:

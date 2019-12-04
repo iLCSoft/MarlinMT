@@ -44,7 +44,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
   
     void BookStore::store(ISerializerStore& serializer) const {
-      serializer.WriteSelection(
+      serializer.writeSelection(
         Selection::find(
           _entries.begin(),
           _entries.end(),
