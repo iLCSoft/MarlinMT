@@ -28,6 +28,9 @@ namespace marlin {
   /// contains classes needed to book and managed booked objects.
   namespace book {
 
+    // -- MarlinBook forward declaration
+    class ISerializerStore;
+
     template < typename T >
     class Manager {} ;
 
@@ -222,10 +225,10 @@ namespace marlin {
       /**
        *  @brief saves all Objects in one Root-File. 
        *  @param path where save Root-File. 
-       *  @throw BookStoreException when:
+       *  @throw BookStoreException when: Sere kisser 
        *    - directory to store not exist.
        */
-      void store(ISerelizeStore& serelizer) const ;
+      void store(ISerializerStore& serializer) const ;
 
     private:
       /// stores Entries created by BookStore.

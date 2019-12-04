@@ -1,4 +1,4 @@
-#include "marlin/book/Serelizer.h"
+#include "marlin/book/Serializer.h"
 
 // -- std includes
 #include <filesystem>
@@ -45,7 +45,7 @@ void writeObject( TDirectory* file, const std::string& name, const T& obj) {
 namespace marlin {
   namespace book {
 
-    void Root6SerelizerStore::WriteSelection(
+    void Root6SerializerStore::WriteSelection(
       const Selection             &selection
     ) {
       DirectoryMap dirs{};

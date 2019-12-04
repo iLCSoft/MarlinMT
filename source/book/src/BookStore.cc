@@ -6,7 +6,7 @@
 
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
-#include "marlin/book/Serelizer.h"
+#include "marlin/book/Serializer.h"
 #include "marlin/book/Selection.h"
 
 // -- ROOT includes
@@ -43,8 +43,8 @@ namespace marlin {
     
     //--------------------------------------------------------------------------
   
-    void BookStore::store(ISerelizeStore& serelizer) const {
-      serelizer.WriteSelection(
+    void BookStore::store(ISerializerStore& serializer) const {
+      serializer.WriteSelection(
         Selection::find(
           _entries.begin(),
           _entries.end(),

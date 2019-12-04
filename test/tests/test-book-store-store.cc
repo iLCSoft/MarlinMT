@@ -12,7 +12,7 @@
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"
-#include "marlin/book/Serelizer.h"
+#include "marlin/book/Serializer.h"
 
 using namespace marlin::book ;
 using namespace marlin::book::types ;
@@ -284,7 +284,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
                false ) ;
   }
 
-  Root6SerelizerStore ser( pathRootFile ) ;
+  Root6SerializerStore ser( pathRootFile ) ;
   store.store( ser ) ;
 
   TFile *file = TFile::Open( pathRootFile.string().c_str(), "READ" ) ;
