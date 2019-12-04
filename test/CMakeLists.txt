@@ -35,19 +35,32 @@ marlin_add_test (
 )
 
 marlin_add_test (
-	test-book-store
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-  COMPONENTS Marlin::Book
-)
-
-marlin_add_test (
 	test-mem-layout
 	BUILD_EXEC
 	REGEX_FAIL "TEST_FAILED"
   COMPONENTS Marlin::Book
 )
 
+marlin_add_test (
+	test-book-store-book
+	BUILD_EXEC
+	REGEX_FAIL "TEST_FAILED"
+  COMPONENTS Marlin::Book
+)
+
+marlin_add_test (
+	test-book-store-find
+	BUILD_EXEC
+	REGEX_FAIL "TEST_FAILED"
+	COMPONENTS Marlin::Book
+)
+
+marlin_add_test (
+	test-book-store-store
+	BUILD_EXEC
+	REGEX_FAIL "TEST_FAILED"
+	COMPONENTS Marlin::Book
+)
 marlin_add_test (
   marlinminusx
   COMMAND $<TARGET_FILE:bin_Marlin>
