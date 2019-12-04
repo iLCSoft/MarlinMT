@@ -42,49 +42,64 @@ using namespace marlin::book::types;
 
 const std::string expected("expected: ");
 
-using TestFn = void(*)(const std::filesystem::path& path, std::size_t n, TKey*);
-
-template<std::size_t N, const char*const* Name, TestFn Test, TestFn ...Rest>
-void TestDirectoryItr(const std::filesystem::path& path, TList* keys) {
-  TKey * key = reinterpret_cast<TKey*>(keys->At(N)) ;
-  if (key == nullptr) {
-    throw expected + std::to_string(N + 1 + sizeof...(Rest)) + " elements in '" + (*Name) + "' but only found " + std::to_string(N) + "!";
-  }
-  Test(path, N, key);
-  if constexpr (sizeof...(Rest) > 0) {
-    TestDirectoryItr<N+1, Name, Rest...>(path, keys);
-  } else {
-    void* empty = static_cast<void*>(keys->At(N+1)) ;
-    if(empty != nullptr) {
-      throw expected + std::to_string(N + 1) + " elements in ''" + (*Name) + "' but found more!";
+template<std::size_t N, const char*const* Name,class TEST,class ...Rest>
+struct TestDirectoryItr {
+  void Test(const std::filesystem::path& path, TList* keys) {
+    TKey * key = reinterpret_cast<TKey*>(keys->At(N)) ;
+    if (key == nullptr) {
+      throw expected + std::to_string(N + 1 + sizeof...(Rest)) + " elements in '" + (*Name) + "' but only found " + std::to_string(N) + "!";
+    }
+    TEST test{};
+    if(strcmp(key->GetName(), test.name()) != 0) {
+      throw expected + " folder Name: '" + (path / test.name()).string() + "' but found: '" + key->GetName() + "' !";
+    }
+    test.Test(path, N, key);
+    if constexpr (sizeof...(Rest) > 0) {
+      TestDirectoryItr<N+1, Name, Rest...>{}.Test(path, keys);
+    } else {
+      void* empty = static_cast<void*>(keys->At(N+1)) ;
+      if(empty != nullptr) {
+        throw expected + std::to_string(N + 1) + " elements in ''" + (*Name) + "' but found more!";
+      }
     }
   }
-}
+};
 
-template<const char*const* Name, TestFn ... Tests>
-void TestDirectory(const std::filesystem::path& path, std::size_t n, TKey* key) {
-  const std::filesystem::path tPath = path / *Name;
-  TDirectory* dir = key->ReadObject<TDirectory>();
-  if (dir == nullptr) {
-    throw expected + (*Name) + "to be exist, at position " + std::to_string(n) + " in " + path.string() + " but it don't!" ;
+template<const char*const* Name,class ... Tests>
+struct TestDirectory {
+  const char* name() const {
+    return *Name;
   }
-  if(strcmp(dir->GetTitle(), *Name) != 0) {
-    throw expected + " folder Name: '" + tPath.string() + "' but found: '" + dir->GetTitle() + "' !";
+  void Test(const std::filesystem::path& path, std::size_t n, TKey* key) {
+    const std::filesystem::path tPath = path / *Name;
+    TDirectory* dir = key->ReadObject<TDirectory>();
+    if (dir == nullptr) {
+      throw expected + (*Name) + "to be exist, at position " + std::to_string(n) + " in " + path.string() + " but it don't!" ;
+    }
+    TList* keys = dir->GetListOfKeys();
+    TestDirectoryItr<0, Name, Tests...>{}.Test(tPath, keys);
   }
-  TList* keys = dir->GetListOfKeys();
-  TestDirectoryItr<0, Name, Tests...>(tPath, keys);
-}
+};
 
-void DummyTest(const std::filesystem::path&,std::size_t,TKey* /*key*/) {
-
-}
+template<const char*const* Name>
+struct DummyTest {
+  const char* name() const {
+    return *Name;
+  }
+  void Test(const std::filesystem::path&,std::size_t,TKey* /*key*/) {
+  }
+};
 
 template<const char*const* Name, const char*const* Title, typename T>
-void TestHist(const std::filesystem::path& path, std::size_t n, TKey* key) {
+struct TestHist {
+  const char* name() const {
+    return *Name;
+  }
+  void Test (const std::filesystem::path& path, std::size_t n, TKey* key) {
+  }
+};
 
-}
-
-template<TestFn ... Tests>
+template<class ... Tests>
 void RootTestFile(TFile* file) {
   static constexpr const char* rootPath = "/";
   TDirectory* dir = static_cast<TDirectory*>(file);
@@ -92,7 +107,7 @@ void RootTestFile(TFile* file) {
     throw expected + " an valid TFile*, but got nullptr!";
   }
   TList* keys = dir->GetListOfKeys();
-  TestDirectoryItr<0, &rootPath, Tests...>(rootPath, keys);
+  TestDirectoryItr<0, &rootPath, Tests...>{}.Test(rootPath, keys);
 }
 
 int main(int /*argc*/, char** /*argv*/) {
@@ -333,29 +348,31 @@ int main(int /*argc*/, char** /*argv*/) {
               EntryData<RH1D>(
                 {"axis_3", 5, -5, 5}
                 ).single());
-      }
-    
-      auto ser = Root6SerelizerStore("./test.root");
-      testStore.store(ser);
+      }    
       std::filesystem::path pRootFile = "./test.root";
-      TFile* file = TFile::Open(pRootFile.string().c_str(), "READ");
       std::optional<std::string> error = std::nullopt;
       try {
+        auto ser = Root6SerelizerStore(pRootFile);      
+        testStore.store(ser);
+        TFile* file = TFile::Open(pRootFile.string().c_str(), "READ");
+
         static constexpr const char* p = "path";
         static constexpr const char* sub_path = "sub-path";
         static constexpr const char* sub_sub = "sub-sub";
         
         static constexpr const char* hist_1 = "hist_1";
         static constexpr const char* title_1 = "title_1";
+        static constexpr const char* hist_2 = "hist_2";
+        static constexpr const char* hist_3 = "hist_3";
         RootTestFile<
           TestDirectory<&p,
           TestHist<&hist_1, &title_1, float>,
             TestDirectory<&sub_path,
               TestDirectory<&sub_sub,
-                DummyTest>
+                DummyTest<&hist_3>>
               >
             >,
-          DummyTest>(file);
+          DummyTest<&hist_2>>(file);
       } catch (const std::string & msg) {
           error.emplace(msg);
       }

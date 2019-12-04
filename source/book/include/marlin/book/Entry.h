@@ -148,8 +148,7 @@ namespace marlin {
         }
         if ( _key.flags.contains( Flags::Book::MultiCopy ) ) {
           if(idx < 0 || idx >= key().mInstances) {
-            std::array<char, 8> n;
-            auto itoa = [&n](std::size_t id){
+            auto itoa = [](std::size_t id){
               return std::to_string(id);
             };
             MARLIN_THROW_T(

@@ -39,37 +39,6 @@ void writeObject( TDirectory* file, const std::string& name, const T& obj) {
       name.c_str()
   ) ;
 }
-TDirectory* mkdir(TDirectory* root, const std::filesystem::path& path) {
-  TDirectory* dir = root;
-  std::vector<std::filesystem::path> stack;
-  std::filesystem::path
-    p = path,
-    parent = p.parent_path();
-  while((p = parent).has_parent_path() && !((parent = p.parent_path()) == p)) {
-    stack.emplace_back(std::filesystem::relative(p, parent));
-  }
-
-  for(auto itr = stack.crbegin(); itr != stack.crend(); ++itr) {
-    std::string name = itr->string();
-    TDirectory* next = dir->GetDirectory(name.c_str());
-    dir = next == nullptr
-      ? dir->mkdir(name.c_str())
-      : next;
-  }
-  return dir;
-}
-
-TDirectory*
-getDirectory(DirectoryMap& dirs, 
-    TDirectory* root,
-    const std::filesystem::path& path) {
-  auto hit = dirs.find(path.parent_path());
-  if( hit != dirs.end()) {
-    return hit->second;
-  }
-  
-  return dirs.insert(std::make_pair(path.parent_path(), mkdir(root, path))).first->second;
-}
 
 
 
@@ -88,8 +57,14 @@ namespace marlin {
 
         const EntryKey& key = h.key();
         const std::type_index type = key.type;
-        TDirectory* file = getDirectory(dirs, root, key.path);
 
+        std::string path = std::filesystem::relative(key.path, "/").remove_filename().string();
+        path.pop_back();
+        root->mkdir(path.c_str());
+        TDirectory *file = root->GetDirectory(path.c_str());
+        if(file == nullptr) {
+          throw std::string("failed create: ") + path + '\n';
+        }
         if (type == std::type_index(typeid(types::RH1F))) {
           writeObject<types::RH1F>(file, key.path.filename().string(), h.bind<types::RH1F>().merged());
         } else if (type == std::type_index(typeid(types::RH1D))){ 
