@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include <UnitTesting.h>
-#include "marlin/book/ROOTAdapter.h"
+#include "marlin/book/Types.h"
 #include "marlin/book/MemLayout.h"
 
 using namespace marlin::book;

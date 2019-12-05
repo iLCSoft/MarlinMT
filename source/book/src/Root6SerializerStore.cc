@@ -6,7 +6,7 @@
 #include <unordered_map>
 
 // -- MarlinBook includes
-#include "marlin/book/ROOTAdapter.h"
+#include "marlin/book/Types.h"
 #include "marlin/book/Selection.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"

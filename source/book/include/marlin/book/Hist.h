@@ -1,7 +1,8 @@
 #pragma once
 
 // -- MarlinBook includes
-#include "marlin/book/ROOTAdapter.h"
+#include "marlin/book/Types.h"
+#include "marlin/book/BookStore.h"
 
 // -- Hist includes
 #include "marlin/book/HistEntry.h"

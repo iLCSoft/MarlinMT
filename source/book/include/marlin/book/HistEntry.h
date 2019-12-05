@@ -6,9 +6,8 @@
 #include <vector>
 
 // -- MarlinBook includes
-#include "marlin/book/BookStore.h"
+#include "marlin/book/Types.h"
 #include "marlin/book/Entry.h"
-#include "marlin/book/ROOTAdapter.h"
 
 namespace marlin {
   namespace book {  

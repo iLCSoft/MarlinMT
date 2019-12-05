@@ -5,7 +5,7 @@
 
 // -- MarlinBook includes
 #include  "marlin/book/EntryData.h"
-#include  "marlin/book/ROOTAdapter.h"
+#include  "marlin/book/Types.h"
 
 namespace marlin {
   namespace book {

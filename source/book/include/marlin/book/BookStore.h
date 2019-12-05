@@ -22,7 +22,6 @@
 #include "marlin/book/EntryData.h"
 #include "marlin/book/Flags.h"
 #include "marlin/book/MemLayout.h"
-#include "marlin/book/ROOTAdapter.h"
 #include "marlin/book/Selection.h"
 
 namespace marlin {
