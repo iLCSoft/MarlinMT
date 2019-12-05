@@ -13,20 +13,20 @@ namespace marlin {
     /**
      *  @brief Base for Histogram EntryData.
      */
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntryDataBase< types::RHist< D, T, STAT... > >
+    template < class T >
+    class EntryDataBase< T, types::Categories::Hist >
       : public EntryDataBase< void > {
-      template < typename, unsigned long long >
+      template < typename, types::Categories, unsigned long long >
       friend class EntryData ;
       static constexpr std::string_view empty{""} ;
-
     public:
       explicit EntryDataBase( const std::string_view &title = empty ) ;
 
       /**
        *  @brief construct EntryData for single booking.
        */
-      EntryData< types::RHist< D, T, STAT... >,
+      EntryData< T,
+                 types::Categories::Hist,
                  Flags::value( Flags::Book::Single ) >
       single() const ;
 
@@ -34,18 +34,22 @@ namespace marlin {
        *  @brief construct EntryData for multi copy booking.
        *  @param n number of memory instances which should be constructed
        */
-      [[nodiscard]] EntryData< types::RHist< D, T, STAT... >,
+      [[nodiscard]] EntryData< T,
+                               types::Categories::Hist,
                                Flags::value( Flags::Book::MultiCopy ) >
       multiCopy( std::size_t n ) const ;
 
       /**
        *  @brief construct EntryData for multi shared booking.
        */
-      [[nodiscard]] EntryData< types::RHist< D, T, STAT... >,
+      [[nodiscard]] EntryData< T,
+                               types::Categories::Hist,
                                Flags::value( Flags::Book::MultiShared ) >
       multiShared() const ;
 
     protected:
+      static constexpr int D = types::TypeInfo<T>::dimension;
+
       /**
        *  @brief read access for passed title.
        */

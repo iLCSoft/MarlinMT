@@ -7,6 +7,7 @@
 
 // -- MarlinBook includes
 #include "marlin/book/MemLayout.h"
+#include "marlin/book/Types.h"
 
 namespace marlin {
   namespace book {
@@ -49,7 +50,7 @@ namespace marlin {
      *  @brief vanilla Handle.
      *  @tparam T type which should be handled.
      */
-    template < typename T >
+    template < typename T, types::Categories C>
     class Handle : public BaseHandle< T > {
     public:
       /// constructor

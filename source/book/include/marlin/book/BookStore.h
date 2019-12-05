@@ -16,6 +16,7 @@
 #include "marlin/Exceptions.h"
 
 // -- MarlinBook includes
+#include "marlin/book/Types.h"
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/EntryData.h"
@@ -34,8 +35,8 @@ namespace marlin {
     template < typename T >
     class Manager {} ;
 
-    template < typename T >
-    class Handle< Manager< T > > {
+    template < typename T, types::Categories C>
+    class Handle< Manager< T >, C> {
       friend BookStore ;
       friend WeakEntry ;
       using IdMap_t = std::unordered_map< std::size_t, std::size_t > ;
@@ -79,7 +80,7 @@ namespace marlin {
      *  @brief Managed Access and creation of Objects.
      */
     class BookStore {
-      template < typename, unsigned long long >
+      template < typename, types::Categories, unsigned long long >
       friend class EntryData ;
 
       /**
@@ -328,8 +329,8 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    template < typename T >
-    std::size_t Handle< Manager< T > >::unmap( std::size_t id ) {
+    template < typename T, types::Categories C>
+    std::size_t Handle< Manager< T >, C >::unmap( std::size_t id ) {
       auto itr = _mapping->find( id ) ;
       if ( itr == _mapping->end() ) {
         itr = _mapping->insert( std::make_pair( id, _count++ ) ).first ;
@@ -339,15 +340,15 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
     
-    template< typename T >
-    const T& Handle< Manager< T > >::merged() const {
+    template< typename T, types::Categories C >
+    const T& Handle< Manager< T >, C >::merged() const {
       return _entry->handle<T>(0).merged();     
     }
 
     //--------------------------------------------------------------------------
 
-    template < typename T >
-    Handle< Manager< T > >::Handle( Handle &&hnd ) noexcept
+    template < typename T, types::Categories C >
+    Handle< Manager< T >, C >::Handle( Handle &&hnd ) noexcept
       : _entry( nullptr ), _mapping( nullptr ), _count( hnd._count ) {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
@@ -357,9 +358,9 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    template < typename T >
-    Handle< Manager< T > > &Handle< Manager< T > >::
-                            operator=( Handle &&hnd ) noexcept {
+    template < typename T, types::Categories C >
+    Handle< Manager< T >, C > &Handle< Manager< T >, C >::
+                            operator=( Handle<Manager<T>, C> &&hnd ) noexcept {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
       _count       = hnd.load() ;
@@ -370,8 +371,8 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    template < typename T >
-    Handle< T > Handle< Manager< T > >::handle( std::size_t id ) {
+    template < typename T, types::Categories C >
+    Handle< T > Handle< Manager< T >, C >::handle( std::size_t id ) {
       return _entry->handle< T >( unmap( id ) ) ;
     }
 

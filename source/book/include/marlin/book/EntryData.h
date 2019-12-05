@@ -1,16 +1,17 @@
 #pragma once
 
 // -- std includes
-#include <filesystem>
-#include <memory>
-#include <string>
-#include <typeindex>
+#include  <filesystem>
+#include  <memory>
+#include  <string>
+#include  <typeindex>
 
 // -- Marlin includes
-#include "marlin/Exceptions.h"
+#include  "marlin/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/Flags.h"
+#include  "marlin/book/Flags.h"
+#include  "marlin/book/Types.h"
 
 namespace marlin {
   namespace book {
@@ -43,7 +44,7 @@ namespace marlin {
     /**
      *  @brief Base Class for Entry Data, for similar behavior.
      */
-    template < class T >
+    template < class T , types::Categories C = types::category_of<T>>
     class EntryDataBase {} ;
 
     template <>
@@ -64,7 +65,7 @@ namespace marlin {
     /**
      * @brief Container for data to construct and setup booked object.
      */
-    template < class T, unsigned long long = 0 >
+    template < class T, types::Categories C  =  types::category_of<T>, unsigned long long = 0 >
     class EntryData : public EntryDataBase< void > {} ;
 
     /**

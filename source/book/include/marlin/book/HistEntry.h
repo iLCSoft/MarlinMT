@@ -12,21 +12,17 @@
 
 namespace marlin {
   namespace book {  
-    // -- MarlinBook forward declaration
-    template < typename T >
-    class BaseHandle ;
-    template < typename T >
-    class Handle ;
 
     /// Handle specialisation for Histograms.
-    template < int D, typename T, template < int, class > class... STAT >
-    class Handle< types::RHist< D, T, STAT... > >
-      : private BaseHandle< types::RHist< D, T, STAT... > > {
+    template < typename T>
+    class Handle< T, types::Categories::Hist>
+      : private BaseHandle< T > {
       friend BookStore ;
+      static constexpr int D = types::TypeInfo<T>::dimension;
 
     public:
       /// Histogram Type which is Handled
-      using Type = types::RHist< D, T, STAT... > ;
+      using Type = T ;
       /// CoordArray_t from managed Histogram
       using CoordArray_t = typename Type::CoordArray_t ;
       /// Weigh_t from managed Histogram
@@ -83,14 +79,14 @@ namespace marlin {
     } ;
 
     /// specialisation of EntrySingle for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntrySingle< types::RHist< D, T, STAT... > > : public EntryBase {
-
+    template < typename T>
+    class EntrySingle< T, types::Categories::Hist > : public EntryBase {
       friend BookStore ;
+      static constexpr int D = types::TypeInfo<T>::dimension;
 
     public:
       /// Type of contained Histogram.
-      using Type = types::RHist< D, T, STAT... > ;
+      using Type = T ;
 
       /// constructor
       explicit EntrySingle( Context context ) ;
@@ -102,7 +98,7 @@ namespace marlin {
        *  @brief creates new Handle for Contained Histogram.
        *  @note not thread save.
        */
-      Handle< Type > handle() ;
+      Handle< Type, types::Categories::Hist > handle() ;
 
     private:
       /// \see {EntrySingle::_context}
@@ -110,14 +106,12 @@ namespace marlin {
     } ;
 
     /// specialisation of EntryMultiCopy for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiCopy< types::RHist< D, T, STAT... > > : public EntryBase {
+    template < typename Type>
+    class EntryMultiCopy< Type, types::Categories::Hist > : public EntryBase {
 
       friend BookStore ;
 
     public:
-      /// Type of contained Histogram.
-      using Type = types::RHist< D, T, STAT... > ;
 
       /// constructor
       explicit EntryMultiCopy( Context context ) ;
@@ -131,20 +125,18 @@ namespace marlin {
        *  @note handles to the same instance should be only use in sequential
        *code.
        */
-      Handle< Type > handle( std::size_t idx ) ;
+      Handle< Type, types::Categories::Hist > handle( std::size_t idx ) ;
 
     private:
       /// \see {EntrySingle::_context}
       Context _context ;
     } ;
     /// specialisation of EntryMultiShared for Histograms
-    template < int D, typename T, template < int, class > class... STAT >
-    class EntryMultiShared< types::RHist< D, T, STAT... > > : public EntryBase {
+    template < typename Type>
+    class EntryMultiShared< Type, types::Categories::Hist> : public EntryBase {
       friend BookStore ;
 
     public:
-      /// Type of contained Histogram.
-      using Type = types::RHist< D, T, STAT... > ;
 
       /// constructor
       explicit EntryMultiShared( Context context ) ;
@@ -163,7 +155,7 @@ namespace marlin {
        *  @note each Handle contains a buffer to reduce synchronisation.
        *  This memory will be freed when the handle is destructed.
        */
-      Handle< Type > handle() ;
+      Handle< Type, types::Categories::Hist > handle() ;
 
       /// flush every Buffer from each Handle.
       void flush() ;

@@ -29,35 +29,6 @@ struct AxisConfig {
   double      max ;
 } ;
 
-template < typename T, std::size_t N >
-using Hist = std::conditional_t<
-  N == 1,
-  std::conditional_t<
-    std::is_same_v< T, float >,
-    RH1F,
-    std::conditional_t<
-      std::is_same_v< T, double >,
-      RH1D,
-      std::conditional_t< std::is_same_v< T, int >, RH1I, void > > >,
-  std::conditional_t<
-    N == 2,
-    std::conditional_t<
-      std::is_same_v< T, float >,
-      RH2F,
-      std::conditional_t<
-        std::is_same_v< T, double >,
-        RH2D,
-        std::conditional_t< std::is_same_v< T, int >, RH2I, void > > >,
-    std::conditional_t<
-      N == 3,
-      std::conditional_t<
-        std::is_same_v< T, float >,
-        RH3F,
-        std::conditional_t<
-          std::is_same_v< T, double >,
-          RH3D,
-          std::conditional_t< std::is_same_v< T, int >, RH3I, void > > >,
-      void > > > ;
 
 template < typename T >
 struct HDetails {} ;
@@ -114,9 +85,9 @@ struct Bin {
   Bin( const T & ){} ;
 } ;
 
-template < typename T, std::size_t N >
+template <int N, typename T >
 class HistTest {
-  using Type                        = Hist< T, N > ;
+  using Type                        = RHist< N, T > ;
   using RootT                       = typename HDetails< Type >::RootT ;
   static constexpr const char *Name = HDetails< Type >::Name ;
 
@@ -272,8 +243,12 @@ int main( int /*argc*/, char * /*argv*/[] ) {
   marlin::test::UnitTest test( " BookStore: write to file " ) ;
 
   AxisConfig            axis = {"x", 2, -2.f, 5.f} ;
-  RootTest              bluePrint( TestDirectory(
-    "path", HistTest< float, 1 >( "hist_1", "title_1", {axis} ) ) ) ;
+
+  RootTest bluePrint(
+      TestDirectory("path",
+        HistTest< 1, float >( "hist_1", "title_1", {axis} ) 
+      )
+    ) ;
   std::filesystem::path pathRootFile( "./test.root" ) ;
 
   BookStore store{} ;
