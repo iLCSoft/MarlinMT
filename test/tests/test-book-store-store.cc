@@ -87,7 +87,7 @@ struct Bin {
 
 template <int N, typename T >
 class HistTest {
-  using Type                        = RHist< N, T > ;
+  using Type                        = marlin::book::types::HistType_t< N, T > ;
   using RootT                       = typename HDetails< Type >::RootT ;
   static constexpr const char *Name = HDetails< Type >::Name ;
 

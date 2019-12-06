@@ -25,8 +25,19 @@ namespace marlin {
         static constexpr Categories category = Categories::None;
       };
 
+      template< int D, typename T >
+      struct HistType {
+        static_assert(D != D, "No histogram type for this argument combination.");
+      };
+
+      template< int D, typename T >
+      using HistType_t = typename HistType<D,T>::type;
+
       template<typename T>
       constexpr Categories category_of = TypeInfo<T>::category;
+
+
+
 
       /// Type for Describing a Histogram Axis.
       using RAxisConfig = ROOT::Experimental::RAxisConfig ;
@@ -37,7 +48,11 @@ namespace marlin {
       template<> struct TypeInfo<Alias> { \
         static constexpr Categories category = Categories::Hist;\
         static constexpr int dimension = Dim;\
+      };\
+      template<> struct HistType<Dim, typename Type::Weight_t> {\
+        using type = Type;\
       }
+
       /// often used Histogram Instance
       AddHistType(RH1F, ROOT::Experimental::RH1F, 1);
       AddHistType(RH1D, ROOT::Experimental::RH1D, 1);
@@ -48,53 +63,6 @@ namespace marlin {
       AddHistType(RH3F, ROOT::Experimental::RH3F, 3);
       AddHistType(RH3D, ROOT::Experimental::RH3D, 3);
       AddHistType(RH3I, ROOT::Experimental::RH3I, 3);
-
-      /// Generic Histogram.
-      template < int N, typename T >
-      using RHist = std::enable_if_t<
-        (N>0)
-        && (N<4) 
-        && (   std::is_same_v<T, float> 
-            || std::is_same_v<T, double> 
-            || std::is_same_v<T, int>),
-        std::conditional_t<
-          N == 1,
-          std::conditional_t<
-            std::is_same_v< T, float >,
-            RH1F,
-            std::conditional_t<
-              std::is_same_v< T, double >,
-              RH1D,
-              std::conditional_t<
-                std::is_same_v< T, int >, 
-                RH1I,
-                void> > >,
-          std::conditional_t<
-            N == 2,
-            std::conditional_t<
-              std::is_same_v< T, float >,
-              RH2F,
-              std::conditional_t<
-                std::is_same_v< T, double >,
-                RH2D,
-                std::conditional_t<
-                  std::is_same_v< T, int >,
-                  RH2I,
-                  void> > >,
-            std::conditional_t<
-              N == 3,
-              std::conditional_t<
-                std::is_same_v< T, float >,
-                RH3F,
-                std::conditional_t<
-                  std::is_same_v< T, double >,
-                  RH3D,
-                  std::conditional_t<
-                    std::is_same_v< T, int >,
-                    RH3I,
-                    void> > >,
-            void> > > > ;
-
 
 
       /// Histogram merge function.
