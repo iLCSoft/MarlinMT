@@ -180,10 +180,10 @@ namespace marlin {
       }
 
 
-			template<typename Config>
-			auto toRoot6(const HistT<Config>& hist, const std::string_view& name) {
+      template<typename Config>
+      auto toRoot6(const HistT<Config>& hist, const std::string_view& name) {
         return into_root6_hist(hist.get(), std::string(name).c_str());
-			}
+      }
 
       template<typename Config>
       void add(
