@@ -4,6 +4,8 @@
 #include <atomic>
 #include <filesystem>
 #include <memory>
+#include <mutex>
+#include <shared_mutex>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -73,6 +75,8 @@ namespace marlin {
       std::unique_ptr< IdMap_t > _mapping{} ;
       /// count number of Handle instances.
       std::atomic< std::size_t > _count{0} ;
+      /// shared mutex for serialisation when writing 
+      std::shared_mutex _mappingAcces;
     } ;
 
     /**
@@ -330,11 +334,16 @@ namespace marlin {
 
     template < typename T >
     std::size_t Handle< Manager< T > >::unmap( std::size_t id ) {
-      auto itr = _mapping->find( id ) ;
-      if ( itr == _mapping->end() ) {
-        itr = _mapping->insert( std::make_pair( id, _count++ ) ).first ;
+      {
+        std::shared_lock lock(_mappingAcces);
+        auto itr = _mapping->find( id ) ;
+        if ( itr != _mapping->end() ) {
+          return itr->second;
+        }
       }
-      return itr->second ;
+
+      std::unique_lock lock(_mappingAcces);
+      return _mapping->insert(std::make_pair( id, _count++ ) ).first->second;
     }
 
     //--------------------------------------------------------------------------
