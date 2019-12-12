@@ -34,6 +34,13 @@ marlin_add_test (
   REGEX_FAIL "TEST_FAILED"
 )
 
+marlin_add_test(
+	benchmark-book-store
+	BUILD_EXEC
+	REGEX_FAIL "TEST_FAILED"
+	COMPONENTS Marlin::Book
+)
+
 marlin_add_test (
 	test-mem-layout
 	BUILD_EXEC
@@ -61,6 +68,7 @@ marlin_add_test (
 	REGEX_FAIL "TEST_FAILED"
 	COMPONENTS Marlin::Book
 )
+
 marlin_add_test (
   marlinminusx
   COMMAND $<TARGET_FILE:bin_Marlin>
@@ -75,6 +83,7 @@ marlin_add_test (
   REGEX_PASS "<parameter name=\"RandomSeed\" value=\"1234567890\" />"
   DEPENDS marlinminusx
 )
+
 
 marlin_add_processor_test (
   eventmodifier
