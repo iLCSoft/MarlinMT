@@ -125,11 +125,14 @@ namespace marlin {
     Handle< types::HistT<Config> >::Handle(
       const std::shared_ptr< MemLayout > &                        mem,
       const std::shared_ptr< types::HistT<Config> > &              obj,
-      typename Handle< types::HistT<Config> >::FillFn_t     fillFn,
-      typename Handle< types::HistT<Config> >::FillNFn_t    fillNFn,
+      const std::shared_ptr<void>& data, 
+      Flag_t type,
       typename Handle< types::HistT<Config> >::FinalizeFn_t finalFn )
-      : BaseHandle< types::HistT<Config> >{mem, obj}, _fillFn{std::move(fillFn)},
-        _fillNFn{std::move(fillNFn)}, _finalFn{std::move(finalFn)} {}
+      : BaseHandle< types::HistT<Config> >{mem, obj},
+        _finalFn{std::move(finalFn)},
+        _data{data},
+        _type{type}
+        {}
 
     //--------------------------------------------------------------------------
 
@@ -137,7 +140,13 @@ namespace marlin {
     void Handle< types::HistT<Config> >::fill(
       const typename Handle< types::HistT<Config> >::Point_t &x,
       const typename Handle< types::HistT<Config> >::Weight_t &    w ) {
-      _fillFn( x, w ) ;
+      if (_type == Flags::Book::Single) {
+        static_cast<Type*>(_data.get())->Fill(x,w);
+      } else if (_type == Flags::Book::MultiCopy) {
+        static_cast<Type*>(_data.get())->Fill(x,w);
+      } else if (_type == Flags::Book::MultiShared) {
+        static_cast<types::HistConcurrentFiller<Config>*>(_data.get())->Fill(x,w);  
+      }
     }
 
     //--------------------------------------------------------------------------
@@ -148,7 +157,12 @@ namespace marlin {
       const PointContainer &x,
       const WeightContainer &w ) {
       // FIXME: only for arrays and vectors
-      _fillNFn( &(*x.begin()), &(*x.end()), &(*w.begin()), &(*w.end()) ) ;
+      if (_type == Flags::Book::Single) {
+        static_cast<Type*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
+      } else if (_type == Flags::Book::MultiCopy) {
+        static_cast<Type*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
+      } else if (_type == Flags::Book::MultiShared) {
+        static_cast<types::HistConcurrentFiller<Config>*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));     }
     }
 
     //--------------------------------------------------------------------------
@@ -172,14 +186,8 @@ namespace marlin {
       return Handle< Type >(
         _context.mem,
         hist,
-        [hist]( const typename Hnd_t::Point_t &x,
-                const typename Hnd_t::Weight_t &    w ) { hist->Fill( x, w ); },
-        [hist]( const typename Type::Point_t *pFirst,
-                const typename Type::Point_t *pLast,
-                const typename Type::Weight_t *wFirst,
-                const typename Type::Weight_t *wLast) {
-          hist->FillN( pFirst, pLast, wFirst, wLast ) ;
-        },
+        hist,
+        Flags::Book::Single,
         []() {} ) ;
     }
 
@@ -198,14 +206,8 @@ namespace marlin {
       return Hnd_t(
         _context.mem,
         pHist,
-        [pHist]( const typename Hnd_t::Point_t &x,
-                 const typename Hnd_t::Weight_t &w ) { pHist->Fill( x, w ); },
-        [pHist]( const typename Type::Point_t *pFirst,
-                const typename Type::Point_t *pLast,
-                const typename Type::Weight_t *wFirst,
-                const typename Type::Weight_t *wLast) {
-          pHist->FillN( pFirst, pLast, wFirst, wLast ) ;
-        },
+        pHist,
+        Flags::Book::MultiCopy,
         []() {} ) ;
     }
 
@@ -252,16 +254,8 @@ namespace marlin {
       return Hnd_t(
         _context.mem,
         _context.mem->at< Type >( 0 ),
-        [pFiller = pFiller]( const typename Hnd_t::Point_t &x,
-                             const typename Hnd_t::Weight_t &    w ) {
-          pFiller->Fill( x, w ) ;
-        },
-        [pFiller]( const typename Type::Point_t *pFirst,
-                const typename Type::Point_t *pLast,
-                const typename Type::Weight_t *wFirst,
-                const typename Type::Weight_t *wLast) {
-          pFiller->FillN( pFirst, pLast,wFirst, wLast ) ;
-        },
+        pFiller,
+        Flags::Book::MultiShared,
         [this]() { this->flush(); } ) ;
     }
 

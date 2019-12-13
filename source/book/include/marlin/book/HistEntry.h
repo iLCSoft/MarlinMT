@@ -8,6 +8,7 @@
 // -- MarlinBook includes
 #include "marlin/book/Types.h"
 #include "marlin/book/Entry.h"
+#include "marlin/book/Flags.h"
 
 
 namespace marlin {
@@ -28,23 +29,14 @@ namespace marlin {
       /// Weigh_t from managed Histogram
       using Weight_t = typename Type::Weight_t ;
 
-      /// type of the RHist::Fill function.
-      using FillFn_t
-        = std::function< void( const Point_t &, const Weight_t & ) > ;
-      /// type of the RHist::FillN function
-      using FillNFn_t = std::function< void( 
-          const typename types::HistT<Config>::Point_t*,
-          const typename types::HistT<Config>::Point_t*,
-          const typename types::HistT<Config>::Weight_t*,
-          const typename types::HistT<Config>::Weight_t*) > ;
       using FinalizeFn_t = std::function< void() > ;
 
     public:
       /// construct a Handle.
       Handle( const std::shared_ptr< MemLayout > &mem,
               const std::shared_ptr< Type > &     obj,
-              FillFn_t                     fillFn,
-              FillNFn_t                    fillNFn,
+              const std::shared_ptr<void>& data,
+              Flag_t type,  
               FinalizeFn_t                 finalFn ) ;
 
       /**
@@ -52,7 +44,7 @@ namespace marlin {
        *  @param x point to add.
        *  @param w weight of point.
        */
-      void fill( const Point_t &x, const Weight_t &w ) ;
+      inline void fill( const Point_t &x, const Weight_t &w ) ;
 
 /*     
        *  @brief Adds N data to the Histogram.
@@ -75,12 +67,10 @@ namespace marlin {
       const Type &merged() ;
 
     private:
-      /// Function to call for fill one object.
-      FillFn_t _fillFn ;
-      /// Function to call for fill N objects.
-      FillNFn_t _fillNFn ;
-      /// Function to call to flush queues which may exists
       FinalizeFn_t _finalFn ;
+      std::shared_ptr<void> _data;
+      Flag_t _type;
+      
     } ;
 
     /// specialisation of EntrySingle for Histograms

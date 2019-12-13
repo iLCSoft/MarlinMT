@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     end = std::chrono::high_resolution_clock::now();
     rootFill += end - start;
   }
-
+  std::cout << "hits: " << hist.merged().get().GetEntries() << " == " << rhist.GetEntries() << '\n';
   std::cout << "             \tStore\t\tRoot\n"
             << "Time to fill:\t"<<bookStoreFill.count() << "\t" << rootFill.count() << "\n";
   return 0;
