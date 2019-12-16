@@ -3,6 +3,7 @@
 // -- std includes
 #include <iostream>
 #include <memory>
+#include <tuple>
 #include <typeinfo>
 #include <variant>
 
@@ -10,6 +11,7 @@
 #include "marlin/Exceptions.h"
 
 // -- MarlinBook includes
+#include "marlin/book/Flags.h"
 #include "marlin/book/EntryData.h"
 #include "marlin/book/MemLayout.h"
 #include "marlin/book/Types.h"
@@ -30,6 +32,7 @@ namespace marlin {
         : _context{std::move( context )} {}
 
     public:
+      static constexpr Flag_t Flag = Flags::Book::Single;
       /// default constructor
       EntrySingle() = default ;
 
@@ -57,6 +60,7 @@ namespace marlin {
         : _context{std::move( context )} {}
 
     public:
+      static constexpr Flag_t Flag = Flags::Book::MultiCopy;
       /// default constructor
       EntryMultiCopy() = default ;
 
@@ -88,6 +92,7 @@ namespace marlin {
         : _context{std::move( context )} {}
 
     public:
+      static constexpr Flag_t Flag = Flags::Book::MultiShared;
       /// default constructor
       EntryMultiShared() = default ;
 
@@ -104,6 +109,13 @@ namespace marlin {
       Context _context ;
     } ;
 
+    template<typename Type>
+    using EntryTypes = std::tuple<
+      EntrySingle<Type>,
+      EntryMultiCopy<Type>,
+      EntryMultiShared<Type>
+    >;
+
     /**
      *  @brief class to store and manage objects in BookStore.
      */
@@ -119,6 +131,63 @@ namespace marlin {
         _key = EntryKey{} ;
         _entry.reset() ;
       }
+
+
+      struct GetFromEntry {
+        static void ThrowIfOutOfBound(const EntryKey& key, std::size_t idx) {
+          if(idx < 0 || idx >= key.mInstances) {
+            auto itoa = [](std::size_t id){
+              return std::to_string(id);
+            };
+            MARLIN_THROW_T(
+              BookStoreException,
+              (std::string("Try to access instances '") + itoa(idx) 
+              + "', which is outside of [0;" 
+                + itoa(key.mInstances-1) + "]"));
+          } 
+        }
+
+
+        template<typename R, typename ET, R(ET::*)(std::size_t)>
+        struct need_index {};
+
+        template<typename T, typename ET>
+        static constexpr bool handle_need_index(
+            need_index<Handle<T>, ET, &ET::handle>* ) {
+          return true;
+        }
+        template<typename T, typename ET>
+        static constexpr bool handle_need_index(...) { return false; }
+
+        template<typename T, typename ET>
+        static constexpr bool handle_need_index_v = handle_need_index<T,ET>(0);
+
+        template<typename T, std::size_t I = 0>
+        [[nodiscard]]
+        static Handle<T> handle(
+            std::shared_ptr<EntryBase> entry,
+            const EntryKey& key,
+            std::size_t idx) {
+          using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
+          if (key.flags == EntryType::Flag) {
+            if constexpr (handle_need_index_v<T, EntryType>) {
+
+              ThrowIfOutOfBound(key, idx);
+
+              return std::static_pointer_cast<EntryType>(entry)->handle(idx);
+            } else {
+              return std::static_pointer_cast<EntryType>(entry)->handle();
+            }
+          }
+          if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<T>>)) {
+            return handle<T, I + 1>(entry, key, idx);
+          } else {
+            MARLIN_THROW_T(
+              BookStoreException,
+              "Entry has an invalid Flag combination! Can't create Handle!" ) ; 
+          }
+        }
+      };
 
     public:
       /// default constructor. Not valid!
@@ -137,32 +206,9 @@ namespace marlin {
           MARLIN_THROW_T( BookStoreException,
                           "Entry is not demanded type. Can't create Handle!" ) ;
         }
+        
+        return GetFromEntry::handle<T>(_entry, key(), idx);
 
-        if ( _key.flags.contains( Flags::Book::Single ) ) {
-          return std::static_pointer_cast< EntrySingle< T > >( _entry )
-            ->handle() ;
-        }
-        if ( _key.flags.contains( Flags::Book::MultiCopy ) ) {
-          if(idx < 0 || idx >= key().mInstances) {
-            auto itoa = [](std::size_t id){
-              return std::to_string(id);
-            };
-            MARLIN_THROW_T(
-                BookStoreException,
-                (std::string("Try to access instances '") + itoa(idx) 
-                + "', which is outside of [0;" + itoa(key().mInstances) + "]"));
-          }
-          return std::static_pointer_cast< EntryMultiCopy< T > >( _entry )
-            ->handle( idx ) ;
-        }
-        if ( _key.flags.contains( Flags::Book::MultiShared ) ) {
-          return std::static_pointer_cast< EntryMultiShared< T > >( _entry )
-            ->handle() ;
-        }
-
-        MARLIN_THROW_T(
-          BookStoreException,
-          "Entry has an invalid Flag combination! Can't create Handle!" ) ;
       }
 
       /// access key data from entry.

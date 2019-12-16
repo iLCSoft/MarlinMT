@@ -136,33 +136,23 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
+
     template < typename Config >
-    void Handle< types::HistT<Config> >::fill(
+    inline void Handle< types::HistT<Config> >::fill(
       const typename Handle< types::HistT<Config> >::Point_t &x,
       const typename Handle< types::HistT<Config> >::Weight_t &    w ) {
-      if (_type == Flags::Book::Single) {
-        static_cast<Type*>(_data.get())->Fill(x,w);
-      } else if (_type == Flags::Book::MultiCopy) {
-        static_cast<Type*>(_data.get())->Fill(x,w);
-      } else if (_type == Flags::Book::MultiShared) {
-        static_cast<types::HistConcurrentFiller<Config>*>(_data.get())->Fill(x,w);  
-      }
+      fillImp(x,w); 
     }
 
     //--------------------------------------------------------------------------
 
     template < typename Config >
     template < typename PointContainer, typename WeightContainer>
-    void Handle< types::HistT<Config> >::fillN(
+    inline void Handle< types::HistT<Config> >::fillN(
       const PointContainer &x,
       const WeightContainer &w ) {
       // FIXME: only for arrays and vectors
-      if (_type == Flags::Book::Single) {
-        static_cast<Type*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
-      } else if (_type == Flags::Book::MultiCopy) {
-        static_cast<Type*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
-      } else if (_type == Flags::Book::MultiShared) {
-        static_cast<types::HistConcurrentFiller<Config>*>(_data.get())->FillN(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));     }
+      fillNImp(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
     }
 
     //--------------------------------------------------------------------------

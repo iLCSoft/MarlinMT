@@ -39,6 +39,7 @@ namespace marlin {
               Flag_t type,  
               FinalizeFn_t                 finalFn ) ;
 
+
       /**
        *  @brief Adds one datum to the Histogram.
        *  @param x point to add.
@@ -67,6 +68,31 @@ namespace marlin {
       const Type &merged() ;
 
     private:
+      template<std::size_t I = 0>
+      inline void fillImp(
+          const Point_t& x,
+          const Weight_t& w) {
+        using EntryType = std::tuple_element_t<I, EntryTypes<Type>>;
+        if(_type == EntryType::Flag) {
+          EntryType::fill(_data, x, w);
+        }
+        else if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<Type>>)) {
+          fillImp<I + 1>(x, w);
+        }
+      }
+      template<std::size_t I = 0>
+      inline void fillNImp(
+          const Point_t* pFirst, const Point_t* pLast,
+          const Weight_t* wFirst, const Weight_t* wLast) {
+        using EntryType = std::tuple_element_t<I, EntryTypes<Type>>;
+        if(_type == EntryType::Flag) {
+          EntryType::fillN(_data, pFirst, pLast, wFirst, wLast);
+        }
+        else if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<Type>>)) {
+          fillNImp<I + 1>(pFirst, pLast, wFirst, wLast);
+        }
+      }
+
       FinalizeFn_t _finalFn ;
       std::shared_ptr<void> _data;
       Flag_t _type;
@@ -82,6 +108,22 @@ namespace marlin {
     public:
       /// Type of contained Histogram.
       using Type = types::HistT<Config> ;
+      using Point_t = typename Type::Point_t;
+      using Weight_t = typename Type::Weight_t;
+
+      static constexpr Flag_t Flag = EntrySingle<void>::Flag;
+      static void fill(const std::shared_ptr<void>& data,
+          typename Type::Point_t const& x,
+          typename Type::Weight_t const& w) {
+        static_cast<Type*>(data.get())->Fill(x,w);
+      }
+
+      static void fillN(const std::shared_ptr<void>& data,
+          Point_t const* pFirst, Point_t const* pLast,
+          Weight_t const* wFirst, Weight_t const* wLast) {
+        static_cast<Type*>(data.get())->FillN(
+            pFirst, pLast, wFirst, wLast);
+      }
 
       /// constructor
       explicit EntrySingle( Context context ) ;
@@ -107,8 +149,24 @@ namespace marlin {
       friend BookStore ;
 
     public:
-
       using Type = types::HistT<Config>;
+      using Point_t = typename Type::Point_t;
+      using Weight_t = typename Type::Weight_t;
+
+      static constexpr Flag_t Flag = EntryMultiCopy<void>::Flag;
+      static void fill(const std::shared_ptr<void>& data,
+          Point_t const& x,
+          Weight_t const& w) {
+        static_cast<Type*>(data.get())->Fill(x,w);
+      }
+
+      static void fillN(const std::shared_ptr<void>& data,
+          Point_t const* pFirst, Point_t const* pLast,
+          Weight_t const* wFirst, Weight_t const* wLast) {
+        static_cast<Type*>(data.get())->FillN(
+            pFirst, pLast, wFirst, wLast);
+      }
+
 
       /// constructor
       explicit EntryMultiCopy( Context context ) ;
@@ -134,7 +192,23 @@ namespace marlin {
       friend BookStore ;
 
     public:
+      static constexpr Flag_t Flag = EntryMultiShared<void>::Flag;
       using Type = types::HistT<Config>;
+      using Point_t = typename Type::Point_t;
+      using Weight_t = typename Type::Weight_t;
+
+      static void fill(const std::shared_ptr<void>& data,
+          typename Type::Point_t const& x,
+          typename Type::Weight_t const& w) {
+        static_cast<types::HistConcurrentFiller<Config>*>(data.get())->Fill(x,w);
+      }
+      
+      static void fillN(const std::shared_ptr<void>& data,
+          Point_t const* pFirst, Point_t const* pLast,
+          Weight_t const* wFirst, Weight_t const* wLast) {
+        static_cast<types::HistConcurrentFiller<Config>*>(data.get())->FillN(
+            pFirst, pLast, wFirst, wLast);
+      }
 
       /// constructor
       explicit EntryMultiShared( Context context ) ;
