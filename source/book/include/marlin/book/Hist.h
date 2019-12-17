@@ -138,7 +138,7 @@ namespace marlin {
 
 
     template < typename Config >
-    inline void Handle< types::HistT<Config> >::fill(
+     void Handle< types::HistT<Config> >::fill(
       const typename Handle< types::HistT<Config> >::Point_t &x,
       const typename Handle< types::HistT<Config> >::Weight_t &    w ) {
       fillImp(x,w); 
@@ -148,7 +148,7 @@ namespace marlin {
 
     template < typename Config >
     template < typename PointContainer, typename WeightContainer>
-    inline void Handle< types::HistT<Config> >::fillN(
+     void Handle< types::HistT<Config> >::fillN(
       const PointContainer &x,
       const WeightContainer &w ) {
       // FIXME: only for arrays and vectors
@@ -389,6 +389,116 @@ namespace marlin {
         *_data.axis(0),
         *_data.axis(1),
         *_data.axis(2) ) ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    template < std::size_t I >
+    inline void Handle<types::HistT<Config>>::fillImp(
+      const typename types::HistT<Config>::Point_t& x,
+      const typename types::HistT<Config>::Weight_t& w
+    ) {
+      using EntryType = std::tuple_element_t<I, EntryTypes<Type>>;
+      if( _type == EntryType::Flag) {
+        EntryType::fill(_data, x, w);
+      } else if constexpr ( I + 1 < (std::tuple_size_v<EntryTypes<Type>>)){
+        fillImp<I + 1>(x,w);
+      }
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    template < std::size_t I >
+    inline void Handle<types::HistT<Config>>::fillNImp (
+      const typename types::HistT<Config>::Point_t* pFirst,
+      const typename types::HistT<Config>::Point_t* pLast,
+      const typename types::HistT<Config>::Weight_t* wFirst,
+      const typename types::HistT<Config>::Weight_t* wLast
+    ) {
+        using EntryType = std::tuple_element_t<I, EntryTypes<Type>>;
+        if(_type == EntryType::Flag) {
+          EntryType::fillN(_data, pFirst, pLast, wFirst, wLast);
+        }
+        else if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<Type>>)) {
+          fillNImp<I + 1>(pFirst, pLast, wFirst, wLast);
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntrySingle<types::HistT<Config>>::fill(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t& x,
+      const typename types::HistT<Config>::Weight_t& w
+    ) {
+      static_cast<Type*>(data.get())->Fill(x,w);
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntrySingle<types::HistT<Config>>::fillN(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t* pFirst,
+      const typename types::HistT<Config>::Point_t* pLast,
+      const typename types::HistT<Config>::Weight_t* wFirst,
+      const typename types::HistT<Config>::Weight_t* wLast
+    ) {
+      static_cast<Type*>(data.get())->FillN(
+          pFirst, pLast, wFirst, wLast);
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntryMultiCopy<types::HistT<Config>>::fill(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t& x,
+      const typename types::HistT<Config>::Weight_t& w
+    ) {
+      static_cast<Type*>(data.get())->Fill(x,w);
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntryMultiCopy<types::HistT<Config>>::fillN(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t* pFirst,
+      const typename types::HistT<Config>::Point_t* pLast,
+      const typename types::HistT<Config>::Weight_t* wFirst,
+      const typename types::HistT<Config>::Weight_t* wLast
+    ) {
+      static_cast<Type*>(data.get())->FillN(
+          pFirst, pLast, wFirst, wLast);
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntryMultiShared<types::HistT<Config>>::fill(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t& x,
+      const typename types::HistT<Config>::Weight_t& w
+    ) {
+      static_cast<types::HistConcurrentFiller<Config>*>(data.get())->Fill(x,w);
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    inline void EntryMultiShared<types::HistT<Config>>::fillN(
+      const std::shared_ptr<void>& data,
+      const typename types::HistT<Config>::Point_t* pFirst,
+      const typename types::HistT<Config>::Point_t* pLast,
+      const typename types::HistT<Config>::Weight_t* wFirst,
+      const typename types::HistT<Config>::Weight_t* wLast
+    ) {
+      static_cast<types::HistConcurrentFiller<Config>*>(data.get())->FillN(
+          pFirst, pLast, wFirst, wLast);
     }
 
   } // end namespace book

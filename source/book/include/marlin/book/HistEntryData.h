@@ -6,6 +6,7 @@
 
 // -- MarlinBook includes
 #include "marlin/book/Types.h"
+#include "marlin/book/Entry.h"
 #include "marlin/book/EntryData.h"
 
 // -- Hist includes
