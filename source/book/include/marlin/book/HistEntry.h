@@ -214,7 +214,7 @@ namespace marlin {
       using Weight_t = typename Type::Weight_t ;
 
       /// Type Flag. Inherited from default EntrySingle.
-      static constexpr Flag_t Flag = EntryMultiCopy<void>::Flag;
+      static constexpr Flag_t Flag = EntryMultiShared<void>::Flag;
 
     private:
       /// add one entry. /ref EntrySingle<types::HistT<Config>>::fill for more information

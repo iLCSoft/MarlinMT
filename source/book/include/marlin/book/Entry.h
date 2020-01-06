@@ -169,6 +169,7 @@ namespace marlin {
             const EntryKey& key,
             std::size_t idx) {
           using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
+
           if (key.flags == EntryType::Flag) {
             if constexpr (handle_need_index_v<T, EntryType>) {
 
