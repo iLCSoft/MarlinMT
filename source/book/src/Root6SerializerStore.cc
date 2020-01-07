@@ -2,20 +2,20 @@
 
 // -- std includes
 #include <filesystem>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 // -- MarlinBook includes
-#include "marlin/book/Types.h"
-#include "marlin/book/Selection.h"
+#include "marlin/book/Entry.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"
-#include "marlin/book/Entry.h"
+#include "marlin/book/Selection.h"
+#include "marlin/book/Types.h"
 
 // -- ROOT includes
 #include "TDirectory.h"
-#include "TFile.h"
 #include "TDirectoryFile.h"
+#include "TFile.h"
 
 class PathHash {
 public:
@@ -61,7 +61,9 @@ namespace marlin {
         root->mkdir(path.c_str());
         TDirectory *file = root->GetDirectory(path.c_str());
         if(file == nullptr) {
-          throw std::string("failed create: ") + path + '\n';
+          MARLIN_THROW_T( 
+            BookStoreException, 
+            std::string("failed create: ") + path + '\n');
         }
         if (type == std::type_index(typeid(types::H1F))) {
           writeObject<types::H1F>(file, key.path.filename().string(), h.handle<types::H1F>().merged());

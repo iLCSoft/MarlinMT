@@ -11,8 +11,8 @@
 #include "marlin/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/Flags.h"
 #include "marlin/book/EntryData.h"
+#include "marlin/book/Flags.h"
 #include "marlin/book/MemLayout.h"
 #include "marlin/book/Types.h"
 
@@ -147,20 +147,27 @@ namespace marlin {
           } 
         }
 
+        enum struct Need { Void, Index };
 
         template<typename R, typename ET, R(ET::*)(std::size_t)>
-        struct need_index {};
+        struct need_index { };
+
+        template<typename R, typename ET, R(ET::*)(void)>
+        struct need_void { };
 
         template<typename T, typename ET>
-        static constexpr bool handle_need_index(
-            need_index<Handle<T>, ET, &ET::handle>* ) {
-          return true;
+        static constexpr Need handle_need(
+            need_index<Handle<T>, ET, &ET::handle>* /*null*/) {
+          return Need::Index ;
         }
         template<typename T, typename ET>
-        static constexpr bool handle_need_index(...) { return false; }
+        static constexpr Need handle_need(
+          need_void<Handle<T>, ET, &ET::handle>* /*null*/) {
+          return Need::Void ; 
+        }
 
         template<typename T, typename ET>
-        static constexpr bool handle_need_index_v = handle_need_index<T,ET>(0);
+        static constexpr Need handle_need_v = handle_need<T,ET>(nullptr);
 
         template<typename T, std::size_t I = 0>
         [[nodiscard]]
@@ -171,15 +178,18 @@ namespace marlin {
           using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
 
           if (key.flags == EntryType::Flag) {
-            if constexpr (handle_need_index_v<T, EntryType>) {
+            if constexpr (handle_need_v<T, EntryType> == Need::Index) {
 
               ThrowIfOutOfBound(key, idx);
 
               return std::static_pointer_cast<EntryType>(entry)->handle(idx);
-            } else {
+            } else if constexpr (handle_need_v<T, EntryType> == Need::Void){
               return std::static_pointer_cast<EntryType>(entry)->handle();
+            } else {
+              static_assert(I!=I, "no callable Handle function");
             }
           }
+
           if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<T>>)) {
             return handle<T, I + 1>(entry, key, idx);
           } else {

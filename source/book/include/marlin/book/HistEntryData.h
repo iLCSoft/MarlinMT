@@ -5,9 +5,9 @@
 #include <functional>
 
 // -- MarlinBook includes
-#include "marlin/book/Types.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/EntryData.h"
+#include "marlin/book/Types.h"
 
 // -- Hist includes
 #include "marlin/book/HistEntryDataBase.h"

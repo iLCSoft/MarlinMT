@@ -6,13 +6,13 @@
 
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
-#include "marlin/book/Serializer.h"
 #include "marlin/book/Selection.h"
+#include "marlin/book/Serializer.h"
 
 // -- ROOT includes
 #include "TDirectory.h"
-#include "TFile.h"
 #include "TDirectoryFile.h"
+#include "TFile.h"
 
 class PathHash {
 public:

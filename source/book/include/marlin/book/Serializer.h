@@ -21,7 +21,7 @@ namespace marlin {
 
     class Root6SerializerStore : public ISerializerStore {
     public:
-      Root6SerializerStore(std::filesystem::path path)
+      explicit Root6SerializerStore(std::filesystem::path path)
         : _path(std::move(path)){}
       Root6SerializerStore() = default ;
       void writeSelection (

@@ -1,8 +1,8 @@
 #pragma once
 
 // -- MarlinBook includes
-#include "marlin/book/Types.h"
 #include "marlin/book/BookStore.h"
+#include "marlin/book/Types.h"
 
 // -- Hist includes
 #include "marlin/book/HistEntry.h"
@@ -125,13 +125,13 @@ namespace marlin {
     Handle< types::HistT<Config> >::Handle(
       const std::shared_ptr< MemLayout > &                        mem,
       const std::shared_ptr< types::HistT<Config> > &              obj,
-      const std::shared_ptr<void>& data, 
+      std::shared_ptr<void> data, 
       Flag_t type,
       typename Handle< types::HistT<Config> >::FinalizeFn_t finalFn )
       : BaseHandle< types::HistT<Config> >{mem, obj},
         _finalFn{std::move(finalFn)},
-        _data{data},
-        _type{type}
+        _data{std::move(data)},
+        _type{std::move(type)}
         {}
 
     //--------------------------------------------------------------------------
@@ -149,10 +149,12 @@ namespace marlin {
     template < typename Config >
     template < typename PointContainer, typename WeightContainer>
      void Handle< types::HistT<Config> >::fillN(
-      const PointContainer &x,
-      const WeightContainer &w ) {
+      const PointContainer &points,
+      const WeightContainer &weights ) {
       // FIXME: only for arrays and vectors
-      fillNImp(&(*x.begin()), &(*x.end()),&(*w.begin()), &(*w.end()));
+      fillNImp(
+        &(*points.begin()), &(*points.end()),
+        &(*weights.begin()), &(*weights.end()));
     }
 
     //--------------------------------------------------------------------------
@@ -171,7 +173,6 @@ namespace marlin {
 
     template < typename Config >
     Handle< types::HistT<Config> > EntrySingle< types::HistT<Config> >::handle() {
-      using Hnd_t = Handle<types::HistT<Config> > ;
       auto hist   = _context.mem->at< Type >( 0 ) ;
       return Handle< Type >(
         _context.mem,

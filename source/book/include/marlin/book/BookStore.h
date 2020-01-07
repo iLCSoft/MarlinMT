@@ -18,13 +18,13 @@
 #include "marlin/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/Types.h"
 #include "marlin/book/Condition.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/EntryData.h"
 #include "marlin/book/Flags.h"
 #include "marlin/book/MemLayout.h"
 #include "marlin/book/Selection.h"
+#include "marlin/book/Types.h"
 
 namespace marlin {
   /// contains classes needed to book and managed booked objects.

@@ -53,6 +53,7 @@ namespace marlin {
        *  @throws BookStoreException when WeakEntry is invalid.
        */
       template <typename T>
+      [[nodiscard]]
       Handle<Manager<T>> handle() const {
         if( ! valid() ) {
           MARLIN_THROW_T( BookStoreException, "Try to bind an expired WeakEntry");  

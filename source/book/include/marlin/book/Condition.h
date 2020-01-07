@@ -92,7 +92,7 @@ namespace marlin {
     class ConditionBuilder {
     public:
       /// implicit cast to Condition.
-      operator Condition() const ;
+      operator Condition() const ; // NOLINT(hicpp-explicit-conversions, google-explicit-constructor)
 
       /// construct new Condition.
       [[nodiscard]] Condition condition() const ;

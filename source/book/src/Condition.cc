@@ -9,7 +9,7 @@
 
 namespace marlin {
   namespace book {
-
+    
     bool rgxEvaluation( const std::string_view &match,
                         const std::string_view &str ) {
       return match == str ;
@@ -44,7 +44,7 @@ namespace marlin {
 
     //--------------------------------------------------------------------------
 
-    // FIXME: performance
+    // TODO: check performance
     Condition ConditionBuilder::condition() const {
       typename Condition::FilterFn_t fn
         = []( const EntryKey & /*key*/) { return true; } ;

@@ -110,7 +110,7 @@ namespace marlin {
       }
 
       std::vector< std::shared_ptr< T > >
-                           _objects; ///< mutable for lazy operation
+                           _objects; 
       std::shared_ptr< T > _mergedObj{nullptr} ;
       std::unique_ptr<
         std::tuple< const typename std::remove_reference< Args_t >::type... > >

@@ -45,10 +45,8 @@ int main (int, char**) {
 
     if(std::rand() > RAND_MAX / 2) {
       ptrH1->Fill({x}, w);
-      std::cout << ptrH1->get().GetBinContent({x});
     } else {
       ptrH2->Fill({x}, w);
-      std::cout << ptrH2->get().GetBinContent({x});
     }
     refHist.Fill({x}, w);
   }

@@ -7,9 +7,9 @@
 #include <vector>
 
 // -- MarlinBook includes
-#include "marlin/book/Types.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/Flags.h"
+#include "marlin/book/Types.h"
 
 
 namespace marlin {
@@ -36,7 +36,7 @@ namespace marlin {
       /// construct a Handle.
       Handle( const std::shared_ptr< MemLayout > &mem,
               const std::shared_ptr< Type > &     obj,
-              const std::shared_ptr<void>& data,
+              std::shared_ptr<void> data,
               Flag_t type,  
               FinalizeFn_t                 finalFn ) ;
 
@@ -55,6 +55,7 @@ namespace marlin {
        *  @param weights container containing N weights
        *  @tparam PointContainer container of Point_t with linear memory, begin() and end()
        *  @tparam WeightContainer container of Weight_t with linear memory, begin() and end()
+       *  @attention objects must be stored in linear memory
        */
       template<typename PointContainer, typename WeightContainer>
       void fillN(
