@@ -1,21 +1,20 @@
 #pragma once
 
 // -- std includes
-#include <type_traits>
-#include <optional>
-#include <vector>
 #include <array>
-#include <string_view>
-#include <string>
-#include <initializer_list>
 #include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 namespace marlin {
   namespace book {
     /// Alias for Types used by MarlinBook
     namespace types {
   
-      // TODO: check for no copy !!
+      // TODO: check for minimal amount of copys 
       /**
        *  @brief collection for Axis Description 
        */
@@ -72,29 +71,34 @@ namespace marlin {
          *         - borders[0] … lower bound
          *         - borders.end … upper bound
          */
-        AxisConfig( std::vector<Precision_t>&& borders) 
+        explicit AxisConfig( std::vector<Precision_t>&& borders) 
           : AxisConfig( "", borders ){}
 
         /// Get Axis Title.
-        const std::string_view title() const { return _title; }
+        [[nodiscard]]
+        std::string_view title() const { return _title; }
 
         /// Get amount of bins.
+        [[nodiscard]]
         std::size_t bins() const { return _bins; }
 
         /// Get lower bound.
+        [[nodiscard]]
         Precision_t min() const { return _min; }
 
         /// Get upper bound.
+        [[nodiscard]]
         Precision_t max() const { return _max; }
 
         /// check if bins are equal sized. 
+        [[nodiscard]]
         bool isRegular() const { return !_iregularBorder.has_value(); }
 
         /** 
          *  @brief get borders, when borders are irregular.
          *  @return vector of irregular borers, or empty vector if bins equal sized. 
          */
-        const std::vector<Precision_t> iregularBorder() const {
+        const std::vector<Precision_t>& iregularBorder() const {
           return _iregularBorder.value_or(std::vector<Precision_t>{});
         }
       private:
@@ -150,6 +154,7 @@ namespace marlin {
       template<typename Config>
       class HistT {
         typename Config::Impl_t& impl() { return _impl; }
+        [[nodiscard]]
         const typename Config::Impl_t& impl() const { return _impl; }
         friend HistT<Config>& add<Config>(HistT<Config>&,const HistT<Config>&);
         friend void add<Config>(const std::shared_ptr<HistT<Config>>&,const std::shared_ptr<HistT<Config>>&);
@@ -170,7 +175,7 @@ namespace marlin {
         /**
          *  @brief non-title 1D-histogram constructor. Only available for 1D-histograms. 
          */
-        HistT(const AxisConfig_t& axis) : HistT("",axis) {}
+        explicit HistT(const AxisConfig_t& axis) : HistT("",axis) {}
 
         /**
          *  @brief non-title 2D-histogram constructor. Only available for 2D-histograms. 
@@ -235,6 +240,7 @@ namespace marlin {
         /**
          *  @brief get read access to actual implementation. 
          */
+        [[nodiscard]]
         const typename Config::Impl_t& get() const { return _impl; }
 
         /**
@@ -244,7 +250,7 @@ namespace marlin {
           return !std::is_same_v<Config::Impl_t, void*>;
         }
 
-      protected:
+      private:
           typename Config::Impl_t _impl{};
       };
 

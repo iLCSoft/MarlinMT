@@ -1,16 +1,23 @@
-#pragma once // TOOD: not used to detect double binding
+#ifndef MARLIN_BOOK_CONFIG
+#define MARLIN_BOOK_CONFIG
+#else
+#error No mutiple binding of MarlinConfig. 
+#endif
 
 #include "marlin/book/configs/Base.h"
 
 // -- ROOT includes
 #include "RVersion.h"
 
+// -- ROOT Files includes
+#include "ROOT/RDirectory.hxx"
+#include "ROOT/RFile.hxx"
+
+// -- ROOT Histogram includes
 #include "ROOT/RHist.hxx"
 #include "ROOT/RHistConcurrentFill.hxx"
 #include "ROOT/RHistData.hxx"
 #include "ROOT/RSpan.hxx"
-#include "ROOT/RFile.hxx"
-#include "ROOT/RDirectory.hxx"
 
 // -- histogram conversion include 
 #include "marlin/book/RootHistV7ToV6Conversion.h"
@@ -48,7 +55,7 @@ namespace marlin {
           = ROOT::Experimental::RHistConcurrentFillManager<Impl, HistogramFillerBufferSize>;\
         static constexpr std::size_t Dimension = static_cast<std::size_t>(Dim);\
       };\
-      using Alias = HistT<HistConfig<double, Weight, Dim>>
+      using Alias = HistT<HistConfig<double, Weight, (Dim)>>
 
       HistConfig_ROOT(H1F, ROOT::Experimental::RH1F, float, 1);
       HistConfig_ROOT(H1D, ROOT::Experimental::RH1D, double, 1);
@@ -150,7 +157,7 @@ namespace marlin {
       }
 
       template<typename Config>
-      void HistT<Config>::template FillN(
+      void HistT<Config>::FillN(
         const typename HistT<Config>::Point_t* pFirst,
         const typename HistT<Config>::Point_t* pLast,
         const typename HistT<Config>::Weight_t* wFirst,
@@ -212,7 +219,7 @@ namespace marlin {
 
 
       template<typename Config>
-      void HistConcurrentFiller<Config>::template FillN(
+      void HistConcurrentFiller<Config>::FillN(
         const typename HistT<Config>::Point_t* pFirst,
         const typename HistT<Config>::Point_t* pLast,
         const typename HistT<Config>::Weight_t* wFirst,
