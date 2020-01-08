@@ -2,6 +2,8 @@
 #define MARLIN_PROCESSORAPI_h 1
 
 // -- std headers
+#include <array>
+#include <filesystem>
 #include <string>
 
 // -- marlin headers
@@ -9,6 +11,12 @@
 #include <marlin/Application.h>
 #include <marlin/GeometryManager.h>
 #include <marlin/MarlinConfig.h>
+
+// -- MarlinBook includes
+#include "marlin/book/BookStore.h"
+#include "marlin/book/Flags.h"
+#include "marlin/book/Handle.h"
+#include "marlin/book/Types.h"
 
 namespace marlin {
 
@@ -31,11 +39,58 @@ namespace marlin {
     ~ProcessorApi() = delete ;
 
     /**
+     *  @brief group function for booking 
+     */
+    struct Store {
+      static constexpr book::Flag_t DefaultConfiguration
+        = book::Flags::Book::MultiShared;
+
+      /**
+       *  @brief Register new Histogram.
+       *  @param proc the processor instance
+       *  @param path to registered histogram
+       *  @param axes array of axis configuration for the Histogram 
+       *  @throw TODO: ErrorType if an Object at path already exist with other type
+       */
+      template<typename HistT>
+      static  book::Handle<book::Manager<HistT>>
+      registerHistogram(
+        const Processor * proc,
+        const std::filesystem::path& path,
+        const std::string_view& title,
+        const std::array<
+          book::types::AxisConfig<typename HistT::Precision_t>,
+          HistT::Dimension>& axes,
+        const book::Flag_t& flags = DefaultConfiguration ) ;
+
+      /**
+       *  @brief Get Handle to existing histogram entry.
+       *  Histograms can registered in steering file or with registerHistogram() 
+       *  @param proc the processor instance
+       *  @param path to registered histogram
+       */
+      template<typename HistT>
+      [[nodiscard]]
+      static book::Handle<book::Manager<HistT>> 
+      getHistogram(const Processor * proc, const std::filesystem::path& path) ;
+
+
+      /**
+       *  @brief register Object to write it at end of lifetime. 
+       *  The same effect can archived with passing the Store flag by registration.
+       *  @param proc the processor instance
+       *  @param path to registered histogram
+       */
+      void writeObject(const Processor * proc, const std::filesystem::path& path) ;
+
+    };
+
+    /**
      *  @brief  Register the processor to get random seeds
      *
      *  @param  proc the processor to register
      */
-    static void registerForRandomSeeds( Processor *const proc ) ;
+    static void registerForRandomSeeds( Processor *const proc ) ; // TOOD: unnecessary const 
 
     /**
      *  @brief  Get a random seed from the event.

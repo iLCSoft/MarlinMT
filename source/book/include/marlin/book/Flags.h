@@ -107,6 +107,8 @@ namespace marlin {
         constexpr Flag_t Single( 1U << 0U ) ;
         /// create one instance witch concurrent access.
         constexpr Flag_t MultiShared( 1U << 1U ) ;
+        /// store object in file at end of lifetime
+        constexpr Flag_t Store( 1U << 2U ) ;
       } // end namespace Book
 
     } // end namespace Flags

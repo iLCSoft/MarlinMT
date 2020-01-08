@@ -14,7 +14,7 @@ namespace marlin {
     /// Alias for Types used by MarlinBook
     namespace types {
   
-      // TODO: check for minimal amount of copys 
+      // TODO: check for minimal amount of copies 
       /**
        *  @brief collection for Axis Description 
        */
