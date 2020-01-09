@@ -78,8 +78,8 @@ void TestEventModifier::processEvent( EventStore * e ) {
 
 void TestEventModifier::end() {
   streamlog_out(MESSAGE4) << name()
-			  << " modified " << _nEvt << " events in " << _nRun << " run "
-			  << std::endl ;
+        << " modified " << _nEvt << " events in " << _nRun << " run "
+        << std::endl ;
 }
 
 MARLIN_DECLARE_PROCESSOR( TestEventModifier )
