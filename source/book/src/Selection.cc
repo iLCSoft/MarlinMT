@@ -47,8 +47,7 @@ namespace marlin {
           _condition = sel.condition() ;
           break ;
         default:
-          MARLIN_THROW_T( BookStoreException,
-                          "Condition compose strategy is not defined." ) ;
+          MARLIN_BOOK_THROW( "Condition compose strategy is not defined." ) ;
       }
     }
 

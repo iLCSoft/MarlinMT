@@ -56,7 +56,7 @@ namespace marlin {
       [[nodiscard]]
       Handle<Manager<T>> handle() const {
         if( ! valid() ) {
-          MARLIN_THROW_T( BookStoreException, "Try to bind an expired WeakEntry");  
+          MARLIN_BOOK_THROW( "Try to bind an expired WeakEntry");  
         }
         return Handle<Manager<T>>(_entry.lock());
       }

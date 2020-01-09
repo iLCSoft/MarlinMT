@@ -139,8 +139,7 @@ namespace marlin {
             auto itoa = [](std::size_t id){
               return std::to_string(id);
             };
-            MARLIN_THROW_T(
-              BookStoreException,
+            MARLIN_BOOK_THROW(
               (std::string("Try to access instances '") + itoa(idx) 
               + "', which is outside of [0;" 
                 + itoa(key.mInstances-1) + "]"));
@@ -193,8 +192,7 @@ namespace marlin {
           if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<T>>)) {
             return handle<T, I + 1>(entry, key, idx);
           } else {
-            MARLIN_THROW_T(
-              BookStoreException,
+            MARLIN_BOOK_THROW(
               "Entry has an invalid Flag combination! Can't create Handle!" ) ; 
           }
         }
@@ -214,8 +212,7 @@ namespace marlin {
       template < class T >
       [[nodiscard]] Handle< T > handle( std::size_t idx = -1 ) const {
         if ( std::type_index( typeid( T ) ) != _key.type ) {
-          MARLIN_THROW_T( BookStoreException,
-                          "Entry is not demanded type. Can't create Handle!" ) ;
+          MARLIN_BOOK_THROW( "Entry is not demanded type. Can't create Handle!" ) ;
         }
         
         return GetFromEntry::handle<T>(_entry, key(), idx);

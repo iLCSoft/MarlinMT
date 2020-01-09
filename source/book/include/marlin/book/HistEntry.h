@@ -102,7 +102,7 @@ namespace marlin {
       /// pointer to data defined from entry.
       std::shared_ptr<void> _data;
       /// entry type decoded as flag.
-      Flag_t _type;
+      const Flag_t _type;
       
     } ;
 

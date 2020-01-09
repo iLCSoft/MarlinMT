@@ -42,8 +42,9 @@ namespace marlin {
      *  @brief group function for booking 
      */
     struct Store {
-      static constexpr book::Flag_t DefaultConfiguration
-        = book::Flags::Book::MultiShared;
+      static constexpr book::Flag_t DefaultConfiguration{
+          book::Flags::value(book::Flags::Book::MultiShared)
+        | book::Flags::value(book::Flags::Book::Store)};
 
       /**
        *  @brief Register new Histogram.
@@ -54,9 +55,9 @@ namespace marlin {
        */
       template<typename HistT>
       static  book::Handle<book::Manager<HistT>>
-      registerHistogram(
-        const Processor * proc,
-        const std::filesystem::path& path,
+      createdHistogram(
+        const Processor * const proc,
+        const std::filesystem::path& pathName,
         const std::string_view& title,
         const std::array<
           book::types::AxisConfig<typename HistT::Precision_t>,
@@ -81,7 +82,9 @@ namespace marlin {
        *  @param proc the processor instance
        *  @param path to registered histogram
        */
-      void writeObject(const Processor * proc, const std::filesystem::path& path) ;
+      void write(const Processor * proc, const std::filesystem::path& path) ;
+      void dontWrite(const Processor * proc, const std::filesystem::path& path) ;
+
 
     };
 
@@ -90,7 +93,7 @@ namespace marlin {
      *
      *  @param  proc the processor to register
      */
-    static void registerForRandomSeeds( Processor *const proc ) ; // TOOD: unnecessary const 
+    static void registerForRandomSeeds( Processor *const proc ) ;
 
     /**
      *  @brief  Get a random seed from the event.

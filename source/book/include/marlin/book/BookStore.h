@@ -40,7 +40,9 @@ namespace marlin {
     class Handle< Manager< T > > {
       friend BookStore ;
       friend WeakEntry ;
-      using IdMap_t = std::unordered_map< std::size_t, std::size_t > ;
+
+      using ThreadId_t = std::thread::id;
+      using IdMap_t = std::unordered_map< ThreadId_t, std::size_t > ;
 
       /// constructor
       explicit Handle( std::shared_ptr< const Entry > entry )
@@ -48,7 +50,7 @@ namespace marlin {
           _mapping( std::make_unique< IdMap_t >() ) {}
 
       /// maps outside id to internal id
-      std::size_t unmap( std::size_t id ) ;
+      std::size_t unmap( const ThreadId_t& id ) ;
 
     public:
       /// no copy
@@ -129,7 +131,7 @@ namespace marlin {
         try {
           return *_entries[key] ;
         } catch ( const std::out_of_range & ) {
-          MARLIN_THROW_T( BookStoreException, "Invalid key." ) ;
+          MARLIN_BOOK_THROW( "Invalid key." ) ;
         }
       }
 
@@ -311,8 +313,7 @@ namespace marlin {
       std::filesystem::path nPath = normalizeDirPath(path);
       nPath /= name;
       if ( !_allowMoving && std::this_thread::get_id() != _constructThread ) {
-        MARLIN_THROW_T( BookStoreException,
-                        "Booking is only allowed "
+        MARLIN_BOOK_THROW( "Booking is only allowed "
                         "from the construction Thread" ) ;
       }
 
@@ -323,8 +324,7 @@ namespace marlin {
             *this, nPath ) ) ;
       }
 
-      MARLIN_THROW_T( BookStoreException,
-                      std::string( "Entry path:'" )
+      MARLIN_BOOK_THROW(std::string( "Entry path:'" )
                         + static_cast< std::string >( nPath ) + "' name:'"
                         + static_cast< std::string >( name )
                         + "' is already booked!" ) ;
@@ -333,7 +333,8 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    std::size_t Handle< Manager< T > >::unmap( std::size_t id ) {
+    std::size_t Handle< Manager< T > >::unmap( 
+        const Handle<Manager<T>>::ThreadId_t& id ) {
       {
         std::shared_lock lock(_mappingAcces);
         auto itr = _mapping->find( id ) ;

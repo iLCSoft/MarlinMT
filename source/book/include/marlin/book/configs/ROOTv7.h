@@ -136,17 +136,6 @@ namespace marlin {
         static_assert(Dimension == 3);
       }
 
-      template<std::size_t D>
-      ROOT::Experimental::Hist::RCoordArray<D> toConfig(const std::array<double, D>& arr) {
-        if constexpr(D == 1) {
-          return ROOT::Experimental::Hist::RCoordArray<1>(arr[0]);
-        } else if constexpr (D == 2) {
-          return ROOT::Experimental::Hist::RCoordArray<2>(arr[0], arr[1]);
-        } else if constexpr (D == 3) {
-          return ROOT::Experimental::Hist::RCoordArray<3>(arr[0], arr[1], arr[2]);
-        }
-      }
-
 
       template<typename Config>
       void HistT<Config>::Fill(

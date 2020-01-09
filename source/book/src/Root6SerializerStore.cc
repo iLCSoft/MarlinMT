@@ -61,9 +61,7 @@ namespace marlin {
         root->mkdir(path.c_str());
         TDirectory *file = root->GetDirectory(path.c_str());
         if(file == nullptr) {
-          MARLIN_THROW_T( 
-            BookStoreException, 
-            std::string("failed create: ") + path + '\n');
+          MARLIN_BOOK_THROW( std::string("failed create: ") + path + '\n');
         }
         if (type == std::type_index(typeid(types::H1F))) {
           writeObject<types::H1F>(file, key.path.filename().string(), h.handle<types::H1F>().merged());
@@ -84,7 +82,7 @@ namespace marlin {
         } else if (type == std::type_index(typeid(types::H3I))){
           writeObject<types::H3I>(file, key.path.filename().string(), h.handle<types::H3I>().merged());
         } else {
-          MARLIN_THROW_T( BookStoreException, "can't store object, no known operation");
+          MARLIN_BOOK_THROW( "can't store object, no known operation" );
         }
       }
       root->Close();

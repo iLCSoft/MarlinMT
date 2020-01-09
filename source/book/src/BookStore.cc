@@ -34,8 +34,7 @@ namespace marlin {
               .insert(
                 std::make_pair( Identifier( key.path ), key.hash ) )
               .second ) {
-        MARLIN_THROW_T( BookStoreException,
-                        "Object already exist. Use store.book to avoid this." ) ;
+        MARLIN_BOOK_THROW( "Object already exist. Use store.book to avoid this." ) ;
       }
       _entries.push_back( std::make_shared< Entry >( Entry( entry, key ) ) ) ;
       return _entries.back() ;
@@ -85,7 +84,9 @@ namespace marlin {
     
     std::filesystem::path BookStore::normalizeDirPath(const std::filesystem::path& path) {
       if(!path.is_absolute() || path.has_filename()) {
-        MARLIN_THROW_T( BookStoreException, std::string("'") + path.string() + "' is not an absolute path to folder!");
+        MARLIN_BOOK_THROW( std::string("'") 
+            + path.string() 
+            + "' is not an absolute path to folder!");
       }
       return std::filesystem::absolute(path);
     }
