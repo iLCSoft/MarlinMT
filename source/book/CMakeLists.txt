@@ -32,7 +32,6 @@ target_include_directories(
 
 target_link_libraries(
   Book PUBLIC
-  Marlin::Core
   ROOT::Core ROOT::RIO ROOT::Hist
 )
 target_link_libraries(
