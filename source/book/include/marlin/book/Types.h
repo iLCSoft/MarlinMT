@@ -29,7 +29,7 @@ namespace marlin {
       };
 
 
-      BookStoreException::BookStoreException(unsigned int line,
+      inline BookStoreException::BookStoreException(unsigned int line,
           const char * func,
           const char * fname,
           const std::string_view& message) 
@@ -39,7 +39,7 @@ namespace marlin {
           + func + ": " + message
       } {}
 
-      const char* BookStoreException::what() const noexcept {
+      inline const char* BookStoreException::what() const noexcept {
         return _message.c_str();
       }
     } // end namespace exceptions
