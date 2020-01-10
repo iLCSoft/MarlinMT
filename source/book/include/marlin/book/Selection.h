@@ -22,7 +22,6 @@ namespace marlin {
     template < typename >
     class Manager ;
     class Selection;
-    class ISerelizerStore;
 
     /**
      *  @brief Wrapper for weak pointer to Entry. Mainly used for Selections. 

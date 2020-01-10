@@ -7,7 +7,7 @@
 // -- MarlinBook includes
 #include "marlin/book/Condition.h"
 #include "marlin/book/Selection.h"
-#include "marlin/book/Serializer.h"
+#include "marlin/book/StoreWriter.h"
 
 // -- ROOT includes
 #include "TDirectory.h"
@@ -42,8 +42,8 @@ namespace marlin {
     
     //--------------------------------------------------------------------------
   
-    void BookStore::store(ISerializerStore& serializer) const {
-      serializer.writeSelection(
+    void BookStore::store(StoreWriter& writer) const {
+      writer.writeSelection(
         Selection::find(
           _entries.begin(),
           _entries.end(),

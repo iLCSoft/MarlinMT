@@ -31,7 +31,7 @@ namespace marlin {
   namespace book {
 
     // -- MarlinBook forward declaration
-    class ISerializerStore;
+    class StoreWriter;
 
     template < typename T >
     class Manager {} ;
@@ -234,7 +234,7 @@ namespace marlin {
        *  @throw BookStoreException when: Sere kisser 
        *    - directory to store not exist.
        */
-      void store(ISerializerStore& serializer) const ;
+      void store(StoreWriter& writer) const ;
 
     private:
       /// stores Entries created by BookStore.

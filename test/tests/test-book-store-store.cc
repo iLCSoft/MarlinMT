@@ -12,7 +12,7 @@
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"
-#include "marlin/book/Serializer.h"
+#include "marlin/book/StoreWriter.h"
 
 using namespace marlin::book ;
 using namespace marlin::book::types ;
@@ -245,12 +245,12 @@ int main( int /*argc*/, char * /*argv*/[] ) {
   BookStore store{} ;
   try {
     bluePrint.Create( store ) ;
-  } catch ( const marlin::BookStoreException &expc ) {
+  } catch ( const marlin::book::exceptions::BookStoreException &expc ) {
     test.test( std::string( "unexpected error: '" ) + expc.what() + "'",
                false ) ;
   }
 
-  Root6SerializerStore ser( pathRootFile ) ;
+  StoreWriter ser( pathRootFile ) ;
   store.store( ser ) ;
 
   TFile *file = TFile::Open( pathRootFile.string().c_str(), "READ" ) ;
