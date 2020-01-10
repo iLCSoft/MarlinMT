@@ -4,6 +4,7 @@
 // -- std headers
 #include <array>
 #include <filesystem>
+#include <optional>
 #include <string>
 
 // -- marlin headers
@@ -41,7 +42,11 @@ namespace marlin {
     /**
      *  @brief group function for booking 
      */
-    struct Store {
+    class Store {
+      template<typename T>
+      static std::optional<book::Handle<book::Manager<T>>>
+      getObject( const std::filesystem::path& pathName ) ;
+    public:
       static constexpr book::Flag_t DefaultConfiguration{
           book::Flags::value(book::Flags::Book::MultiShared)
         | book::Flags::value(book::Flags::Book::Store)};
@@ -69,6 +74,7 @@ namespace marlin {
        *  Histograms can registered in steering file or with registerHistogram() 
        *  @param proc the processor instance
        *  @param path to registered histogram
+       *  @throw TODO: ErrorType if path don't belong to an Object.
        */
       template<typename HistT>
       [[nodiscard]]
@@ -85,7 +91,9 @@ namespace marlin {
       void write(const Processor * proc, const std::filesystem::path& path) ;
       void dontWrite(const Processor * proc, const std::filesystem::path& path) ;
 
-
+    private:
+      friend void registerStore(std::unique_ptr<book::BookStore>&& store);
+      static std::unique_ptr<book::BookStore> _store;
     };
 
     /**
@@ -166,6 +174,58 @@ namespace marlin {
   template <typename HANDLER>
   inline const HANDLER* ProcessorApi::geometry( const Processor *const proc ) {
     return proc->app().geometryManager().geometry<HANDLER>() ;
+  }
+
+  //--------------------------------------------------------------------------
+
+  template<typename HistT>
+  book::Handle<book::Manager<HistT>>
+  ProcessorApi::Store::createdHistogram(
+    const Processor * const proc,
+    const std::filesystem::path& pathName,
+    const std::string_view& title,
+    const std::array<
+      book::types::AxisConfig<typename HistT::Precision_t>,
+      HistT::Dimension>& axes,
+    const book::Flag_t& flags ) {
+    using namespace book;
+    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
+    if ( res ) {
+      return res.value();
+    }
+    return _store->book( 
+        std::filesystem::path(proc->name()) / pathName, 
+        EntryData<HistT>( axes, flags ));
+  } 
+
+  //--------------------------------------------------------------------------
+
+  template<typename HistT>
+  book::Handle<book::Manager<HistT>> 
+  ProcessorApi::Store::getHistogram(const Processor * proc, const std::filesystem::path& path) 
+  {
+    using namespace book;
+    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(path);
+    if ( res ) {
+      return res.value();
+    }
+    throw std::exception();
+  }
+
+  //--------------------------------------------------------------------------
+
+  template<typename T>
+  std::optional<book::Handle<book::Manager<T>>>
+  ProcessorApi::Store::getObject( const std::filesystem::path& pathName ) {
+    using namespace book;
+    using namespace book;
+    Selection res = _store->find( 
+        ConditionBuilder().setType(typeid(T)).setPath(pathName.string()));
+    if ( res.size() != 1 ) {
+      return std::nullopt;
+    }
+    return std::optional(res.get(0).handle<T>());
+
   }
 
 }

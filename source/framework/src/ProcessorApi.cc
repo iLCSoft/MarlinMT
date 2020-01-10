@@ -1,10 +1,20 @@
 #include <marlin/ProcessorApi.h>
 
+// -- std headers
+#include <utility>
+
 // -- marlin headers
 #include <marlin/Exceptions.h>
 #include <marlin/EventExtensions.h>
 
 namespace marlin {
+
+  std::unique_ptr<book::BookStore> ProcessorApi::Store::_store{nullptr};
+  void ProcessorApi::Store::registerStore(std::unique_ptr<book::BookStore>&& store) {
+    std::swap(_store, store); 
+  }
+
+  //--------------------------------------------------------------------------
 
   void ProcessorApi::registerForRandomSeeds( Processor *const proc ) {
     proc->app().randomSeedManager().addEntry( proc ) ;
