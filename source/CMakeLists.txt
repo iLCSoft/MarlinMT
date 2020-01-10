@@ -3,6 +3,8 @@
 # @author Remi Ete, DESY
 #################################
 
+# MarlinBook and framework
+add_subdirectory( book )
 add_subdirectory( framework )
 
 # ----- MarlinDD4hep 
@@ -27,8 +29,5 @@ if( MARLIN_GUI )
   add_subdirectory( gui )
 endif()
 
-# MarlinBooK
-if( MARLIN_BOOK )
-    add_subdirectory( book )
-endif()
+
 
