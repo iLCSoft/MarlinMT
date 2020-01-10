@@ -12,20 +12,62 @@
 include( GNUInstallDirs )
 include( MarlinMacros )
 
-macro( MARLIN_OPTION opt )
-  option( ${opt} ${ARGN} )
-  list( APPEND MARLIN_CMAKE_OPTIONS ${opt} )
+macro( MARLIN_OPTION )
+  cmake_parse_arguments(ARG "CACHE" "NAME;VALUE;DOC" "POSSIBLE_VALUES" ${ARGN} )
+  if( ARG_CACHE )
+    # is cache variable set by command line ?
+    if( NOT DEFINED ${ARG_NAME} )
+      set( ${ARG_NAME} ${ARG_VALUE} )
+    endif()
+    if( NOT ${${ARG_NAME}} IN_LIST ARG_POSSIBLE_VALUES )
+      message( FATAL_ERROR "Cache option ${ARG_NAME}: invalid value '${${ARG_NAME}}'. Possible values: ${ARG_POSSIBLE_VALUES}" )
+    endif()
+    set( ${ARG_NAME} ${${ARG_NAME}} CACHE STRING ${ARG_DOC} FORCE )
+  else()
+    option( ${ARG_NAME} ${ARG_DOC} ${ARG_VALUE} )
+  endif()
+  list( APPEND MARLIN_CMAKE_OPTIONS ${ARG_NAME} )
   list( REMOVE_DUPLICATES MARLIN_CMAKE_OPTIONS )
 endmacro()
 
 # CMake options
-marlin_option( MARLIN_LCIO                  "Set to ON to build Marlin with LCIO support" ON )
-marlin_option( MARLIN_BOOK                  "Set to ON to build Marlin with book store functionality (requires ROOT7 !)" OFF )
-marlin_option( MARLIN_DD4HEP                "Set to ON to build Marlin with DD4hep" ON )
-marlin_option( MARLIN_GEAR                  "Set to ON to build Marlin with Gear" OFF )
-marlin_option( MARLIN_DOXYGEN               "Set to ON to build/install Doxygen documentation" OFF )
-marlin_option( MARLIN_MKDOCS                "Set to ON to build/install mkdocs documentation" OFF )
-marlin_option( MARLIN_WERROR                "Set to ON to compile Marlin with -Werror" OFF )
+marlin_option( 
+  NAME MARLIN_LCIO
+  VALUE ON
+  DOC "Set to ON to build Marlin with LCIO support"
+)
+marlin_option( 
+  NAME MARLIN_DD4HEP
+  VALUE ON
+  DOC "Set to ON to build Marlin with DD4hep"
+)
+marlin_option( 
+  NAME MARLIN_GEAR
+  VALUE OFF                 
+  DOC "Set to ON to build Marlin with Gear"
+)
+marlin_option( 
+  NAME MARLIN_DOXYGEN
+  VALUE OFF 
+  DOC "Set to ON to build/install Doxygen documentation"
+)
+marlin_option( 
+  NAME MARLIN_MKDOCS
+  VALUE OFF
+  DOC "Set to ON to build/install mkdocs documentation"
+)
+marlin_option( 
+  NAME MARLIN_WERROR
+  VALUE OFF
+  DOC "Set to ON to compile Marlin with -Werror"
+)
+marlin_option(
+  NAME MARLIN_BOOK_IMPL
+  VALUE dummy
+  DOC "The Marlin Book implementation"
+  CACHE 
+  POSSIBLE_VALUES root7 dummy
+)
 
 # List of compiler we want to compile Marlin with.
 # The list is purified using MarlinSupportedCompilerFlags
