@@ -11,25 +11,19 @@ namespace marlin {
     class Entry;
     class Selection;
 
-    class ISerializerStore {
+    class StoreWriter {
     public:
-      virtual void 
-      writeSelection  (
-        const Selection             &sel
-      ) = 0;
-    };
-
-    class Root6SerializerStore : public ISerializerStore {
-    public:
-      explicit Root6SerializerStore(std::filesystem::path path)
+      explicit StoreWriter(std::filesystem::path path)
         : _path(std::move(path)){}
-      Root6SerializerStore() = default ;
+      StoreWriter() = default ;
       void writeSelection (
         const Selection             &sel
-      ) final;
+      ) ;
     private:
       std::filesystem::path _path{""};
     };
+
+
 
   } // end namespace book
 } // end namespace marlin

@@ -1,4 +1,4 @@
-#include "marlin/book/Serializer.h"
+#include "marlin/book/StoreWriter.h"
 
 // -- std includes
 #include <filesystem>
@@ -11,6 +11,7 @@
 #include "marlin/book/Hist.h"
 #include "marlin/book/Selection.h"
 #include "marlin/book/Types.h"
+
 
 // -- ROOT includes
 #include "TDirectory.h"
@@ -43,7 +44,7 @@ void writeObject( TDirectory* file, const std::string_view& name, const T& obj) 
 namespace marlin {
   namespace book {
 
-    void Root6SerializerStore::writeSelection(
+    void StoreWriter::writeSelection(
       const Selection             &selection
     ) {
       DirectoryMap dirs{};
@@ -91,3 +92,4 @@ namespace marlin {
 
   } // end namespace book
 } // end namespace marlin
+
