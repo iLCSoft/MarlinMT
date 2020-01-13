@@ -40,6 +40,7 @@ target_include_directories(
 target_link_libraries( 
   Core PUBLIC
   Threads::Threads
+  Marlin::Book
   ${streamlog_LIBRARIES} 
   ${TinyXML_LIBRARY}
   ${CMAKE_DL_LIBS} 
