@@ -29,11 +29,11 @@ namespace marlin {
     class WeakEntry {
       friend Selection ;
         
-    public:
       // constructor
       explicit WeakEntry( const std::shared_ptr< const Entry > &entry ) ;
       // constructor
       explicit WeakEntry( const std::shared_ptr< Entry > &entry ) ;
+    public:
 
       /**
        *  @brief check if WeakEntry is usable.

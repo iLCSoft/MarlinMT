@@ -6,9 +6,6 @@
 #include  <string>
 #include  <typeindex>
 
-// -- Marlin includes
-// #include  "marlin/Exceptions.h"
-
 // -- MarlinBook includes
 #include  "marlin/book/Flags.h"
 #include  "marlin/book/Types.h"

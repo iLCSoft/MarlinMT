@@ -46,6 +46,8 @@ namespace marlin {
       template<typename T>
       static std::optional<book::Handle<book::Manager<T>>>
       getObject( const std::filesystem::path& pathName ) ;
+      // TODO: add friends which set this 
+      void registerStore(std::unique_ptr<book::BookStore>&& store);
     public:
       static constexpr book::Flag_t DefaultConfiguration{
           book::Flags::value(book::Flags::Book::MultiShared)
@@ -92,7 +94,6 @@ namespace marlin {
       void dontWrite(const Processor * proc, const std::filesystem::path& path) ;
 
     private:
-      friend void registerStore(std::unique_ptr<book::BookStore>&& store);
       static std::unique_ptr<book::BookStore> _store;
     };
 
@@ -105,7 +106,7 @@ namespace marlin {
 
     /**
      *  @brief  Get a random seed from the event.
-     *  Your processor must have been registered before hand using registerForRandomSeeds()
+     *  Your processor must have been registered beforehand using registerForRandomSeeds()
      *
      *  @param  proc the processor instance
      *  @param  event the current event from which to get random seeds
@@ -190,6 +191,7 @@ namespace marlin {
     const book::Flag_t& flags ) {
     using namespace book;
     std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
+    // TODO: decision: need more test? 
     if ( res ) {
       return res.value();
     }
