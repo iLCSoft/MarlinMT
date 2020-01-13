@@ -35,13 +35,6 @@ marlin_add_test (
 )
 
 if("${MARLIN_BOOK_IMPL}" STREQUAL "root7")
-	marlin_add_test(
-		benchmark-book-store
-		BUILD_EXEC
-		REGEX_FAIL "TEST_FAILED"
-		COMPONENTS Marlin::Book
-	)
-
 	marlin_add_test (
 		test-mem-layout
 		BUILD_EXEC
