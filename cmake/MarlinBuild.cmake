@@ -66,7 +66,7 @@ marlin_option(
   VALUE dummy
   DOC "The Marlin Book implementation"
   CACHE 
-  POSSIBLE_VALUES root7 dummy
+  POSSIBLE_VALUES root6 root7 dummy
 )
 
 # List of compiler we want to compile Marlin with.
