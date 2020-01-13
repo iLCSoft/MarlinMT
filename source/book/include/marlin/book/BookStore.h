@@ -66,7 +66,7 @@ namespace marlin {
       /// custom move (atomic is not movable)
       Handle &operator=( Handle &&hnd ) noexcept ;
 
-      Handle< T > handle( std::size_t id ) ;
+      Handle< T > handle( const ThreadId_t& id ) ;
 
       const T& merged() const ;
 
@@ -381,7 +381,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    Handle< T > Handle< Manager< T > >::handle( std::size_t id ) {
+    Handle< T > Handle< Manager< T > >::handle( const Handle<Manager<T>>::ThreadId_t& id ) {
       return _entry->handle< T >( unmap( id ) ) ;
     }
 

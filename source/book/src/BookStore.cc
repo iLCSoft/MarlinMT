@@ -9,18 +9,12 @@
 #include "marlin/book/Selection.h"
 #include "marlin/book/StoreWriter.h"
 
-// -- ROOT includes
-#include "TDirectory.h"
-#include "TDirectoryFile.h"
-#include "TFile.h"
-
 class PathHash {
 public:
   std::size_t operator()(const std::filesystem::path& path) const {
     return std::filesystem::hash_value(path);
   }
 };
-using DirectoryMap = std::unordered_map<std::filesystem::path, TDirectory*, PathHash>;
 
 namespace marlin {
   namespace book {

@@ -1,6 +1,7 @@
 #include <UnitTesting.h>
 #include <thread>
 
+#include "marlin/book/configs/ROOTv7.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"
@@ -14,6 +15,9 @@ std::string unicStr() {
 }
 
 int main( int /*argc*/, char * /*argv*/[] ) {
+
+  std::array<std::thread::id, 3> tids;
+
   marlin::test::UnitTest test( " BookStore: Store/Fill " ) ;
   constexpr std::size_t  bins         = 3 ;
   constexpr float        min          = -1.F ;
@@ -26,7 +30,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       Handle< Manager< H1F > > entry
         = store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
 
-      Handle< H1F > hnd = entry.handle( 0 ) ;
+      Handle< H1F > hnd = entry.handle( tids[0] ) ;
       std::vector< typename decltype( hnd )::Point_t> xs ;
       std::vector< typename decltype( hnd )::Weight_t >     ws ;
       for ( int i = 0; i < nItrerations; ++i ) {
@@ -43,7 +47,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       try {
         Handle< Manager< H1F > > entry
           = store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
-      } catch ( const marlin::BookStoreException & ) {
+      } catch ( const exceptions::BookStoreException & ) {
         error = true ;
       }
       test.test( "No Double booking.", error ) ;
@@ -51,17 +55,17 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     {
       Handle e = store.book(
         "/path/", unicStr(), EntryData< H1F >( "title", axis ).single() ) ;
-      e.handle( 1 ).fill( {0}, 1 ) ;
-      test.test( "Named Histograms", e.handle( 1 ).merged().get().GetEntries() == 1 ) ;
+      e.handle( tids[1] ).fill( {0}, 1 ) ;
+      test.test( "Named Histograms", e.handle( tids[1] ).merged().get().GetEntries() == 1 ) ;
     }
     {
       Handle< Manager< H1I > > entry = store.book(
         "/path_2/", "name", EntryData< H1I >( axis ).multiCopy( 2 ) ) ;
 
-      auto hnd = entry.handle( 0 ) ;
+      auto hnd = entry.handle( tids[0] ) ;
       hnd.fill( {0}, 1 ) ;
 
-      auto hnd2 = entry.handle( 1 ) ;
+      auto hnd2 = entry.handle( tids[1] ) ;
       hnd2.fill( {0}, 1 ) ;
 
       auto hist = hnd.merged() ;
@@ -71,10 +75,10 @@ int main( int /*argc*/, char * /*argv*/[] ) {
 
       Handle< Manager< H1I > > entry = store.book(
         "/path_3/", "name", EntryData< H1I >( axis ).multiShared() ) ;
-      auto hnd = entry.handle( 1 ) ;
+      auto hnd = entry.handle( tids[1] ) ;
       hnd.fill( {0}, 1 ) ;
 
-      auto hnd2 = entry.handle( 2 ) ;
+      auto hnd2 = entry.handle( tids[2] ) ;
       hnd2.fill( {0}, 1 ) ;
 
       auto hist = hnd.merged() ;
@@ -101,14 +105,14 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       std::thread t1( [&store, &errorThrown, &axis]() {
         try {
           store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
-        } catch ( const marlin::BookStoreException & ) {
+        } catch ( const exceptions::BookStoreException & ) {
           errorThrown = true ;
         }
       } ) ;
       t1.join() ;
       test.test( "prevent booking from other threads", errorThrown ) ;
     }
-  } catch ( const marlin::BookStoreException &excp ) {
+  } catch ( const exceptions::BookStoreException &excp ) {
     test.test( std::string( "Unexpected exception: '" ) + excp.what() + "'",
                false ) ;
   }

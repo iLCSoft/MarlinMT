@@ -8,6 +8,8 @@
 
 #include <UnitTesting.h>
 
+#include "marlin/book/configs/ROOTv7.h"
+
 #include "marlin/book/Handle.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Hist.h"
@@ -20,11 +22,13 @@ constexpr std::pair<float, float> range(0, 1000);
 int main(int /*argc*/, char * /*argv*/[])
 {
 
+  const std::thread::id& tid = std::this_thread::get_id();
+
   marlin::test::UnitTest test(" Performance Test Filling: ");
 
   marlin::book::BookStore store;
   marlin::book::Handle entry = store.book("/", "hist", marlin::book::EntryData<marlin::book::types::H1F>("title", {"a", 250, range.first, range.second}).single());
-  marlin::book::Handle hist = entry.handle(0);
+  marlin::book::Handle hist = entry.handle(tid);
   ROOT::Experimental::RH1F rhist("title", {"a", 250, range.first, range.second});
 
   std::array<float, nWrites> numbers;

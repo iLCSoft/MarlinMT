@@ -141,7 +141,7 @@ namespace marlin {
       void HistT<Config>::Fill(
           const typename HistT<Config>::Point_t& p,
           const typename HistT<Config>::Weight_t& w) {
-        _impl.Fill(toConfig(p), w);
+        _impl.Fill(p);
         static_assert(std::is_same_v<typename Config::Precision_t, double>);
       }
 

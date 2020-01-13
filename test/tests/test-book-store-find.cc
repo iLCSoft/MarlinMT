@@ -1,5 +1,6 @@
 #include <UnitTesting.h>
 
+#include "marlin/book/configs/ROOTv7.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"
@@ -123,20 +124,21 @@ int main( int /*argc*/, char * /*argv*/[] ) {
                  equal && rem2.size() == 0 && selAll.size() == 0 ) ;
     }
     {
+      const std::thread::id& tid = std::this_thread::get_id();
       BookStore                 store{} ;
       Handle< Manager< H1F > > e
         = store.book( "/path/", "my Name", EntryData< H1F >( axis ).single() ) ;
-      e.handle( 1 ).fill( {0}, 1 ) ;
+      e.handle( tid  ).fill( {0}, 1 ) ;
 
       Selection sel    = store.find( ConditionBuilder().setName( "my Name" ) ) ;
-      Handle< H1F > h = sel.begin()->handle< H1F >().handle( 1 ) ;
+      Handle< H1F > h = sel.begin()->handle< H1F >().handle( tid ) ;
       h.fill( {0}, 1 ) ;
 
       test.test( "Get booked entry from BookStore",
-                 e.handle( 1 ).merged().get().GetBinContent( {0} ) == 2
+                 e.handle( tid ).merged().get().GetBinContent( {0} ) == 2
                    && h.merged().get().GetBinContent( {0} ) == 2 ) ;
     }
-  } catch ( const marlin::BookStoreException &excp ) {
+  } catch ( const exceptions::BookStoreException &excp ) {
     test.test( std::string( "unexpected exception: '" ) + excp.what() + "'",
                false ) ;
   }

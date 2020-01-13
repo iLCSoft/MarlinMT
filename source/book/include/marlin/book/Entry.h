@@ -135,7 +135,7 @@ namespace marlin {
 
       struct GetFromEntry {
         static void ThrowIfOutOfBound(const EntryKey& key, std::size_t idx) {
-          if(idx < 0 || idx >= key.mInstances) {
+          if(idx >= key.mInstances) {
             auto itoa = [](std::size_t id){
               return std::to_string(id);
             };

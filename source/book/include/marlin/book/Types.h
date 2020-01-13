@@ -1,7 +1,6 @@
 #pragma once
 
-// TODO: use CMAKE %HistBackend% (ROOTv7|Dummy)
-# include "marlin/book/configs/ROOTv7.h"
+# include "marlin/book/configs/Base.h"
 
 // -- std includes
 #include <exception>
@@ -36,7 +35,7 @@ namespace marlin {
       : _message{
         std::string(fname) 
           + " (l." + std::to_string(line) + ") in " 
-          + func + ": " + message
+          + func + ": " + std::string(message)
       } {}
 
       inline const char* BookStoreException::what() const noexcept {

@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <type_traits>
 
+#include "marlin/book/configs/ROOTv7.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"

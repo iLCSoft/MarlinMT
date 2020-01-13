@@ -6,6 +6,7 @@
 #include <vector>
 
 // -- MarlinBook includes
+#include "marlin/book/configs/ROOTv7.h"
 #include "marlin/book/Entry.h"
 #include "marlin/book/Handle.h"
 #include "marlin/book/Hist.h"

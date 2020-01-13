@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include <UnitTesting.h>
+#include "marlin/book/configs/ROOTv7.h"
 #include "marlin/book/Types.h"
 #include "marlin/book/MemLayout.h"
 
