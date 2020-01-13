@@ -50,7 +50,7 @@ namespace marlin {
       EntryDataBase()                                   = default ;
       EntryDataBase( const EntryDataBase & )            = delete ;
       EntryDataBase &operator=( const EntryDataBase & ) = delete ;
-      EntryDataBase( EntryDataBase && )                 = delete ;
+      EntryDataBase( EntryDataBase<void> && )           = delete ;
       EntryDataBase &operator=( EntryDataBase && )      = delete ;
       ~EntryDataBase()                                  = default ;
 

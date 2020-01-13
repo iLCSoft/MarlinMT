@@ -30,14 +30,14 @@ namespace marlin {
       /**
        *  @brief construct EntryData for single booking.
        */
-      EntryData< Type, Flags::value( Flags::Book::Single ) >
+      [[nodiscard]] EntryData< Type, Flags::value( Flags::Book::Single ) >
       single() const ;
 
       /**
        *  @brief construct EntryData for multi copy booking.
        *  @param n number of memory instances which should be constructed
        */
-      [[nodiscard]] EntryData< Type,  Flags::value( Flags::Book::MultiCopy ) >
+      [[nodiscard]] EntryData< Type, Flags::value( Flags::Book::MultiCopy ) >
       multiCopy( std::size_t n ) const ;
 
       /**

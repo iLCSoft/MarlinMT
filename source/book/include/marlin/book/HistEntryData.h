@@ -77,6 +77,17 @@ namespace marlin {
                  const typename Type::AxisConfig_t &x_axis,
                  const typename Type::AxisConfig_t &y_axis,
                  const typename Type::AxisConfig_t &z_axis ) ;
+
+      /**
+       *  @brief Constructor.
+       *  @param title of Histogram
+       *  @param axes configurations for [1|2|3] ax[i|e]s 
+       */
+      EntryData( const std::string_view& title,
+                 const std::array<types::AxisConfig<
+                  typename Config::Precision_t>
+                  , Config::Dimension>& axes) ;
+
     } ;
 
 

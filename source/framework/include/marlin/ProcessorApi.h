@@ -46,6 +46,7 @@ namespace marlin {
       template<typename T>
       static std::optional<book::Handle<book::Manager<T>>>
       getObject( const std::filesystem::path& pathName ) ;
+
       // TODO: add friends which set this 
       void registerStore(std::unique_ptr<book::BookStore>&& store);
     public:
@@ -193,21 +194,35 @@ namespace marlin {
     std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
     // TODO: decision: need more test? 
     if ( res ) {
-      return res.value();
+      return std::move(res.value());
     }
+    std::filesystem::path path 
+      = (std::filesystem::path(proc->name()) / pathName).remove_filename() ;
+    if ( flags.contains(book::Flags::Book::MultiCopy) ) {
+      return _store->book(
+        path,
+        pathName.filename().string(),
+        EntryData<HistT>(title, axes).multiCopy(1 /* FIXME: need a number */));
+    } else if ( flags.contains(book::Flags::Book::MultiShared)){
+      return _store->book(
+        path,
+        pathName.filename().string(),
+        EntryData<HistT>(title, axes).multiShared()); 
+    } 
     return _store->book( 
-        std::filesystem::path(proc->name()) / pathName, 
-        EntryData<HistT>( axes, flags ));
+        path,
+        pathName.filename().string(),
+        EntryData<HistT>( title, axes).single());
   } 
 
   //--------------------------------------------------------------------------
 
   template<typename HistT>
   book::Handle<book::Manager<HistT>> 
-  ProcessorApi::Store::getHistogram(const Processor * proc, const std::filesystem::path& path) 
+  ProcessorApi::Store::getHistogram(const Processor * proc, const std::filesystem::path& pathName) 
   {
     using namespace book;
-    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(path);
+    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
     if ( res ) {
       return res.value();
     }
@@ -222,7 +237,10 @@ namespace marlin {
     using namespace book;
     using namespace book;
     Selection res = _store->find( 
-        ConditionBuilder().setType(typeid(T)).setPath(pathName.string()));
+        ConditionBuilder()
+          .setType(typeid(T))
+          .setPath(std::filesystem::path(pathName).remove_filename().string())
+          .setName(pathName.filename().c_str()));
     if ( res.size() != 1 ) {
       return std::nullopt;
     }

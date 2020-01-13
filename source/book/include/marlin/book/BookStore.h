@@ -182,8 +182,8 @@ namespace marlin {
 
     public:
       explicit BookStore( bool allowMoving = false )
-        : _constructThread( std::this_thread::get_id() ), _allowMoving{
-                                                            allowMoving} {}
+        : _constructThread( std::this_thread::get_id() ), 
+          _allowMoving{allowMoving} {}
 
       /**
        *  @brief book new object.
@@ -234,7 +234,7 @@ namespace marlin {
        *  @throw BookStoreException when: Sere kisser 
        *    - directory to store not exist.
        */
-      void store(StoreWriter& writer) const ;
+      void store( StoreWriter& writer ) const ;
 
     private:
       /// stores Entries created by BookStore.
@@ -358,7 +358,7 @@ namespace marlin {
 
     template < typename T >
     Handle< Manager< T > >::Handle( Handle &&hnd ) noexcept
-      : _entry( nullptr ), _mapping( nullptr ), _count( hnd._count ) {
+      : _entry( nullptr ), _mapping( nullptr ), _count( hnd._count.load() ) {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
 
@@ -372,7 +372,7 @@ namespace marlin {
                             operator=( Handle<Manager<T>> &&hnd ) noexcept {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
-      _count       = hnd.load() ;
+      _count       = hnd._count.load() ;
 
       hnd._entry.reset() ;
       return *this ;
