@@ -34,40 +34,42 @@ marlin_add_test (
   REGEX_FAIL "TEST_FAILED"
 )
 
-marlin_add_test(
-	benchmark-book-store
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-	COMPONENTS Marlin::Book
-)
+if("${MARLIN_BOOK_IMPL}" STREQUAL "root7")
+	marlin_add_test(
+		benchmark-book-store
+		BUILD_EXEC
+		REGEX_FAIL "TEST_FAILED"
+		COMPONENTS Marlin::Book
+	)
 
-marlin_add_test (
-	test-mem-layout
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-  COMPONENTS Marlin::Book
-)
+	marlin_add_test (
+		test-mem-layout
+		BUILD_EXEC
+		REGEX_FAIL "TEST_FAILED"
+		COMPONENTS Marlin::Book
+	)
 
-marlin_add_test (
-	test-book-store-book
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-  COMPONENTS Marlin::Book
-)
+	marlin_add_test (
+		test-book-store-book
+		BUILD_EXEC
+		REGEX_FAIL "TEST_FAILED"
+		COMPONENTS Marlin::Book
+	)
 
-marlin_add_test (
-	test-book-store-find
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-	COMPONENTS Marlin::Book
-)
+	marlin_add_test (
+		test-book-store-find
+		BUILD_EXEC
+		REGEX_FAIL "TEST_FAILED"
+		COMPONENTS Marlin::Book
+	)
 
-marlin_add_test (
-	test-book-store-store
-	BUILD_EXEC
-	REGEX_FAIL "TEST_FAILED"
-	COMPONENTS Marlin::Book
-)
+	marlin_add_test (
+		test-book-store-store
+		BUILD_EXEC
+		REGEX_FAIL "TEST_FAILED"
+		COMPONENTS Marlin::Book
+	)
+endif()
 
 marlin_add_test (
   marlinminusx
