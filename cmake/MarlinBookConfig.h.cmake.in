@@ -18,12 +18,6 @@ namespace marlin {
     template <typename P, typename W, std::size_t D>
     using HistT = types::HistT<HistConfig<P, W, D>> ;
     
-    template <typename P, typename W, std::size_t D>
-    using HistConcurrentFillManager = types::HistConcurrentFillManager<HistConfig<P, W, D>> ;
-    
-    template <typename P, typename W, std::size_t D>
-    using HistConcurrentFiller = types::HistConcurrentFiller<HistConfig<P, W, D>> ;
-    
     template <typename T>
     class Entry ;
     
