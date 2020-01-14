@@ -16,8 +16,6 @@ std::string unicStr() {
 
 int main( int /*argc*/, char * /*argv*/[] ) {
 
-  std::array<std::thread::id, 3> tids;
-
   marlin::test::UnitTest test( " BookStore: Store/Fill " ) ;
   constexpr std::size_t  bins         = 3 ;
   constexpr float        min          = -1.F ;
@@ -30,7 +28,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       Handle< Entry< H1F > > entry
         = store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
 
-      Handle< H1F > hnd = entry.handle( tids[0] ) ;
+      Handle< H1F > hnd = entry.handle() ;
       std::vector< typename decltype( hnd )::Point_t> xs ;
       std::vector< typename decltype( hnd )::Weight_t >     ws ;
       for ( int i = 0; i < nItrerations; ++i ) {
@@ -55,33 +53,42 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     {
       Handle e = store.book(
         "/path/", unicStr(), EntryData< H1F >( "title", axis ).single() ) ;
-      e.handle( tids[1] ).fill( {0}, 1 ) ;
-      test.test( "Named Histograms", e.handle( tids[1] ).merged().get().GetEntries() == 1 ) ;
+      e.handle().fill( {0}, 1 ) ;
+      test.test( "Named Histograms", e.handle().merged().get().GetEntries() == 1 ) ;
     }
     {
       Handle< Entry< H1I > > entry = store.book(
-        "/path_2/", "name", EntryData< H1I >( axis ).multiCopy( 2 ) ) ;
+        "/path_2/", "name", EntryData< H1I >( axis ).multiCopy( 3 ) ) ;
 
-      auto hnd = entry.handle( tids[0] ) ;
-      hnd.fill( {0}, 1 ) ;
+      std::thread t1([&entry]() { 
+          auto hnd = entry.handle(); 
+          hnd.fill({0}, 1);});
 
-      auto hnd2 = entry.handle( tids[1] ) ;
-      hnd2.fill( {0}, 1 ) ;
+      std::thread t2([&entry]() { 
+          auto hnd = entry.handle(); 
+          hnd.fill({0}, 1);});
 
-      auto hist = hnd.merged() ;
+      t1.join(); t2.join();
+
+      auto hist = entry.handle().merged() ;
       test.test( "MultiCopy Hist Filling", hist.get().GetBinContent( {0} ) == 2 ) ;
     }
     {
 
       Handle< Entry< H1I > > entry = store.book(
         "/path_3/", "name", EntryData< H1I >( axis ).multiShared() ) ;
-      auto hnd = entry.handle( tids[1] ) ;
-      hnd.fill( {0}, 1 ) ;
 
-      auto hnd2 = entry.handle( tids[2] ) ;
-      hnd2.fill( {0}, 1 ) ;
+      std::thread t1([&entry]() { 
+          auto hnd = entry.handle(); 
+          hnd.fill({0}, 1);});
 
-      auto hist = hnd.merged() ;
+      std::thread t2([&entry]() { 
+          auto hnd = entry.handle(); 
+          hnd.fill({0}, 1);});
+
+      t1.join(); t2.join();
+
+      auto hist = entry.handle().merged() ;
       test.test( "MultiShared Hist Filling", hist.get().GetBinContent( {0} ) == 2 ) ;
     }
     {

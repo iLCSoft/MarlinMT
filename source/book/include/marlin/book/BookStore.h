@@ -67,7 +67,11 @@ namespace marlin {
       /// custom move (atomic is not movable)
       Handle &operator=( Handle &&hnd ) noexcept ;
 
-      Handle< T > handle( const ThreadId_t& id ) ;
+      /**
+       *  @brief get handle for Object. 
+       *  offers handle based on thread_id to avoid unused duplications.
+       */
+      Handle< T > handle() ;
 
       const T& merged() const ;
 
@@ -385,8 +389,8 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    Handle< T > Handle< Entry< T > >::handle( const Handle<Entry<T>>::ThreadId_t& id ) {
-      return _entry->handle< T >( unmap( id ) ) ;
+    Handle< T > Handle< Entry< T > >::handle() {
+      return _entry->handle< T >( unmap( std::this_thread::get_id()) ) ;
     }
 
   } // end namespace book

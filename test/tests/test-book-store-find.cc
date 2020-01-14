@@ -124,18 +124,17 @@ int main( int /*argc*/, char * /*argv*/[] ) {
                  equal && rem2.size() == 0 && selAll.size() == 0 ) ;
     }
     {
-      const std::thread::id& tid = std::this_thread::get_id();
       BookStore                 store{} ;
       Handle< Entry< H1F > > e
         = store.book( "/path/", "my Name", EntryData< H1F >( axis ).single() ) ;
-      e.handle( tid  ).fill( {0}, 1 ) ;
+      e.handle().fill( {0}, 1 ) ;
 
       Selection sel    = store.find( ConditionBuilder().setName( "my Name" ) ) ;
-      Handle< H1F > h = sel.begin()->handle< H1F >().handle( tid ) ;
+      Handle< H1F > h = sel.begin()->handle< H1F >().handle() ;
       h.fill( {0}, 1 ) ;
 
       test.test( "Get booked entry from BookStore",
-                 e.handle( tid ).merged().get().GetBinContent( {0} ) == 2
+                 e.handle().merged().get().GetBinContent( {0} ) == 2
                    && h.merged().get().GetBinContent( {0} ) == 2 ) ;
     }
   } catch ( const exceptions::BookStoreException &excp ) {

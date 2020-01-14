@@ -30,7 +30,6 @@ public:
 
 private:
   book::Handle<book::Entry<book::types::H1F>> _histogram;
-  std::thread::id _tid{};
 };
 
 TestHistogram::TestHistogram() :
@@ -50,7 +49,7 @@ void TestHistogram::init() {
 void TestHistogram::processEvent(EventStore * evt) {
   IMPL::LCEventImpl* event 
     = dynamic_cast<IMPL::LCEventImpl*>(evt->event<EVENT::LCEvent>().get());
-  book::Handle<book::types::H1F> hnd = _histogram.handle(_tid);
+  book::Handle<book::types::H1F> hnd = _histogram.handle();
   try {
     EVENT::LCCollection * coll 
       =  event->getCollection("MCParticle");
