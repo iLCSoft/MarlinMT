@@ -1,0 +1,24 @@
+<?xml version="1.0" enconding="us-ascii"?>
+
+<marlin xmlns:xsi="https://www.w3.org/2001/XMLShema-instance" xsi:noNamespaceSchemaLocation="htts://ilcsoft.desy.de/marlin/marlin.xsd">
+  <execute>
+    <processor name="MyTestHistogram" />
+  </execute>
+
+  <global>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARING0-4,ERROR0-4,SILENT"> MESSAGE3 DEBUG </parameter>
+  </global>
+
+  <datasource type="LCIO">
+    <parameter name="LCIOInputFiles">
+      simjob.slcio
+    </parameter>
+    <parameter name="MaxRecordNumber" value="4" />
+  </datasource>
+
+  <geometry type="EmptyGeometry" />
+
+  <processor name="MyTestHistogram" type="TestHistogram">
+  </processor>
+
+</marlin>

@@ -3,6 +3,12 @@
 // -- marlin headers
 #include "marlin/Processor.h"
 #include "marlin/ProcessorApi.h"
+#include "marlin/PluginManager.h"
+
+#include <EVENT/LCCollection.h>
+#include <EVENT/MCParticle.h>
+
+#include <thread>
 
 // -- lcio headers
 #include "IMPL/LCEventImpl.h"
@@ -14,22 +20,24 @@
 #include "marlin/book/configs/ROOTv7.h"
 
 using namespace marlin ;
-using namespace EVENT ;
-using namespace IMPL ;
 
 class TestHistogram : public Processor {
 public:
   TestHistogram() ;
-  void processRunHeader( RunHeader* run ) final;
+  void init() final;
   void processEvent( EventStore * evt) final;
-  void end();
+  void end() final;
 
 private:
   book::Handle<book::Manager<book::types::H1F>> _histogram;
+  std::thread::id _tid{};
 };
 
-void TestHistogram::processRunHeader( RunHeader* run) {
-  _histogram = ProcessorApi::Store::createdHistogram<book::types::H1F>(
+TestHistogram::TestHistogram() :
+  Processor("TestHistogram") {}
+
+void TestHistogram::init() {
+  _histogram = ProcessorApi::Book::create<book::types::H1F>(
     this,
     "/someWhere/hit",
     "test histogram",
@@ -38,3 +46,27 @@ void TestHistogram::processRunHeader( RunHeader* run) {
     }
   );
 }
+
+void TestHistogram::processEvent(EventStore * evt) {
+  IMPL::LCEventImpl* event 
+    = dynamic_cast<IMPL::LCEventImpl*>(evt->event<EVENT::LCEvent>().get());
+  book::Handle<book::types::H1F> hnd = _histogram.handle(_tid);
+  try {
+    EVENT::LCCollection * coll 
+      =  event->getCollection("MCParticle");
+    int nHits = coll->getNumberOfElements();
+    for(int i = 0; i < nHits; ++i) {
+      EVENT::MCParticle* par =
+        dynamic_cast<EVENT::MCParticle*>(coll->getElementAt(i));
+      hnd.fill({par->getEnergy()}, 1.);
+    }
+  } catch ( EVENT::Exception& ) {
+    streamlog_out(ERROR) << " failed to process event, LC error\n";
+  }
+}
+
+void TestHistogram::end() {
+  streamlog_out(ERROR) << "success\n";  
+}
+
+MARLIN_DECLARE_PROCESSOR( TestHistogram )

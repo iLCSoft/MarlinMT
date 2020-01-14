@@ -7,10 +7,13 @@
 #include <marlin/Exceptions.h>
 #include <marlin/EventExtensions.h>
 
-namespace marlin {
 
-  std::unique_ptr<book::BookStore> ProcessorApi::Store::_store{nullptr};
-  void ProcessorApi::Store::registerStore(std::unique_ptr<book::BookStore>&& store) {
+
+namespace marlin {
+   InternalClass setStore{};
+
+  std::unique_ptr<book::BookStore> ProcessorApi::Book::_store{nullptr};
+  void ProcessorApi::Book::registerStore(std::unique_ptr<book::BookStore>&& store) {
     std::swap(_store, store); 
   }
 

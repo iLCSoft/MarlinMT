@@ -53,6 +53,7 @@ namespace marlin {
       std::size_t unmap( const ThreadId_t& id ) ;
 
     public:
+      Handle()                            = default ;
       /// no copy
       Handle( const Handle & )            = delete ;
       /// no copy

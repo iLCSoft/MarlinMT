@@ -33,6 +33,8 @@ namespace marlin {
    *  ProcessorApi::registerForRandomSeeds( this ) ;
    *  @endcode
    */
+  class InternalClass;
+
   class ProcessorApi {
   public:
     // only static API
@@ -42,13 +44,14 @@ namespace marlin {
     /**
      *  @brief group function for booking 
      */
-    class Store {
+    class Book {
       template<typename T>
       static std::optional<book::Handle<book::Manager<T>>>
       getObject( const std::filesystem::path& pathName ) ;
 
+      friend InternalClass;
       // TODO: add friends which set this 
-      void registerStore(std::unique_ptr<book::BookStore>&& store);
+      static void registerStore(std::unique_ptr<book::BookStore>&& store);
     public:
       static constexpr book::Flag_t DefaultConfiguration{
           book::Flags::value(book::Flags::Book::MultiShared)
@@ -63,7 +66,7 @@ namespace marlin {
        */
       template<typename HistT>
       static  book::Handle<book::Manager<HistT>>
-      createdHistogram(
+      create(
         const Processor * const proc,
         const std::filesystem::path& pathName,
         const std::string_view& title,
@@ -182,7 +185,7 @@ namespace marlin {
 
   template<typename HistT>
   book::Handle<book::Manager<HistT>>
-  ProcessorApi::Store::createdHistogram(
+  ProcessorApi::Book::create(
     const Processor * const proc,
     const std::filesystem::path& pathName,
     const std::string_view& title,
@@ -196,30 +199,31 @@ namespace marlin {
     if ( res ) {
       return std::move(res.value());
     }
+    EntryData<HistT> data(title, axes);
     std::filesystem::path path 
       = (std::filesystem::path(proc->name()) / pathName).remove_filename() ;
     if ( flags.contains(book::Flags::Book::MultiCopy) ) {
       return _store->book(
         path,
         pathName.filename().string(),
-        EntryData<HistT>(title, axes).multiCopy(1 /* FIXME: need a number */));
+        data.multiCopy(1 /* FIXME: need a number */));
     } else if ( flags.contains(book::Flags::Book::MultiShared)){
       return _store->book(
         path,
         pathName.filename().string(),
-        EntryData<HistT>(title, axes).multiShared()); 
+        data.multiShared()); 
     } 
     return _store->book( 
         path,
         pathName.filename().string(),
-        EntryData<HistT>( title, axes).single());
+        data.single());
   } 
 
   //--------------------------------------------------------------------------
 
   template<typename HistT>
   book::Handle<book::Manager<HistT>> 
-  ProcessorApi::Store::getHistogram(const Processor * proc, const std::filesystem::path& pathName) 
+  ProcessorApi::Book::getHistogram(const Processor * proc, const std::filesystem::path& pathName) 
   {
     using namespace book;
     std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
@@ -233,9 +237,10 @@ namespace marlin {
 
   template<typename T>
   std::optional<book::Handle<book::Manager<T>>>
-  ProcessorApi::Store::getObject( const std::filesystem::path& pathName ) {
+  ProcessorApi::Book::getObject( const std::filesystem::path& pathName ) {
     using namespace book;
     using namespace book;
+    if(!_store) { throw "no store :O"; }
     Selection res = _store->find( 
         ConditionBuilder()
           .setType(typeid(T))
@@ -247,6 +252,15 @@ namespace marlin {
     return std::optional(res.get(0).handle<T>());
 
   }
+
+  class InternalClass {
+  public:
+    InternalClass() {
+      ProcessorApi::Book::registerStore(
+        std::make_unique<book::BookStore>(false)
+          );
+    }
+  };
 
 }
 

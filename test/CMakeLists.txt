@@ -9,7 +9,7 @@
 set( MarlinUnitTest_sources processors/TestProcessorEventSeeder.cc )
 if( MARLIN_LCIO )
   find_package( LCIO REQUIRED QUIET )
-	# list( APPEND MarlinUnitTest_sources processors/TestEventModifier.cc )
+	list( APPEND MarlinUnitTest_sources processors/TestEventModifier.cc )
 	list( APPEND MarlinUnitTest_sources processors/TestHistogram.cc )
 endif()
 add_library( UnitTest SHARED ${MarlinUnitTest_sources} )
@@ -80,13 +80,13 @@ marlin_add_test (
   DEPENDS marlinminusx
 )
 
-# marlin_add_processor_test (
-# 	histogram
-# 	STEERING_FILE ${CMAKE_CURRENT_SOURCE_DIR}/steer/eventmodifier.xml
-# 	INPUT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/simjob.slcio
-# 	REGEX_PASS "jurra"
-# 	MARLIN_DLL Marlin::CorePlugins Marlin::LCIOPlugins 
-# )
+marlin_add_processor_test (
+	histogram
+	STEERING_FILE ${CMAKE_CURRENT_SOURCE_DIR}/steer/histogram.xml
+	INPUT_FILES ${CMAKE_CURRENT_SOURCE_DIR}/data/simjob.slcio
+	REGEX_PASS "success"
+	MARLIN_DLL Marlin::CorePlugins Marlin::LCIOPlugins 
+)
 
 marlin_add_processor_test (
   eventmodifier
