@@ -1,0 +1,67 @@
+
+// Marlin book config
+// WARNING: this header has been generated at configure time via CMake.
+// Modification may be lost ...
+#include <marlin/book/configs/@MARLIN_BOOK_IMPL_HEADER@>
+
+namespace marlin {
+  
+  namespace book {
+    
+    // import types and forward declarations
+    
+    using AxisConfig = types::AxisConfig ;
+    
+    template <typename P, typename W, std::size_t D>
+    using HistConfig = types::HistConfig<P, W, D> ;
+    
+    template <typename P, typename W, std::size_t D>
+    using HistT = types::HistT<HistConfig<P, W, D>> ;
+    
+    template <typename P, typename W, std::size_t D>
+    using HistConcurrentFillManager = types::HistConcurrentFillManager<HistConfig<P, W, D>> ;
+    
+    template <typename P, typename W, std::size_t D>
+    using HistConcurrentFiller = types::HistConcurrentFiller<HistConfig<P, W, D>> ;
+    
+    template <typename T>
+    class Entry ;
+    
+    // Histogram types
+    using Hist1F = types::H1F ;
+    using Hist1D = types::H1D ;
+    using Hist1I = types::H1I ;
+    using Hist2F = types::H2F ;
+    using Hist2D = types::H2D ;
+    using Hist2I = types::H2I ;
+    using Hist3F = types::H3F ;
+    using Hist3D = types::H3D ;
+    using Hist3I = types::H3I ;
+    
+    // Handle on histogram entries
+    // This is what you get when you book something
+    // using the ProcessorApi::Book::create()
+    using H1FEntry = Handle<Entry<Hist1F>> ;
+    using H1DEntry = Handle<Entry<Hist1D>> ;
+    using H1IEntry = Handle<Entry<Hist1I>> ;
+    using H2FEntry = Handle<Entry<Hist2F>> ;
+    using H2DEntry = Handle<Entry<Hist2D>> ;
+    using H2IEntry = Handle<Entry<Hist2I>> ;
+    using H3FEntry = Handle<Entry<Hist3F>> ;
+    using H3DEntry = Handle<Entry<Hist3D>> ;
+    using H3IEntry = Handle<Entry<Hist3I>> ;
+    
+    // Handle on histograms
+    // This is what you get when you call entry.handle()
+    using H1FHandle = Handle<Hist1F> ;
+    using H1DHandle = Handle<Hist1D> ;
+    using H1IHandle = Handle<Hist1I> ;
+    using H2FHandle = Handle<Hist2F> ;
+    using H2DHandle = Handle<Hist2D> ;
+    using H2IHandle = Handle<Hist2I> ;
+    using H3FHandle = Handle<Hist3F> ;
+    using H3DHandle = Handle<Hist3D> ;
+    using H3IHandle = Handle<Hist3I> ;
+    
+  }
+}
