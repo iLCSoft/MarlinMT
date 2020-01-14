@@ -10,14 +10,6 @@
 
 
 namespace marlin {
-   InternalClass setStore{};
-
-  std::unique_ptr<book::BookStore> ProcessorApi::Book::_store{nullptr};
-  void ProcessorApi::Book::registerStore(std::unique_ptr<book::BookStore>&& store) {
-    std::swap(_store, store); 
-  }
-
-  //--------------------------------------------------------------------------
 
   void ProcessorApi::registerForRandomSeeds( Processor *const proc ) {
     proc->app().randomSeedManager().addEntry( proc ) ;

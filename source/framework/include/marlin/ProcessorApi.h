@@ -50,9 +50,6 @@ namespace marlin {
       static std::optional<book::Handle<book::Entry<T>>>
       getObject( const std::filesystem::path& pathName ) ;
 
-      friend InternalClass;
-      // TODO: add friends which set this 
-      static void registerStore(std::unique_ptr<book::BookStore>&& store);
     public:
       static constexpr book::Flag_t DefaultConfiguration{
           book::Flags::value(book::Flags::Book::MultiShared)
@@ -98,8 +95,6 @@ namespace marlin {
       void write(const Processor * proc, const std::filesystem::path& path) ;
       void dontWrite(const Processor * proc, const std::filesystem::path& path) ;
 
-    private:
-      static std::unique_ptr<book::BookStore> _store;
     };
 
     /**
@@ -203,18 +198,20 @@ namespace marlin {
     EntryData<HistT> data(title, axes);
     std::filesystem::path path 
       = (std::filesystem::path(proc->name()) / pathName).remove_filename() ;
+
+    BookStore& store = *static_cast<BookStore*>(nullptr);
     if ( flags.contains(book::Flags::Book::MultiCopy) ) {
-      return _store->book(
+      return store.book(
         path,
         pathName.filename().string(),
         data.multiCopy(1 /* FIXME: need a number */));
     } else if ( flags.contains(book::Flags::Book::MultiShared)){
-      return _store->book(
+      return store.book(
         path,
         pathName.filename().string(),
         data.multiShared()); 
     } 
-    return _store->book( 
+    return store.book( 
         path,
         pathName.filename().string(),
         data.single());
@@ -241,8 +238,10 @@ namespace marlin {
   ProcessorApi::Book::getObject( const std::filesystem::path& pathName ) {
     using namespace book;
     using namespace book;
-    if(!_store) { throw "no store :O"; }
-    Selection res = _store->find( 
+    
+    BookStore& store = *static_cast<BookStore*>(nullptr);
+
+    Selection res = store.find( 
         ConditionBuilder()
           .setType(typeid(T))
           .setPath(std::filesystem::path(pathName).remove_filename().string())
@@ -253,16 +252,6 @@ namespace marlin {
     return std::optional(res.get(0).handle<T>());
 
   }
-
-  class InternalClass {
-  public:
-    InternalClass() {
-      ProcessorApi::Book::registerStore(
-        std::make_unique<book::BookStore>(false)
-          );
-    }
-  };
-
 }
 
 #endif
