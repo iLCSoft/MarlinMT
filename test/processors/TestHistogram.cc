@@ -8,16 +8,12 @@
 #include <EVENT/LCCollection.h>
 #include <EVENT/MCParticle.h>
 
-#include <thread>
-
 // -- lcio headers
 #include "IMPL/LCEventImpl.h"
 #include "IMPL/LCRunHeaderImpl.h"
 
 // -- book headers
-#include "marlin/book/BookStore.h"
 #include "marlin/book/Hist.h"
-#include "marlin/book/configs/ROOTv7.h"
 
 using namespace marlin ;
 
@@ -29,7 +25,7 @@ public:
   void end() final;
 
 private:
-  book::Handle<book::Entry<book::types::H1F>> _histogram;
+  book::H1FEntry _histogram;
 };
 
 TestHistogram::TestHistogram() :
@@ -49,14 +45,17 @@ void TestHistogram::init() {
 void TestHistogram::processEvent(EventStore * evt) {
   IMPL::LCEventImpl* event 
     = dynamic_cast<IMPL::LCEventImpl*>(evt->event<EVENT::LCEvent>().get());
-  book::Handle<book::types::H1F> hnd = _histogram.handle();
+  book::H1FHandle hnd = _histogram.handle();
   try {
     EVENT::LCCollection * coll 
       =  event->getCollection("MCParticle");
+
     int nHits = coll->getNumberOfElements();
+
     for(int i = 0; i < nHits; ++i) {
       EVENT::MCParticle* par =
         dynamic_cast<EVENT::MCParticle*>(coll->getElementAt(i));
+
       hnd.fill({par->getEnergy()}, 1.);
     }
   } catch ( EVENT::Exception& ) {

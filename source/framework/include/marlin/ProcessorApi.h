@@ -14,10 +14,11 @@
 #include <marlin/MarlinConfig.h>
 
 // -- MarlinBook includes
+#include "marlin/book/Types.h"
 #include "marlin/book/BookStore.h"
 #include "marlin/book/Flags.h"
 #include "marlin/book/Handle.h"
-#include "marlin/book/Types.h"
+#include "marlin/MarlinBookConfig.h"
 
 namespace marlin {
 
@@ -71,7 +72,7 @@ namespace marlin {
         const std::filesystem::path& pathName,
         const std::string_view& title,
         const std::array<
-          book::types::AxisConfig<typename HistT::Precision_t>,
+          book::AxisConfig<typename HistT::Precision_t>,
           HistT::Dimension>& axes,
         const book::Flag_t& flags = DefaultConfiguration ) ;
 

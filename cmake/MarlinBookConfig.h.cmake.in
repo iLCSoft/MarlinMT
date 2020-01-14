@@ -9,8 +9,9 @@ namespace marlin {
   namespace book {
     
     // import types and forward declarations
-    
-    using AxisConfig = types::AxisConfig ;
+   
+    template<typename Precission>
+    using AxisConfig = types::AxisConfig<Precission> ;
     
     template <typename P, typename W, std::size_t D>
     using HistConfig = types::HistConfig<P, W, D> ;
