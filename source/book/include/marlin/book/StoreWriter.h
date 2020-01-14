@@ -8,7 +8,9 @@ namespace marlin {
   namespace book {
 
     // -- MarlinBook forward declaration
-    class Entry;
+    namespace details {
+      class Entry;
+    }
     class Selection;
 
     class StoreWriter {

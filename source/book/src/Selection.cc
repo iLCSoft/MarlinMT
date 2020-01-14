@@ -5,10 +5,10 @@
 
 namespace marlin {
   namespace book {
-    WeakEntry::WeakEntry( const std::shared_ptr< const Entry > &entry )
+    WeakEntry::WeakEntry( const std::shared_ptr< const details::Entry > &entry )
       : _entry{entry}{}
 
-    WeakEntry::WeakEntry( const std::shared_ptr< Entry > &entry )
+    WeakEntry::WeakEntry( const std::shared_ptr< details::Entry > &entry )
       : _entry{entry}{}
 
     bool WeakEntry::valid() const {

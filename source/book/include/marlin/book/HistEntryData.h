@@ -111,7 +111,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 1, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -119,7 +119,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 2, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -127,7 +127,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 3, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       const EntryDataBase< Object_t > &_data ;
@@ -152,7 +152,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 1, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -160,7 +160,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 2, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -168,7 +168,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 3, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       const EntryDataBase< Object_t > &_data ;
@@ -194,7 +194,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 1, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 1, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -202,7 +202,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 2, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 2, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       /**
@@ -210,7 +210,7 @@ namespace marlin {
        *  @param store to where book Histogram.
        */
       template < typename... Args_t, int d = D >
-      std::enable_if_t< d == 3, std::shared_ptr< Entry > >
+      std::enable_if_t< d == 3, std::shared_ptr< details::Entry > >
       book( BookStore &store, const Args_t &... args ) const ;
 
       const EntryDataBase< Object_t > &_data ;

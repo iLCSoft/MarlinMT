@@ -126,7 +126,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     {
       const std::thread::id& tid = std::this_thread::get_id();
       BookStore                 store{} ;
-      Handle< Manager< H1F > > e
+      Handle< Entry< H1F > > e
         = store.book( "/path/", "my Name", EntryData< H1F >( axis ).single() ) ;
       e.handle( tid  ).fill( {0}, 1 ) ;
 

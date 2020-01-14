@@ -267,7 +267,7 @@ namespace marlin {
 
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 1, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 1, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::Single)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookSingle< Object_t,
@@ -280,7 +280,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 2, std::shared_ptr<Entry>>
+    std::enable_if_t< d == 2, std::shared_ptr<details::Entry>>
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::Single)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookSingle< Object_t,
@@ -294,7 +294,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 3, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 3, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::Single)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookSingle< Object_t,
@@ -313,7 +313,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 1, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 1, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiCopy)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiCopy< Object_t,
@@ -327,7 +327,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 2, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 2, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiCopy)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiCopy<Object_t,
@@ -342,7 +342,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 3, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 3, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiCopy)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiCopy< Object_t,
@@ -363,7 +363,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 1, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 1, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiShared)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiShared< Object_t,
@@ -376,7 +376,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 2, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 2, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiShared)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiShared< Object_t,
@@ -390,7 +390,7 @@ namespace marlin {
     
     template < typename Config >
     template < typename... Args_t, int d >
-    std::enable_if_t< d == 3, std::shared_ptr<Entry> >
+    std::enable_if_t< d == 3, std::shared_ptr<details::Entry> >
     EntryData<types::HistT<Config>, Flags::value(Flags::Book::MultiShared)>
       ::book( BookStore &store, const Args_t &... args ) const {
       return store.bookMultiShared< Object_t,

@@ -29,7 +29,7 @@ public:
   void end() final;
 
 private:
-  book::Handle<book::Manager<book::types::H1F>> _histogram;
+  book::Handle<book::Entry<book::types::H1F>> _histogram;
   std::thread::id _tid{};
 };
 

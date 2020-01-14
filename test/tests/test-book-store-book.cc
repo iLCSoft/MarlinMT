@@ -27,7 +27,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
   BookStore              store{} ;
   try {
     {
-      Handle< Manager< H1F > > entry
+      Handle< Entry< H1F > > entry
         = store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
 
       Handle< H1F > hnd = entry.handle( tids[0] ) ;
@@ -45,7 +45,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     {
       bool error = false ;
       try {
-        Handle< Manager< H1F > > entry
+        Handle< Entry< H1F > > entry
           = store.book( "/path/", "name", EntryData< H1F >( axis ).single() ) ;
       } catch ( const exceptions::BookStoreException & ) {
         error = true ;
@@ -59,7 +59,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       test.test( "Named Histograms", e.handle( tids[1] ).merged().get().GetEntries() == 1 ) ;
     }
     {
-      Handle< Manager< H1I > > entry = store.book(
+      Handle< Entry< H1I > > entry = store.book(
         "/path_2/", "name", EntryData< H1I >( axis ).multiCopy( 2 ) ) ;
 
       auto hnd = entry.handle( tids[0] ) ;
@@ -73,7 +73,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     }
     {
 
-      Handle< Manager< H1I > > entry = store.book(
+      Handle< Entry< H1I > > entry = store.book(
         "/path_3/", "name", EntryData< H1I >( axis ).multiShared() ) ;
       auto hnd = entry.handle( tids[1] ) ;
       hnd.fill( {0}, 1 ) ;

@@ -116,125 +116,129 @@ namespace marlin {
       EntryMultiShared<Type>
     >;
 
-    /**
-     *  @brief class to store and manage objects in BookStore.
-     */
-    class Entry {
-      friend BookStore ;
+    namespace details {
 
-      /// constructor
-      Entry( std::shared_ptr< EntryBase > entry, EntryKey key )
-        : _key{std::move( key )}, _entry{std::move( entry )} {}
+      /**
+       *  @brief class to store and manage objects in BookStore.
+       */
+      class Entry {
+        friend BookStore ;
 
-      /// reduce Entry to default constructed version.
-      void clear() {
-        _key = EntryKey{} ;
-        _entry.reset() ;
-      }
+        /// constructor
+        Entry( std::shared_ptr< EntryBase > entry, EntryKey key )
+          : _key{std::move( key )}, _entry{std::move( entry )} {}
 
-
-      struct GetFromEntry {
-        static void ThrowIfOutOfBound(const EntryKey& key, std::size_t idx) {
-          if(idx >= key.mInstances) {
-            auto itoa = [](std::size_t id){
-              return std::to_string(id);
-            };
-            MARLIN_BOOK_THROW(
-              (std::string("Try to access instances '") + itoa(idx) 
-              + "', which is outside of [0;" 
-                + itoa(key.mInstances-1) + "]"));
-          } 
+        /// reduce Entry to default constructed version.
+        void clear() {
+          _key = EntryKey{} ;
+          _entry.reset() ;
         }
 
-        enum struct Need { Void, Index };
 
-        template<typename R, typename ET, R(ET::*)(std::size_t)>
-        struct need_index { };
+        /// class which helps to access entry from the different EntryTypes
+        struct EntryHelper { 
+          static void ThrowIfOutOfBound(const EntryKey& key, std::size_t idx) {
+            if(idx >= key.mInstances) {
+              auto itoa = [](std::size_t id){
+                return std::to_string(id);
+              };
+              MARLIN_BOOK_THROW(
+                (std::string("Try to access instances '") + itoa(idx) 
+                + "', which is outside of [0;" 
+                  + itoa(key.mInstances-1) + "]"));
+            } 
+          }
 
-        template<typename R, typename ET, R(ET::*)(void)>
-        struct need_void { };
+          enum struct Need { Void, Index };
 
-        template<typename T, typename ET>
-        static constexpr Need handle_need(
-            need_index<Handle<T>, ET, &ET::handle>* /*null*/) {
-          return Need::Index ;
-        }
-        template<typename T, typename ET>
-        static constexpr Need handle_need(
-          need_void<Handle<T>, ET, &ET::handle>* /*null*/) {
-          return Need::Void ; 
-        }
+          template<typename R, typename ET, R(ET::*)(std::size_t)>
+          struct need_index { };
 
-        template<typename T, typename ET>
-        static constexpr Need handle_need_v = handle_need<T,ET>(nullptr);
+          template<typename R, typename ET, R(ET::*)(void)>
+          struct need_void { };
 
-        template<typename T, std::size_t I = 0>
-        [[nodiscard]]
-        static Handle<T> handle(
-            std::shared_ptr<EntryBase> entry,
-            const EntryKey& key,
-            std::size_t idx) {
-          using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
+          template<typename T, typename ET>
+          static constexpr Need handle_need(
+              need_index<Handle<T>, ET, &ET::handle>* /*null*/) {
+            return Need::Index ;
+          }
+          template<typename T, typename ET>
+          static constexpr Need handle_need(
+            need_void<Handle<T>, ET, &ET::handle>* /*null*/) {
+            return Need::Void ; 
+          }
 
-          if (key.flags == EntryType::Flag) {
-            if constexpr (handle_need_v<T, EntryType> == Need::Index) {
+          template<typename T, typename ET>
+          static constexpr Need handle_need_v = handle_need<T,ET>(nullptr);
 
-              ThrowIfOutOfBound(key, idx);
+          template<typename T, std::size_t I = 0>
+          [[nodiscard]]
+          static Handle<T> handle(
+              std::shared_ptr<EntryBase> entry,
+              const EntryKey& key,
+              std::size_t idx) {
+            using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
 
-              return std::static_pointer_cast<EntryType>(entry)->handle(idx);
-            } else if constexpr (handle_need_v<T, EntryType> == Need::Void){
-              return std::static_pointer_cast<EntryType>(entry)->handle();
+            if (key.flags == EntryType::Flag) {
+              if constexpr (handle_need_v<T, EntryType> == Need::Index) {
+
+                ThrowIfOutOfBound(key, idx);
+
+                return std::static_pointer_cast<EntryType>(entry)->handle(idx);
+              } else if constexpr (handle_need_v<T, EntryType> == Need::Void){
+                return std::static_pointer_cast<EntryType>(entry)->handle();
+              } else {
+                static_assert(I!=I, "no callable Handle function");
+              }
+            }
+
+            if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<T>>)) {
+              return handle<T, I + 1>(entry, key, idx);
             } else {
-              static_assert(I!=I, "no callable Handle function");
+              MARLIN_BOOK_THROW(
+                "Entry has an invalid Flag combination! Can't create Handle!" ) ; 
             }
           }
+        };
 
-          if constexpr (I + 1 < (std::tuple_size_v<EntryTypes<T>>)) {
-            return handle<T, I + 1>(entry, key, idx);
-          } else {
-            MARLIN_BOOK_THROW(
-              "Entry has an invalid Flag combination! Can't create Handle!" ) ; 
+      public:
+        /// default constructor. Not valid!
+        Entry() = default ;
+
+        /**
+         *  @brief creates an handle for the entry.
+         *  @param idx of instance, only used for multi copy entries
+         *  @throw BookStoreException when the Entry has Invalid Flags, or
+         *  type mismatch with demanded Handle.
+         *  @return empty optional if the type or the configuration not matches.
+         */
+        template < class T >
+        [[nodiscard]] Handle< T > handle( std::size_t idx = -1 ) const {
+          if ( std::type_index( typeid( T ) ) != _key.type ) {
+            MARLIN_BOOK_THROW( "Entry is not demanded type. Can't create Handle!" ) ;
           }
+          
+          return EntryHelper::handle<T>(_entry, key(), idx);
+
         }
-      };
 
-    public:
-      /// default constructor. Not valid!
-      Entry() = default ;
+        /// access key data from entry.
+        [[nodiscard]] const EntryKey &key() const { return _key; }
 
-      /**
-       *  @brief creates an handle for the entry.
-       *  @param idx of instance, only used for multi copy entries
-       *  @throw BookStoreException when the Entry has Invalid Flags, or
-       *  type mismatch with demanded Handle.
-       *  @return empty optional if the type or the configuration not matches.
-       */
-      template < class T >
-      [[nodiscard]] Handle< T > handle( std::size_t idx = -1 ) const {
-        if ( std::type_index( typeid( T ) ) != _key.type ) {
-          MARLIN_BOOK_THROW( "Entry is not demanded type. Can't create Handle!" ) ;
-        }
-        
-        return GetFromEntry::handle<T>(_entry, key(), idx);
+        /**
+         *  @brief check if entry is valid.
+         *  check if there is a reference stored or not.
+         *  @return true if entry is valid.
+         */
+        [[nodiscard]] bool valid() const { return _entry != nullptr; }
 
-      }
+      private:
+        /// Key data for Entry.
+        EntryKey _key{std::type_index( typeid( void ) )} ;
+        /// reference to entry data.
+        std::shared_ptr< EntryBase > _entry{nullptr} ;
+      } ;
 
-      /// access key data from entry.
-      [[nodiscard]] const EntryKey &key() const { return _key; }
-
-      /**
-       *  @brief check if entry is valid.
-       *  check if there is a reference stored or not.
-       *  @return true if entry is valid.
-       */
-      [[nodiscard]] bool valid() const { return _entry != nullptr; }
-
-    private:
-      /// Key data for Entry.
-      EntryKey _key{std::type_index( typeid( void ) )} ;
-      /// reference to entry data.
-      std::shared_ptr< EntryBase > _entry{nullptr} ;
-    } ;
-
+    } // end namespace details
   } // end namespace book
 } // end namespace marlin

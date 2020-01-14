@@ -34,10 +34,10 @@ namespace marlin {
     class StoreWriter;
 
     template < typename T >
-    class Manager {} ;
+    class Entry {} ;
 
     template < typename T >
-    class Handle< Manager< T > > {
+    class Handle< Entry< T > > {
       friend BookStore ;
       friend WeakEntry ;
 
@@ -45,7 +45,7 @@ namespace marlin {
       using IdMap_t = std::unordered_map< ThreadId_t, std::size_t > ;
 
       /// constructor
-      explicit Handle( std::shared_ptr< const Entry > entry )
+      explicit Handle( std::shared_ptr< const details::Entry > entry )
         : _entry{std::move( entry )},
           _mapping( std::make_unique< IdMap_t >() ) {}
 
@@ -73,7 +73,7 @@ namespace marlin {
 
     private:
       /// reference to handled Entry.
-      std::shared_ptr< const Entry > _entry{nullptr} ;
+      std::shared_ptr< const details::Entry > _entry{nullptr} ;
       /// maps ids to Handle instances.
       std::unique_ptr< IdMap_t > _mapping{} ;
       /// count number of Handle instances.
@@ -115,20 +115,20 @@ namespace marlin {
        *  generate id for Entry.
        *  @return shared pointer to new Entry
        */
-      std::shared_ptr< Entry >
+      std::shared_ptr< details::Entry >
       addEntry( const std::shared_ptr< EntryBase > &entry, EntryKey key ) ;
 
       /**
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      Entry &get( const EntryKey &key ) { return get( key.hash ); }
+      details::Entry &get( const EntryKey &key ) { return get( key.hash ); }
 
       /**
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      Entry &get( std::size_t const key ) {
+      details::Entry &get( std::size_t const key ) {
         try {
           return *_entries[key] ;
         } catch ( const std::out_of_range & ) {
@@ -145,8 +145,9 @@ namespace marlin {
        *  @param ctor_p parameters to construct the object.
        */
       template < class T, typename... Args_t >
-      std::shared_ptr< Entry > bookSingle( std::filesystem::path path,
-                                           Args_t... ctor_p ) ;
+      std::shared_ptr< details::Entry > bookSingle( 
+        std::filesystem::path path,
+        Args_t... ctor_p ) ;
 
       /**
        *  @brief creates an Entry for parallel access.
@@ -160,9 +161,10 @@ namespace marlin {
                  void ( *MERGE )( const std::shared_ptr< T > &,
                                   const std::shared_ptr< T > & ),
                  typename... Args_t >
-      std::shared_ptr< Entry > bookMultiCopy( std::size_t           n,
-                                              std::filesystem::path path,
-                                              Args_t... ctor_p ) ;
+      std::shared_ptr< details::Entry > bookMultiCopy( 
+        std::size_t           n,
+        std::filesystem::path path,
+        Args_t... ctor_p ) ;
 
       /**
        *  @brief creates an Entry for parallel access.
@@ -170,8 +172,9 @@ namespace marlin {
        *  \see BookStore::book
        */
       template < class T, typename... Args_t >
-      std::shared_ptr< Entry > bookMultiShared( std::filesystem::path path,
-                                                Args_t... ctor_p ) ;
+      std::shared_ptr< details::Entry > bookMultiShared( 
+          std::filesystem::path path,
+          Args_t... ctor_p ) ;
 
       /**
        *  @brief normalize and check path for internal usage. 
@@ -197,7 +200,7 @@ namespace marlin {
        *    - book was constructed in different thread. \see{_allowMoving}
        */
       template < class T >
-      Handle< Manager< typename T::Object_t > >
+      Handle< Entry< typename T::Object_t > >
       book( const std::filesystem::path& path,
             const std::string_view&      name,
             const T                     &data ) ;
@@ -239,7 +242,7 @@ namespace marlin {
 
     private:
       /// stores Entries created by BookStore.
-      std::vector< std::shared_ptr< Entry > > _entries{} ;
+      std::vector< std::shared_ptr< details::Entry > > _entries{} ;
       /// stores path+name -> Entry Id
       std::unordered_map< Identifier, std::size_t, Identifier::Hash >
                       _idToEntry{} ;
@@ -251,7 +254,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < class T, typename... Args_t >
-    std::shared_ptr< Entry >
+    std::shared_ptr< details::Entry >
     BookStore::bookSingle( std::filesystem::path path,
                            Args_t...              ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
@@ -271,7 +274,7 @@ namespace marlin {
                void ( *MERGE )( const std::shared_ptr< T > &,
                                 const std::shared_ptr< T > & ),
                typename... Args_t >
-    std::shared_ptr< Entry >
+    std::shared_ptr< details::Entry >
     BookStore::bookMultiCopy( std::size_t           n,
                               std::filesystem::path path,
                               Args_t... ctor_p ) {
@@ -290,7 +293,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < class T, typename... Args_t >
-    std::shared_ptr< Entry >
+    std::shared_ptr< details::Entry >
     BookStore::bookMultiShared( std::filesystem::path path,
                                 Args_t...              ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
@@ -307,7 +310,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < class T >
-    Handle< Manager< typename T::Object_t > >
+    Handle< Entry< typename T::Object_t > >
     BookStore::book( const std::filesystem::path &path,
                      const std::string_view      &name,
                      const T                     &data ) {
@@ -320,7 +323,7 @@ namespace marlin {
 
       auto entry = _idToEntry.find( Identifier(nPath)) ;
       if ( entry == _idToEntry.end() ) {
-        return Handle< Manager< typename T::Object_t > >(
+        return Handle< Entry< typename T::Object_t > >(
           data.template book< std::filesystem::path >(
             *this, nPath ) ) ;
       }
@@ -334,8 +337,8 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    std::size_t Handle< Manager< T > >::unmap( 
-        const Handle<Manager<T>>::ThreadId_t& id ) {
+    std::size_t Handle< Entry< T > >::unmap( 
+        const Handle<Entry<T>>::ThreadId_t& id ) {
       {
         std::shared_lock lock(_mappingAcces);
         auto itr = _mapping->find( id ) ;
@@ -351,14 +354,14 @@ namespace marlin {
     //--------------------------------------------------------------------------
     
     template< typename T >
-    const T& Handle< Manager< T > >::merged() const {
+    const T& Handle< Entry< T > >::merged() const {
       return _entry->handle<T>(0).merged();     
     }
 
     //--------------------------------------------------------------------------
 
     template < typename T >
-    Handle< Manager< T > >::Handle( Handle &&hnd ) noexcept
+    Handle< Entry< T > >::Handle( Handle &&hnd ) noexcept
       : _entry( nullptr ), _mapping( nullptr ), _count( hnd._count.load() ) {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
@@ -369,8 +372,8 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    Handle< Manager< T > > &Handle< Manager< T > >::
-                            operator=( Handle<Manager<T>> &&hnd ) noexcept {
+    Handle< Entry< T > > &Handle< Entry< T > >::
+                            operator=( Handle<Entry<T>> &&hnd ) noexcept {
       _entry   = hnd._entry ;
       _mapping = std::move( hnd._mapping ) ;
       _count       = hnd._count.load() ;
@@ -382,7 +385,7 @@ namespace marlin {
     //--------------------------------------------------------------------------
 
     template < typename T >
-    Handle< T > Handle< Manager< T > >::handle( const Handle<Manager<T>>::ThreadId_t& id ) {
+    Handle< T > Handle< Entry< T > >::handle( const Handle<Entry<T>>::ThreadId_t& id ) {
       return _entry->handle< T >( unmap( id ) ) ;
     }
 

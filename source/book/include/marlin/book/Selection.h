@@ -20,7 +20,7 @@ namespace marlin {
     // -- MarlinBook forward declaration
     class BookStore ;
     template < typename >
-    class Manager ;
+    class Entry ;
     class Selection;
 
     /**
@@ -30,9 +30,9 @@ namespace marlin {
       friend Selection ;
         
       // constructor
-      explicit WeakEntry( const std::shared_ptr< const Entry > &entry ) ;
+      explicit WeakEntry( const std::shared_ptr< const details::Entry > &entry ) ;
       // constructor
-      explicit WeakEntry( const std::shared_ptr< Entry > &entry ) ;
+      explicit WeakEntry( const std::shared_ptr< details::Entry > &entry ) ;
     public:
 
       /**
@@ -53,16 +53,16 @@ namespace marlin {
        */
       template <typename T>
       [[nodiscard]]
-      Handle<Manager<T>> handle() const {
+      Handle<Entry<T>> handle() const {
         if( ! valid() ) {
           MARLIN_BOOK_THROW( "Try to bind an expired WeakEntry");  
         }
-        return Handle<Manager<T>>(_entry.lock());
+        return Handle<Entry<T>>(_entry.lock());
       }
 
     private:
       /// wake reference to Entry
-      std::weak_ptr< const Entry > _entry ;
+      std::weak_ptr< const details::Entry > _entry ;
     } ;
 
     /**

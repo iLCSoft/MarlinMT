@@ -19,7 +19,7 @@ public:
 namespace marlin {
   namespace book {
 
-    std::shared_ptr< Entry >
+    std::shared_ptr< details::Entry >
     BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
                          EntryKey                            key ) {
       key.hash = _entries.size() ;
@@ -30,7 +30,7 @@ namespace marlin {
               .second ) {
         MARLIN_BOOK_THROW( "Object already exist. Use store.book to avoid this." ) ;
       }
-      _entries.push_back( std::make_shared< Entry >( Entry( entry, key ) ) ) ;
+      _entries.push_back( std::make_shared< details::Entry >( details::Entry( entry, key ) ) ) ;
       return _entries.back() ;
     }
     

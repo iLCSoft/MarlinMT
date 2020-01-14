@@ -46,7 +46,7 @@ namespace marlin {
      */
     class Book {
       template<typename T>
-      static std::optional<book::Handle<book::Manager<T>>>
+      static std::optional<book::Handle<book::Entry<T>>>
       getObject( const std::filesystem::path& pathName ) ;
 
       friend InternalClass;
@@ -65,7 +65,7 @@ namespace marlin {
        *  @throw TODO: ErrorType if an Object at path already exist with other type
        */
       template<typename HistT>
-      static  book::Handle<book::Manager<HistT>>
+      static  book::Handle<book::Entry<HistT>>
       create(
         const Processor * const proc,
         const std::filesystem::path& pathName,
@@ -84,7 +84,7 @@ namespace marlin {
        */
       template<typename HistT>
       [[nodiscard]]
-      static book::Handle<book::Manager<HistT>> 
+      static book::Handle<book::Entry<HistT>> 
       getHistogram(const Processor * proc, const std::filesystem::path& path) ;
 
 
@@ -184,7 +184,7 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   template<typename HistT>
-  book::Handle<book::Manager<HistT>>
+  book::Handle<book::Entry<HistT>>
   ProcessorApi::Book::create(
     const Processor * const proc,
     const std::filesystem::path& pathName,
@@ -194,7 +194,7 @@ namespace marlin {
       HistT::Dimension>& axes,
     const book::Flag_t& flags ) {
     using namespace book;
-    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
+    std::optional<Handle<Entry<HistT>>> res = getObject<HistT>(pathName);
     // TODO: decision: need more test? 
     if ( res ) {
       return std::move(res.value());
@@ -222,11 +222,11 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   template<typename HistT>
-  book::Handle<book::Manager<HistT>> 
+  book::Handle<book::Entry<HistT>> 
   ProcessorApi::Book::getHistogram(const Processor * proc, const std::filesystem::path& pathName) 
   {
     using namespace book;
-    std::optional<Handle<Manager<HistT>>> res = getObject<HistT>(pathName);
+    std::optional<Handle<Entry<HistT>>> res = getObject<HistT>(pathName);
     if ( res ) {
       return res.value();
     }
@@ -236,7 +236,7 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   template<typename T>
-  std::optional<book::Handle<book::Manager<T>>>
+  std::optional<book::Handle<book::Entry<T>>>
   ProcessorApi::Book::getObject( const std::filesystem::path& pathName ) {
     using namespace book;
     using namespace book;
