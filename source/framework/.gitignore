@@ -1,1 +1,2 @@
 include/marlin/MarlinConfig.h
+include/marlin/MarlinBookConfig.h
