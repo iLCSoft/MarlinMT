@@ -17,6 +17,19 @@ configure_file(
   @ONLY
 )
 
+#--- Generate MarlinBookConfig.h
+# Map the options available in MARLIN_BOOK_IMPL variable
+set( MARLIN_BOOK_HEADER_dummy Dummy.h )
+set( MARLIN_BOOK_HEADER_root6 Dummy.h ) # No ROOT 6 implementation for the moment
+set( MARLIN_BOOK_HEADER_root7 ROOTv7.h )
+# Select the implementation config
+set( MARLIN_BOOK_IMPL_HEADER ${MARLIN_BOOK_HEADER_${MARLIN_BOOK_IMPL}} )
+configure_file(
+  ${PROJECT_SOURCE_DIR}/cmake/MarlinBookConfig.h.cmake.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/marlin/MarlinBookConfig.h
+  @ONLY
+)
+
 # MarlinCore library
 aux_source_directory( src MarlinCore_sources )
 aux_source_directory( src/concurrency MarlinCore_sources )
