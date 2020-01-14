@@ -83,7 +83,7 @@ namespace marlin {
       template<typename HistT>
       [[nodiscard]]
       static book::Handle<book::Entry<HistT>> 
-      getHistogram(const Processor * proc, const std::filesystem::path& path) ;
+      get(const Processor * proc, const std::filesystem::path& path) ;
 
 
       /**
@@ -170,88 +170,12 @@ namespace marlin {
   };
 
   //--------------------------------------------------------------------------
-  //--------------------------------------------------------------------------
 
   template <typename HANDLER>
   inline const HANDLER* ProcessorApi::geometry( const Processor *const proc ) {
     return proc->app().geometryManager().geometry<HANDLER>() ;
   }
 
-  //--------------------------------------------------------------------------
-
-  template<typename HistT>
-  book::Handle<book::Entry<HistT>>
-  ProcessorApi::Book::create(
-    const Processor * const proc,
-    const std::filesystem::path& pathName,
-    const std::string_view& title,
-    const std::array<
-      book::types::AxisConfig<typename HistT::Precision_t>,
-      HistT::Dimension>& axes,
-    const book::Flag_t& flags ) {
-    using namespace book;
-    std::optional<Handle<Entry<HistT>>> res = getObject<HistT>(pathName);
-    // TODO: decision: need more test? 
-    if ( res ) {
-      return std::move(res.value());
-    }
-    EntryData<HistT> data(title, axes);
-    std::filesystem::path path 
-      = (std::filesystem::path(proc->name()) / pathName).remove_filename() ;
-
-    BookStore& store = *static_cast<BookStore*>(nullptr);
-    if ( flags.contains(book::Flags::Book::MultiCopy) ) {
-      return store.book(
-        path,
-        pathName.filename().string(),
-        data.multiCopy(1 /* FIXME: need a number */));
-    } else if ( flags.contains(book::Flags::Book::MultiShared)){
-      return store.book(
-        path,
-        pathName.filename().string(),
-        data.multiShared()); 
-    } 
-    return store.book( 
-        path,
-        pathName.filename().string(),
-        data.single());
-  } 
-
-  //--------------------------------------------------------------------------
-
-  template<typename HistT>
-  book::Handle<book::Entry<HistT>> 
-  ProcessorApi::Book::getHistogram(const Processor * proc, const std::filesystem::path& pathName) 
-  {
-    using namespace book;
-    std::optional<Handle<Entry<HistT>>> res = getObject<HistT>(pathName);
-    if ( res ) {
-      return res.value();
-    }
-    throw std::exception();
-  }
-
-  //--------------------------------------------------------------------------
-
-  template<typename T>
-  std::optional<book::Handle<book::Entry<T>>>
-  ProcessorApi::Book::getObject( const std::filesystem::path& pathName ) {
-    using namespace book;
-    using namespace book;
-    
-    BookStore& store = *static_cast<BookStore*>(nullptr);
-
-    Selection res = store.find( 
-        ConditionBuilder()
-          .setType(typeid(T))
-          .setPath(std::filesystem::path(pathName).remove_filename().string())
-          .setName(pathName.filename().c_str()));
-    if ( res.size() != 1 ) {
-      return std::nullopt;
-    }
-    return std::optional(res.get(0).handle<T>());
-
-  }
 }
 
 #endif
