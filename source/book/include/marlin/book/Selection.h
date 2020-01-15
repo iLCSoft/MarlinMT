@@ -171,7 +171,7 @@ namespace marlin {
     private:
       /// entries which included in selection.
       std::vector< WeakEntry > _entries{} ;
-      /// condition which every entry full fill.
+      /// condition which every entry fulfill.
       Condition _condition{} ;
     } ;
 

@@ -22,11 +22,11 @@ namespace marlin {
     std::shared_ptr< details::Entry >
     BookStore::addEntry( const std::shared_ptr< EntryBase > &entry,
                          EntryKey                            key ) {
-      key.hash = _entries.size() ;
+      key.idx = _entries.size() ;
 
       if ( !_idToEntry
               .insert(
-                std::make_pair( Identifier( key.path ), key.hash ) )
+                std::make_pair( Identifier( key.path ), key.idx ) )
               .second ) {
         MARLIN_BOOK_THROW( "Object already exist. Use store.book to avoid this." ) ;
       }
@@ -44,7 +44,14 @@ namespace marlin {
           ConditionBuilder())
       );  
     }
+
+    //--------------------------------------------------------------------------
     
+    void BookStore::storeSelection(
+        StoreWriter& writer, const Selection& selection) const {
+      writer.writeSelection(selection);
+    }
+
     //--------------------------------------------------------------------------
 
     Selection BookStore::find( const Condition &cond ) {

@@ -126,15 +126,15 @@ namespace marlin {
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      details::Entry &get( const EntryKey &key ) { return get( key.hash ); }
+      details::Entry &get( const EntryKey &key ) { return get( key.idx ); }
 
       /**
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      details::Entry &get( std::size_t const key ) {
+      details::Entry &get( std::size_t const idx ) {
         try {
-          return *_entries[key] ;
+          return *_entries[idx] ;
         } catch ( const std::out_of_range & ) {
           MARLIN_BOOK_THROW( "Invalid key." ) ;
         }
@@ -238,11 +238,23 @@ namespace marlin {
 
       /**
        *  @brief saves all Objects in one Root-File. 
-       *  @param path where save Root-File. 
+       *  @param writer used to serialize objects. 
        *  @throw BookStoreException when: Sere kisser 
        *    - directory to store not exist.
        */
       void store( StoreWriter& writer ) const ;
+      
+      /**
+       *  @brief stores only Objects which key is listed.   
+       *  @param writer used to serialize objects. 
+       *  @param begin of list with keys
+       *  @param end of list with keys (not included)
+       *  @tparam Itr Iterator type used for traversing keys
+       */
+      template<typename Itr>
+      void storeList( StoreWriter& writer, Itr begin, Itr end) const ; 
+
+      void storeSelection( StoreWriter& writer, const Selection& selection ) const ;
 
     private:
       /// stores Entries created by BookStore.
@@ -391,6 +403,26 @@ namespace marlin {
     template < typename T >
     Handle< T > Handle< Entry< T > >::handle() {
       return _entry->handle< T >( unmap( std::this_thread::get_id()) ) ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Itr >
+    void BookStore::storeList( StoreWriter& writer, Itr begin, Itr end) const {
+      static_assert(std::is_same_v<
+            EntryKey,
+            std::remove_reference_t<std::remove_cv_t<decltype(*begin)>>>);
+      decltype(_entries) storeList{};
+      for( Itr itr = begin; itr != end; ++itr) {
+        storeList.push_back(get(itr->idx)); 
+      } 
+      storeSelection(
+        writer,
+        Selection::find(
+          storeList.begin(),
+          storeList.end(),
+          ConditionBuilder())
+      );
     }
 
   } // end namespace book

@@ -35,7 +35,7 @@ namespace marlin {
       /// Status flags from Entry.
       Flag_t flags{} ;
       /// unique number for Entry
-      std::size_t hash{0} ;
+      std::size_t idx{std::numeric_limits<std::size_t>::max()} ;
     } ;
 
     /**

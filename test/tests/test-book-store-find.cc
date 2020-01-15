@@ -35,8 +35,8 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       test.test( "Basic find function BookStore",
                  selection.size() == 2 && selection1.size() == 1
                    && selection2.size() == 1 && selection3.size() == 2
-                   && selection1.begin()->key().hash
-                        == selection2.begin()->key().hash ) ;
+                   && selection1.begin()->key().idx
+                        == selection2.begin()->key().idx ) ;
 
       auto subSelection
         = selection.find( ConditionBuilder().setPath( "/path/" ),
@@ -45,8 +45,8 @@ int main( int /*argc*/, char * /*argv*/[] ) {
 
       test.test( "Sub selection composing AND",
                  subSelection.size() == 1 && subSelection1.size() == 1
-                   && subSelection.begin()->key().hash
-                        == subSelection1.begin()->key().hash ) ;
+                   && subSelection.begin()->key().idx
+                        == subSelection1.begin()->key().idx ) ;
     }
     {
       BookStore   store{} ;
@@ -79,7 +79,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
         for ( ; equal && aItr[0] != selC[0].end(); ) {
           for ( int i = 0; i < nItrerations / 2 - 1; ++aItr.at( i++ ) ) {
             if ( i < 3
-                 && aItr.at( i )->key().hash != aItr.at( i + 1 )->key().hash ) {
+                 && aItr.at( i )->key().idx != aItr.at( i + 1 )->key().idx ) {
               equal = false ;
               break ;
             }
@@ -108,7 +108,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
       bool equal = true ;
       auto itr2  = sel2.begin() ;
       for ( auto itr = sel.begin(); itr != sel.end(); ++itr, ++itr2 ) {
-        if ( itr->key().hash != itr2->key().hash ) {
+        if ( itr->key().idx != itr2->key().idx ) {
           equal = false ;
           break ;
         }

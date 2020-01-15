@@ -243,32 +243,58 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     ) ;
   std::filesystem::path pathRootFile( "./test.root" ) ;
 
-  BookStore store{} ;
-  try {
-    bluePrint.Create( store ) ;
-  } catch ( const marlin::book::exceptions::BookStoreException &expc ) {
-    test.test( std::string( "unexpected error: '" ) + expc.what() + "'",
-               false ) ;
+  {
+    BookStore store{} ;
+    try {
+      bluePrint.Create( store ) ;
+    } catch ( const marlin::book::exceptions::BookStoreException &expc ) {
+      test.test( std::string( "unexpected error: '" ) + expc.what() + "'",
+                 false ) ;
+    }
+
+    StoreWriter ser( pathRootFile ) ;
+    store.store( ser ) ;
+
+    {
+      TFile *file = TFile::Open( pathRootFile.c_str(), "READ" ) ;
+      std::optional< std::string > error = std::nullopt ;
+      try {
+        bluePrint.Test( file ) ;
+      } catch ( const std::string &msg ) {
+        error = msg ;
+      }
+
+      if ( std::filesystem::exists( pathRootFile ) ) {
+        std::filesystem::remove(pathRootFile) ;
+      }
+
+      test.test( std::string( "Write to ROOT-6 File store function" )
+                   + ( error ? ( ": '" + error.value() + "'" ) : "" ),
+                 !error ) ;
+    } {
+      std::vector<EntryKey> fullKeyList;
+      for ( const WeakEntry& entry : store.find(ConditionBuilder())) {
+        fullKeyList.push_back(entry.key());
+      }
+      store.storeList(ser, fullKeyList.begin(), fullKeyList.end());
+
+      TFile *file = TFile::Open( pathRootFile.c_str(), "READ") ;
+      std::optional<std::string> error = std::nullopt ;
+      try {
+        bluePrint.Test( file ) ;
+      } catch ( const std::string &msg ) {
+        error = msg ; 
+      }
+
+      if ( std::filesystem::exists( pathRootFile ) ) {
+        std::filesystem::remove(pathRootFile) ;
+      }
+
+      test.test( std::string( "Write to ROOT-6 File with storeList" )
+                   + ( error ? ( ": '" + error.value() + "'" ) : "" ),
+                 !error ) ;
+    }
   }
-
-  StoreWriter ser( pathRootFile ) ;
-  store.store( ser ) ;
-
-  TFile *file = TFile::Open( pathRootFile.string().c_str(), "READ" ) ;
-  std::optional< std::string > error = std::nullopt ;
-  try {
-    bluePrint.Test( file ) ;
-  } catch ( const std::string &msg ) {
-    error = msg ;
-  }
-
-  if ( std::filesystem::exists( pathRootFile ) ) {
-    std::filesystem::remove(pathRootFile) ;
-  }
-
-  test.test( std::string( "Write to ROOT-6 File" )
-               + ( error ? ( ": '" + error.value() + "'" ) : "" ),
-             !error ) ;
 
   return 0 ;
 }
