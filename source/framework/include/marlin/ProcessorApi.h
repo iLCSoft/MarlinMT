@@ -69,7 +69,7 @@ namespace marlin {
         const std::filesystem::path& pathName,
         const std::string_view& title,
         const std::array<
-          book::AxisConfig<typename HistT::Precision_t>,
+          AxisConfig<typename HistT::Precision_t>,
           HistT::Dimension>& axes,
         const book::Flag_t& flags = DefaultConfiguration ) ;
 
