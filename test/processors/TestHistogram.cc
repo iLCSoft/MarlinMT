@@ -25,7 +25,7 @@ public:
   void end() final;
 
 private:
-  book::H1FEntry _histogram;
+  H1FEntry _histogram;
 };
 
 TestHistogram::TestHistogram() :
@@ -45,7 +45,7 @@ void TestHistogram::init() {
 void TestHistogram::processEvent(EventStore * evt) {
   IMPL::LCEventImpl* event 
     = dynamic_cast<IMPL::LCEventImpl*>(evt->event<EVENT::LCEvent>().get());
-  book::H1FHandle hnd = _histogram.handle();
+  H1FHandle hnd = _histogram.handle();
   try {
     EVENT::LCCollection * coll 
       =  event->getCollection("MCParticle");
