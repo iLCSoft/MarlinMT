@@ -3,60 +3,65 @@
 // WARNING: this header has been generated at configure time via CMake.
 // Modification may be lost ...
 #include <marlin/book/configs/@MARLIN_BOOK_IMPL_HEADER@>
+#include <marlin/book/BookStore.h>
 
 namespace marlin {
+    
+  // import types and forward declarations
+ 
+  template<typename P>
+  using AxisConfig = book::types::AxisConfig<P> ;
   
-  namespace book {
-    
-    // import types and forward declarations
-   
-    template<typename Precission>
-    using AxisConfig = types::AxisConfig<Precission> ;
-    
-    template <typename P, typename W, std::size_t D>
-    using HistConfig = types::HistConfig<P, W, D> ;
-    
-    template <typename P, typename W, std::size_t D>
-    using HistT = types::HistT<HistConfig<P, W, D>> ;
-    
-    template <typename T>
-    class Entry ;
-    
-    // Histogram types
-    using Hist1F = types::H1F ;
-    using Hist1D = types::H1D ;
-    using Hist1I = types::H1I ;
-    using Hist2F = types::H2F ;
-    using Hist2D = types::H2D ;
-    using Hist2I = types::H2I ;
-    using Hist3F = types::H3F ;
-    using Hist3D = types::H3D ;
-    using Hist3I = types::H3I ;
-    
-    // Handle on histogram entries
-    // This is what you get when you book something
-    // using the ProcessorApi::Book::create()
-    using H1FEntry = Handle<Entry<Hist1F>> ;
-    using H1DEntry = Handle<Entry<Hist1D>> ;
-    using H1IEntry = Handle<Entry<Hist1I>> ;
-    using H2FEntry = Handle<Entry<Hist2F>> ;
-    using H2DEntry = Handle<Entry<Hist2D>> ;
-    using H2IEntry = Handle<Entry<Hist2I>> ;
-    using H3FEntry = Handle<Entry<Hist3F>> ;
-    using H3DEntry = Handle<Entry<Hist3D>> ;
-    using H3IEntry = Handle<Entry<Hist3I>> ;
-    
-    // Handle on histograms
-    // This is what you get when you call entry.handle()
-    using H1FHandle = Handle<Hist1F> ;
-    using H1DHandle = Handle<Hist1D> ;
-    using H1IHandle = Handle<Hist1I> ;
-    using H2FHandle = Handle<Hist2F> ;
-    using H2DHandle = Handle<Hist2D> ;
-    using H2IHandle = Handle<Hist2I> ;
-    using H3FHandle = Handle<Hist3F> ;
-    using H3DHandle = Handle<Hist3D> ;
-    using H3IHandle = Handle<Hist3I> ;
-    
-  }
+  template <typename P, typename W, std::size_t D>
+  using HistConfig = book::types::HistConfig<P, W, D> ;
+  
+  template <typename P, typename W, std::size_t D>
+  using HistT = book::types::HistT<HistConfig<P, W, D>> ;
+  
+  using BookFlag = book::Flag_t ;
+  
+  template <typename T>
+  class Entry ;
+  
+  // AxisConfig types
+  using AxisConfigF = AxisConfig<float> ;
+  using AxisConfigD = AxisConfig<double> ;
+  using AxisConfigI = AxisConfig<int> ;
+  
+  // Histogram types
+  using Hist1F = book::types::H1F ;
+  using Hist1D = book::types::H1D ;
+  using Hist1I = book::types::H1I ;
+  using Hist2F = book::types::H2F ;
+  using Hist2D = book::types::H2D ;
+  using Hist2I = book::types::H2I ;
+  using Hist3F = book::types::H3F ;
+  using Hist3D = book::types::H3D ;
+  using Hist3I = book::types::H3I ;
+  
+  // Handle on histogram entries
+  // This is what you get when you book something
+  // using the ProcessorApi::Book::create()
+  using H1FEntry = book::Handle<book::Entry<Hist1F>> ;
+  using H1DEntry = book::Handle<book::Entry<Hist1D>> ;
+  using H1IEntry = book::Handle<book::Entry<Hist1I>> ;
+  using H2FEntry = book::Handle<book::Entry<Hist2F>> ;
+  using H2DEntry = book::Handle<book::Entry<Hist2D>> ;
+  using H2IEntry = book::Handle<book::Entry<Hist2I>> ;
+  using H3FEntry = book::Handle<book::Entry<Hist3F>> ;
+  using H3DEntry = book::Handle<book::Entry<Hist3D>> ;
+  using H3IEntry = book::Handle<book::Entry<Hist3I>> ;
+  
+  // Handle on histograms
+  // This is what you get when you call entry.handle()
+  using H1FHandle = book::Handle<Hist1F> ;
+  using H1DHandle = book::Handle<Hist1D> ;
+  using H1IHandle = book::Handle<Hist1I> ;
+  using H2FHandle = book::Handle<Hist2F> ;
+  using H2DHandle = book::Handle<Hist2D> ;
+  using H2IHandle = book::Handle<Hist2I> ;
+  using H3FHandle = book::Handle<Hist3F> ;
+  using H3DHandle = book::Handle<Hist3D> ;
+  using H3IHandle = book::Handle<Hist3I> ;
+  
 }
