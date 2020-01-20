@@ -208,7 +208,7 @@ namespace marlin {
     public:
       explicit BookStore( bool allowMoving = false )
         : _constructThread( std::this_thread::get_id() ), 
-          _allowMoving{allowMoving} {}
+          _allowMoving{allowMoving} { }
 
       /**
        *  @brief book new object.
