@@ -16,6 +16,7 @@ cmake \
   -DMARLIN_GEAR=ON \
   -DBUILD_TESTING=ON \
   -DMARLIN_WERROR=ON \
+	-DMARLIN_BOOK_IMPL=root7 \
   .. && \
 make install && \
 ctest --output-on-failure
