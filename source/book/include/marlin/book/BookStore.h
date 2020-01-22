@@ -87,7 +87,7 @@ namespace marlin {
       /// count number of Handle instances.
       std::atomic< std::size_t > _count{0} ;
       /// shared mutex for serialisation when writing 
-      std::shared_mutex _mappingAcces{};
+      std::shared_mutex _mappingAccess{};
     } ;
 
     /**
@@ -279,6 +279,11 @@ namespace marlin {
       template<typename Itr>
       void storeList( StoreWriter& writer, Itr begin, Itr end) const ; 
 
+      /**
+       *  @brief stores all objects from the selection.
+       *  @param writer used to serialize objects.
+       *  @param selection which includes objects to write.
+       */
       void storeSelection( StoreWriter& writer, const Selection& selection ) const ;
 
     private:
@@ -381,14 +386,14 @@ namespace marlin {
     std::size_t Handle< Entry< T > >::unmap( 
         const Handle<Entry<T>>::ThreadId_t& id ) {
       {
-        std::shared_lock lock(_mappingAcces);
+        std::shared_lock lock(_mappingAccess);
         auto itr = _mapping->find( id ) ;
         if ( itr != _mapping->end() ) {
           return itr->second;
         }
       }
 
-      std::unique_lock lock(_mappingAcces);
+      std::unique_lock lock(_mappingAccess);
       return _mapping->insert(std::make_pair( id, _count++ ) ).first->second;
     }
 
