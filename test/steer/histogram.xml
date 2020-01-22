@@ -1,6 +1,6 @@
 <?xml version="1.0" enconding="us-ascii"?>
 
-<marlin xmlns:xsi="https://www.w3.org/2001/XMLShema-instance" xsi:noNamespaceSchemaLocation="htts://ilcsoft.desy.de/marlin/marlin.xsd">
+<marlin>
   <execute>
     <processor name="MyTestHistogram" />
   </execute>

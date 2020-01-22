@@ -98,6 +98,93 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
   
+  H1DEntry ProcessorApi::Book::bookHist1D (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfig,
+    const BookFlag &flags )  {
+    return proc->app().bookStoreManager().bookHist<Hist1D>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfig},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H1DEntry ProcessorApi::Book::getHist1D (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObjectOrThrow<Hist1D>( 
+        proc->app().bookStoreManager(), 
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+
+  H2DEntry ProcessorApi::Book::bookHist2D (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfigX,
+    const AxisConfigD &axisconfigY,
+    const BookFlag &flags) {
+    return proc->app().bookStoreManager().bookHist<Hist2D>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfigX, &axisconfigY},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H2DEntry ProcessorApi::Book::getHist2D (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObjectOrThrow<Hist2D>(
+        proc->app().bookStoreManager(),
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+  
+  H3DEntry ProcessorApi::Book::bookHist3D (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfigX,
+    const AxisConfigD &axisconfigY,
+    const AxisConfigD &axisconfigZ,
+    const BookFlag &flags )  {
+    return proc->app().bookStoreManager().bookHist<Hist3D>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfigX, &axisconfigY, &axisconfigZ},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H3DEntry ProcessorApi::Book::getHist3D (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObjectOrThrow<Hist3D>( 
+        proc->app().bookStoreManager(), 
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+  
   void ProcessorApi::Book::write( 
       const Processor *proc,
       const book::EntryKey &key) 

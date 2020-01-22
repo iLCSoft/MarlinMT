@@ -89,6 +89,66 @@ namespace marlin {
         const BookFlag &flags  = DefaultConfiguration) ; 
 
       /**
+       *  @brief  Book  a histogram 1D, double type
+       *  
+       *  @param  proc       the processor booking the histogram
+       *  @param  path       the histogram entry path
+       *  @param  name       the histogram name
+       *  @param  title      the histogram title
+       *  @param  axisconfig the histogram X axis config
+       *  @param  flags      the book flag policy
+       */
+      [[nodiscard]] static H1DEntry bookHist1D (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfig,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
+       *  @brief  Book  a histogram 2D, double type
+       *  
+       *  @param  proc        the processor booking the histogram
+       *  @param  path        the histogram entry path
+       *  @param  name        the histogram name
+       *  @param  title       the histogram title
+       *  @param  axisconfigX the histogram X axis configuration
+       *  @param  axisconfigY the histogram Y axis configuration
+       *  @param  flags       the book flag policy
+       */
+      [[nodiscard]] static H2DEntry bookHist2D (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfigX,
+        const AxisConfigD &axisconfigY,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
+       *  @brief  Book  a histogram 3D, double type
+       *  
+       *  @param  proc        the processor booking the histogram
+       *  @param  path        the histogram entry path
+       *  @param  name        the histogram name
+       *  @param  title       the histogram title
+       *  @param  axisconfigX the histogram X axis configuration
+       *  @param  axisconfigY the histogram Y axis configuration
+       *  @param  axisconfigZ the histogram Z axis configuration
+       *  @param  flags       the book flag policy
+       */
+      [[nodiscard]] static H3DEntry bookHist3D (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfigX,
+        const AxisConfigD &axisconfigY,
+        const AxisConfigD &axisconfigZ,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
        *  @brief Get handle for booked histogram 1D, float type.
        *
        *  @param proc the processor which booked the histogram
@@ -108,6 +168,42 @@ namespace marlin {
        *  @param name the histogram name
        */
       [[nodiscard]] static H2FEntry getHist2F (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 1D, double type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H1DEntry getHist1D (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 2D, double type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H2DEntry getHist2D (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 3D, double type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H3DEntry getHist3D (
         const Processor *proc,
         const std::filesystem::path &path,
         const std::string_view &name ) ;

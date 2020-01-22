@@ -50,29 +50,46 @@ namespace marlin {
         /**
          *  @brief Axis with irregular borders 
          *  @param title title
-         *  @param borders list of borders,
-         *         - borders[0] … lower bound
-         *         - borders.end … upper bound
-         *         - borders.size - 1 … amount of bins
+         *  @tparam Itr iterator type
+         *  @param begin,end range to copy bins
+         *         - begin … lower bound
+         *         - end - 1 … upper bound
+         *         - (begin - end) - 1 … amount of bins
          */
+        template<typename Itr>
         AxisConfig( const std::string_view& title,
-                    std::vector<Precision_t>&& borders) 
+                    Itr begin, Itr end) 
 
           : _title(title),
-            _bins{borders.size() - 1},
-            _min{borders[0]},
-            _max{borders.end()},
-            _iregularBorder{borders}
+            _bins{(end - begin) - 1},
+            _iregularBorder(begin, end),
+            _min{_iregularBorder.front()},
+            _max{_iregularBorder.back()}
         {}
 
         /**
          *  @brief Axis with irregular borders 
-         *  @param borders list of borders,
-         *         - borders[0] … lower bound
-         *         - borders.end … upper bound
+         *  @tparam Itr iterator type
+         *  @param begin,end range to copy bins
+         *         - begin … lower bound
+         *         - end - 1 … upper bound
+         *         - (begin - end) - 1 … amount of bins
          */
-        explicit AxisConfig( std::vector<Precision_t>&& borders) 
-          : AxisConfig( "", borders ){}
+        template<typename Itr>
+        explicit AxisConfig( Itr begin, Itr end ) 
+          : AxisConfig<Itr>( "", begin, end ){}
+
+        /**
+         *  @brief Axis with irregular borders.
+         *  @tparam Container type of Container which includes bin border. (need begin, end)
+         *  @param title title
+         *  @param container with bin borders 
+         */
+        template<typename Container>
+        AxisConfig(
+            const std::string_view& title,
+            const Container& container)
+          : AxisConfig(title, container.begin(), container.end()) {}
 
         /// Get Axis Title.
         [[nodiscard]]
