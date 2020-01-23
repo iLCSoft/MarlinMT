@@ -38,7 +38,7 @@ namespace marlin {
        *  @brief logical OR on tow set of Flags.
        */
       Flag_t operator|( const Flag_t &f ) const {
-        return Flag_t( _val & f._val ) ;
+        return Flag_t( _val | f._val ) ;
       }
 
       /**
@@ -100,15 +100,15 @@ namespace marlin {
       }
       /// flags for booking
       namespace Book {
-        /// create multiple instances of booked object (if possible) to avoid
-        /// sync points
-        constexpr Flag_t MultiCopy( 1U << 2U ) ;
         /// vanilla object.
         constexpr Flag_t Single( 1U << 0U ) ;
         /// create one instance witch concurrent access.
         constexpr Flag_t MultiShared( 1U << 1U ) ;
+        /// create multiple instances of booked object (if possible) to avoid
+        /// sync points
+        constexpr Flag_t MultiCopy( 1U << 2U ) ;
         /// store object in file at end of lifetime
-        constexpr Flag_t Store( 1U << 2U ) ;
+        constexpr Flag_t Store( 1U << 3U ) ;
       } // end namespace Book
 
     } // end namespace Flags
