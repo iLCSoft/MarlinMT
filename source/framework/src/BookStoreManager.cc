@@ -101,7 +101,7 @@ namespace marlin {
     Entry_t res = getObject<HistT>(getKey(path, name)) ;
     const book::EntryKey& key = res.key();
     if (   key.flags != flagsToPass
-        || key.type !=  std::type_index(typeid(Hist1F))) {
+        || key.type !=  std::type_index(typeid(HistT))) {
       MARLIN_THROW("try to book to the same spot again");
     } 
     return res;
