@@ -46,6 +46,8 @@ namespace marlin {
           book::Flags::value(book::Flags::Book::MultiShared)
         | book::Flags::value(book::Flags::Book::Store)};
 
+      // book histogram float
+
       /**
        *  @brief  Book  a histogram 1D, float type
        *  
@@ -83,6 +85,30 @@ namespace marlin {
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
         const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
+       *  @brief  Book  a histogram 3D, float type
+       *  
+       *  @param  proc        the processor booking the histogram
+       *  @param  path        the histogram entry path
+       *  @param  name        the histogram name
+       *  @param  title       the histogram title
+       *  @param  axisconfigX the histogram X axis configuration
+       *  @param  axisconfigY the histogram Y axis configuration
+       *  @param  axisconfigZ the histogram Z axis configuration
+       *  @param  flags       the book flag policy
+       */
+      [[nodiscard]] static H3FEntry bookHist3F (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfigX,
+        const AxisConfigD &axisconfigY,
+        const AxisConfigD &axisconfigZ,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      // book histogram double
 
       /**
        *  @brief  Book  a histogram 1D, double type
@@ -144,6 +170,70 @@ namespace marlin {
         const AxisConfigD &axisconfigZ,
         const BookFlag &flags  = DefaultConfiguration) ; 
 
+      // book histogram integer 
+      
+      /**
+       *  @brief  Book  a histogram 1D, integer type
+       *  
+       *  @param  proc       the processor booking the histogram
+       *  @param  path       the histogram entry path
+       *  @param  name       the histogram name
+       *  @param  title      the histogram title
+       *  @param  axisconfig the histogram X axis config
+       *  @param  flags      the book flag policy
+       */
+      [[nodiscard]] static H1IEntry bookHist1I (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfig,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
+       *  @brief  Book  a histogram 2D, integer type
+       *  
+       *  @param  proc        the processor booking the histogram
+       *  @param  path        the histogram entry path
+       *  @param  name        the histogram name
+       *  @param  title       the histogram title
+       *  @param  axisconfigX the histogram X axis configuration
+       *  @param  axisconfigY the histogram Y axis configuration
+       *  @param  flags       the book flag policy
+       */
+      [[nodiscard]] static H2IEntry bookHist2I (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfigX,
+        const AxisConfigD &axisconfigY,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      /**
+       *  @brief  Book  a histogram 3D, integer type
+       *  
+       *  @param  proc        the processor booking the histogram
+       *  @param  path        the histogram entry path
+       *  @param  name        the histogram name
+       *  @param  title       the histogram title
+       *  @param  axisconfigX the histogram X axis configuration
+       *  @param  axisconfigY the histogram Y axis configuration
+       *  @param  axisconfigZ the histogram Z axis configuration
+       *  @param  flags       the book flag policy
+       */
+      [[nodiscard]] static H3IEntry bookHist3I (
+        const Processor *proc, 
+        const std::filesystem::path &path, 
+        const std::string_view &name,
+        const std::string_view &title,
+        const AxisConfigD &axisconfigX,
+        const AxisConfigD &axisconfigY,
+        const AxisConfigD &axisconfigZ,
+        const BookFlag &flags  = DefaultConfiguration) ; 
+
+      // get histogram float
+
       /**
        *  @brief Get handle for booked histogram 1D, float type.
        *
@@ -167,6 +257,20 @@ namespace marlin {
         const Processor *proc,
         const std::filesystem::path &path,
         const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 3D, float type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H3FEntry getHist3F (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      // get histogram double
 
       /**
        *  @brief Get handle for booked histogram 1D, double type.
@@ -203,6 +307,45 @@ namespace marlin {
         const Processor *proc,
         const std::filesystem::path &path,
         const std::string_view &name ) ;
+
+      // get histogram integer
+
+      /**
+       *  @brief Get handle for booked histogram 1D, integer type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H1IEntry getHist1I (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 2D, integer type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H2IEntry getHist2I (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
+      /**
+       *  @brief Get handle for booked histogram 3D, integer type.
+       *
+       *  @param proc the processor which booked the histogram
+       *  @param path the histogram entry path
+       *  @param name the histogram name
+       */
+      [[nodiscard]] static H3IEntry getHist3I (
+        const Processor *proc,
+        const std::filesystem::path &path,
+        const std::string_view &name ) ;
+
 
 
       /**

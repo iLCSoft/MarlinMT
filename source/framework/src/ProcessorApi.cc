@@ -95,6 +95,36 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
   
+  H3FEntry ProcessorApi::Book::bookHist3F (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfigX,
+    const AxisConfigD &axisconfigY,
+    const AxisConfigD &axisconfigZ,
+    const BookFlag &flags )  {
+    return proc->app().bookStoreManager().bookHist<Hist3F>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfigX, &axisconfigY, &axisconfigZ},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H3FEntry ProcessorApi::Book::getHist3F (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObject<Hist3F>( 
+        proc->app().bookStoreManager(), 
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+  
   H1DEntry ProcessorApi::Book::bookHist1D (
     const Processor *proc, 
     const std::filesystem::path &path, 
@@ -176,6 +206,93 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3D>( 
+        proc->app().bookStoreManager(), 
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+  
+  H1IEntry ProcessorApi::Book::bookHist1I (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfig,
+    const BookFlag &flags )  {
+    return proc->app().bookStoreManager().bookHist<Hist1I>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfig},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H1IEntry ProcessorApi::Book::getHist1I (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObject<Hist1I>( 
+        proc->app().bookStoreManager(), 
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+
+  H2IEntry ProcessorApi::Book::bookHist2I (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfigX,
+    const AxisConfigD &axisconfigY,
+    const BookFlag &flags) {
+    return proc->app().bookStoreManager().bookHist<Hist2I>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfigX, &axisconfigY},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H2IEntry ProcessorApi::Book::getHist2I (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObject<Hist2I>(
+        proc->app().bookStoreManager(),
+        constructPath(proc, path), name);
+  }
+
+  //--------------------------------------------------------------------------
+  
+  H3IEntry ProcessorApi::Book::bookHist3I (
+    const Processor *proc, 
+    const std::filesystem::path &path, 
+    const std::string_view &name,
+    const std::string_view &title,
+    const AxisConfigD &axisconfigX,
+    const AxisConfigD &axisconfigY,
+    const AxisConfigD &axisconfigZ,
+    const BookFlag &flags )  {
+    return proc->app().bookStoreManager().bookHist<Hist3I>(
+      constructPath(proc, path),
+      name,
+      title,
+      {&axisconfigX, &axisconfigY, &axisconfigZ},
+      flags);
+  } 
+
+  //--------------------------------------------------------------------------
+
+  H3IEntry ProcessorApi::Book::getHist3I (
+    const Processor *proc,
+    const std::filesystem::path &path,
+    const std::string_view &name ) {
+    return getObject<Hist3I>( 
         proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
