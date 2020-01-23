@@ -26,7 +26,12 @@ namespace marlin {
     BookStoreManager &operator=( const BookStoreManager & ) = delete ;
     BookStoreManager( BookStoreManager && ) = delete ;
     BookStoreManager &operator=( BookStoreManager && ) = delete ;
-    ~BookStoreManager() ;
+
+    /**
+     *  @brief reads output File from global StoreOutput. 
+     *    if set to "" (empty) no output file will be generated. 
+     */
+    void writeToDisk() const ;
     
     /// Whether the book store has been initialized
     [[nodiscard]] bool isInitialized() const ;
@@ -105,7 +110,7 @@ namespace marlin {
     /// The book store
     book::BookStore                      _bookStore {true} ;
     /// list of entry keys for Entries which should be stored at end of lifetime
-    std::set<book::EntryKey>             _entrysToWrite {} ;
+    std::set<book::EntryKey>             _entriesToWrite {} ;
     /// The logger instance
     Logger                               _logger {nullptr} ;
     /// path to file to store objects

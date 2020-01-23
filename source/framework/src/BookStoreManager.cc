@@ -35,12 +35,21 @@ namespace marlin {
   //--------------------------------------------------------------------------
     
   
-  BookStoreManager::~BookStoreManager() {
-    book::StoreWriter writer ( _storeFile ) ;
-    _bookStore.storeList(
-      writer,
-      _entrysToWrite.begin(), 
-      _entrysToWrite.end());
+  void BookStoreManager::writeToDisk() const {
+    if (_storeFile == "") {
+      if (_entriesToWrite.empty())   {
+        _logger->log<MESSAGE>() << "No Output file set!\n";
+      } else {
+        _logger->log<WARNING>() << "No Output file set, but " 
+          << _entriesToWrite.size() << " entries to write!\n";
+      }
+    } else {
+      book::StoreWriter writer ( _storeFile ) ;
+      _bookStore.storeList(
+        writer,
+        _entriesToWrite.begin(), 
+        _entriesToWrite.end());
+    }
   }
 
   //--------------------------------------------------------------------------
@@ -125,13 +134,13 @@ namespace marlin {
   //--------------------------------------------------------------------------
   
   void BookStoreManager::addToWrite( const book::EntryKey& key) {
-    _entrysToWrite.insert(key);
+    _entriesToWrite.insert(key);
   }
 
   //--------------------------------------------------------------------------
   
   void BookStoreManager::removeFromWrite( const book::EntryKey& key) {
-    _entrysToWrite.erase(key);
+    _entriesToWrite.erase(key);
   }
 
   //--------------------------------------------------------------------------

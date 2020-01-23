@@ -100,6 +100,7 @@ namespace marlin {
     }
     _geometryMgr.clear() ;
     _scheduler->end() ;
+    _bookStoreManager->writeToDisk();
     // end() ;
   }
 
