@@ -60,14 +60,22 @@ namespace marlin {
     }
     _application = app ;
     _logger = _application->createLogger( "BookStoreManager" ) ;
-    try {
-      _storeFile = app->globalParameters()
-        ->getValue<std::string>(OutPutFileParameterName);
-    } catch (const Exception& exception) {
+
+    std::shared_ptr<StringParameters> paras =  app->storeParameters();
+    if (!paras) {
       _logger->log<WARNING>() 
-        << "No output File set!"
-          "Fetch global " << OutPutFileParameterName << " failed with: " 
-        << exception.what() << '\n';  
+        << "no <store> node exist on top level!\n"
+        << "\tNo Output file set!\n"
+        << "\tUse Default flags for Booking!\n";
+    } else {
+      try {
+          _storeFile = paras->getValue<std::string>(OutPutFileParameterName);
+      } catch (const Exception& exception) {
+        _logger->log<WARNING>() 
+          << "No output File set!"
+            "Fetch global " << OutPutFileParameterName << " failed with: " 
+          << exception.what() << '\n';  
+      }
     }
   }
   

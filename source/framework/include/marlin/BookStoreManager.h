@@ -17,7 +17,7 @@ namespace marlin {
    *  @brief  BookStoreManager class
    */
   class BookStoreManager {
-    static constexpr char OutPutFileParameterName[] = "StoreOutputFile";
+    static constexpr char OutPutFileParameterName[] = "OutputFile";
   public:
     using Logger = Logging::Logger;   
   public:

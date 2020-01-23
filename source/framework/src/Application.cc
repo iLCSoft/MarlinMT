@@ -240,6 +240,12 @@ namespace marlin {
   }
 
   //--------------------------------------------------------------------------
+  
+  std::shared_ptr<StringParameters> Application::storeParameters () const {
+    return (nullptr == _parser) ? nullptr : _parser->getParameters( "Store" ) ;
+  }
+
+  //--------------------------------------------------------------------------
 
   std::shared_ptr<StringParameters> Application::geometryParameters () const {
     return (nullptr == _parser) ? nullptr : _parser->getParameters( "Geometry" ) ;

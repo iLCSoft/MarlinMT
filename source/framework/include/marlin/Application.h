@@ -77,6 +77,12 @@ namespace marlin {
     std::shared_ptr<StringParameters> globalParameters () const ;
 
     /**
+     *  @brief Get the store section parameters.
+     *    including setting for the Bookstore Manager.
+     */
+    std::shared_ptr<StringParameters> storeParameters () const ;
+
+    /**
      *  @brief  Get the geometry section parameters
      */
     std::shared_ptr<StringParameters> geometryParameters () const ;

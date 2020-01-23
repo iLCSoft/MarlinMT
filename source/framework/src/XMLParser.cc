@@ -85,6 +85,15 @@ namespace marlin{
             _current->add( "GeometryType", geotype );
         }
 
+        // optional store section
+        section = root->FirstChildElement("store");
+        if(section != 0) {
+          _map[ "store" ] = std::make_shared<StringParameters>() ;
+          _current = _map[ "store" ].get() ;
+          parametersFromNode( section, constants ) ;
+        }
+
+
         // data source section
         section = root->FirstChildElement("datasource")  ;
 
