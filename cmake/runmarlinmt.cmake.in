@@ -1,5 +1,5 @@
 #
-#   run a Marlin job with local input files - needs to be configured with CMake...
+#   run a MarlinMT job with local input files - needs to be configured with CMake...
 #
 #  users can set the following variables:
 #   MARLIN_DLL :           full path to Marlin plugin library(ies)
@@ -23,7 +23,7 @@ ENDFOREACH( input_file ${MARLIN_INPUT_FILES} )
 
 # execute marlin
 EXECUTE_PROCESS(
-	COMMAND $<TARGET_FILE:bin_Marlin> @MARLIN_STEERING_FILE@ @MARLIN_ARGS@
+	COMMAND $<TARGET_FILE:bin_MarlinMT> @MARLIN_STEERING_FILE@ @MARLIN_ARGS@
   OUTPUT_VARIABLE RUN_OUTPUT
 )
 

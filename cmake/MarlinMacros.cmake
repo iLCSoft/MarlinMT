@@ -197,6 +197,7 @@ endfunction()
 # Usage:
 #     marlin_add_processor_test( <name>
 #        STEERING_FILE <file>
+#				 [PARALLEL]
 #        [REGEX_PASS <regex>]
 #        [REGEX_FAIL <regex>]
 #        [INPUT_FILES <files>]
@@ -204,7 +205,7 @@ endfunction()
 #     )
 #
 function( MARLIN_ADD_PROCESSOR_TEST test_name )
-  cmake_parse_arguments(ARG "" "STEERING_FILE;REGEX_PASS;REGEX_FAIL" "INPUT_FILES;MARLIN_ARGS;MARLIN_DLL;COMPONENTS" ${ARGN} )
+	cmake_parse_arguments(ARG "PARALLEL" "STEERING_FILE;REGEX_PASS;REGEX_FAIL" "INPUT_FILES;MARLIN_ARGS;MARLIN_DLL;COMPONENTS" ${ARGN} )
   if( NOT test_name )
     message( FATAL_ERROR "[UNIT_TESTS] Configuring processor test without name" )
   endif()
@@ -246,7 +247,13 @@ function( MARLIN_ADD_PROCESSOR_TEST test_name )
   # configure cmake test file.
   # Read the file content and use file( GENERATE )
   # because the MARLIN_DLL contains generator expressions
-  file( READ ${PROJECT_SOURCE_DIR}/cmake/runmarlin.cmake.in TEST_FILE_CONTENT )
+	set (RUN_INPUT_FILE "${PROJECT_SOURCE_DIR}/cmake")
+	if (ARG_PARALLEL)
+		set( RUN_INPUT_FILE "${RUN_INPUT_FILE}/runmarlinmt.cmake.in")
+	else()
+		set ( RUN_INPUT_FILE "${RUN_INPUT_FILE}/runmarlin.cmake.in")
+	endif()
+	file( READ ${RUN_INPUT_FILE} TEST_FILE_CONTENT )
   string( CONFIGURE ${TEST_FILE_CONTENT} TEST_FILE_FINAL @ONLY )
   set( TEST_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_processor_${test_name}.cmake )
   if( EXISTS ${TEST_CMAKE_FILE} )
