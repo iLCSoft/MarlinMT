@@ -4,6 +4,7 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
@@ -328,14 +329,22 @@ namespace marlin {
     } // end namespace types
 
     namespace details {
+      /**
+       *  @brief caste integral types with domain check.
+       *  @return input value in new domain.
+       *  @param input value to change domain.
+       *  @throw std::domain_error if input won't fit in new domain.
+       */
       template<typename I, typename O>
       constexpr O safe_cast(const I& input) {
+        static_assert(true == std::is_integral_v<I> == std::is_integral_v<O>
+            , "safe_cast only available for integral types!");
         if ( 
             static_cast<O>(input) >= std::numeric_limits<O>::min()
             && static_cast<O>(input) <= std::numeric_limits<O>::max()) {
           return static_cast<O>(input);
         }
-        throw "numeber cast with data lose!";
+        throw std::domain_error("Input number is outside of target type domain!");
       }
       
     } // end namespace details
