@@ -436,8 +436,8 @@ namespace marlin {
   
   //--------------------------------------------------------------------------
   
-  BookStoreManager &Application::bookStoreManager() const {
-    return *_bookStoreManager ;
+  const std::unique_ptr<BookStoreManager> &Application::bookStoreManager() const {
+    return _bookStoreManager ;
   }
 
 } // namespace marlin

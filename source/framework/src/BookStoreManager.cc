@@ -157,7 +157,7 @@ namespace marlin {
   {
     book::WeakEntry res = _bookStore.findFirst(
       book::ConditionBuilder()
-        .setPath(path.string()) // TODO: life time check
+        .setPath(path.string())
         .setName(name) ) ;
     if (!res.valid()) {
       throw ObjectNotFound("Object for key not found.");

@@ -146,7 +146,7 @@ namespace marlin {
     /**
      *  @brief Get book store manager
      */
-    BookStoreManager &bookStoreManager() const ;
+    const std::unique_ptr<BookStoreManager> &bookStoreManager() const ;
 
     /**
      *  @brief  Set the scheduler instance to use in this application.

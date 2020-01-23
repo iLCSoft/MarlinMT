@@ -45,7 +45,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist1F>(
+    return proc->app().bookStoreManager()->bookHist<Hist1F>(
       constructPath(proc, path),
       name,
       title,
@@ -60,7 +60,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1F>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -74,7 +74,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager().bookHist<Hist2F>(
+    return proc->app().bookStoreManager()->bookHist<Hist2F>(
       constructPath(proc, path),
       name,
       title,
@@ -89,7 +89,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2F>(
-        proc->app().bookStoreManager(),
+        *proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
@@ -104,7 +104,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist3F>(
+    return proc->app().bookStoreManager()->bookHist<Hist3F>(
       constructPath(proc, path),
       name,
       title,
@@ -119,7 +119,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3F>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -132,7 +132,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist1D>(
+    return proc->app().bookStoreManager()->bookHist<Hist1D>(
       constructPath(proc, path),
       name,
       title,
@@ -147,7 +147,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1D>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -161,7 +161,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager().bookHist<Hist2D>(
+    return proc->app().bookStoreManager()->bookHist<Hist2D>(
       constructPath(proc, path),
       name,
       title,
@@ -176,7 +176,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2D>(
-        proc->app().bookStoreManager(),
+        *proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
@@ -191,7 +191,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist3D>(
+    return proc->app().bookStoreManager()->bookHist<Hist3D>(
       constructPath(proc, path),
       name,
       title,
@@ -206,7 +206,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3D>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -219,7 +219,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist1I>(
+    return proc->app().bookStoreManager()->bookHist<Hist1I>(
       constructPath(proc, path),
       name,
       title,
@@ -234,7 +234,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1I>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -248,7 +248,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager().bookHist<Hist2I>(
+    return proc->app().bookStoreManager()->bookHist<Hist2I>(
       constructPath(proc, path),
       name,
       title,
@@ -263,7 +263,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2I>(
-        proc->app().bookStoreManager(),
+        *proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
@@ -278,7 +278,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager().bookHist<Hist3I>(
+    return proc->app().bookStoreManager()->bookHist<Hist3I>(
       constructPath(proc, path),
       name,
       title,
@@ -293,7 +293,7 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3I>( 
-        proc->app().bookStoreManager(), 
+        *proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
@@ -303,7 +303,7 @@ namespace marlin {
       const Processor *proc,
       const book::EntryKey &key) 
   {
-    proc->app().bookStoreManager().addToWrite(key);
+    proc->app().bookStoreManager()->addToWrite(key);
   }
 
   //--------------------------------------------------------------------------
@@ -312,7 +312,7 @@ namespace marlin {
       const Processor *proc,
       const book::EntryKey &key)
   {
-    proc->app().bookStoreManager().removeFromWrite(key);
+    proc->app().bookStoreManager()->removeFromWrite(key);
   }
 
   //--------------------------------------------------------------------------
