@@ -128,7 +128,9 @@ namespace marlin {
 
       /**
        *  @brief 
-       *  @throw BookStoreException key not exist in Sore
+       *  @param key for Entry which is demanded. 
+       *  @throw BookStoreException key not exist in Store
+       *  @return shared pointer to details::Entry with given key. 
        */
       const std::shared_ptr<details::Entry> 
         &getPtr( const EntryKey &key ) const {
