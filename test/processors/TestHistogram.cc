@@ -34,7 +34,7 @@ void TestHistogram::init() {
     "/someWhere/",
     "hit",
     "test histogram",
-      AxisConfigD(3, -3., 3.)
+      AxisConfigD(10, -1., 10.)
   );
 }
 
