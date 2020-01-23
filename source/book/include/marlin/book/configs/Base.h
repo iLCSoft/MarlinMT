@@ -337,7 +337,7 @@ namespace marlin {
        */
       template<typename I, typename O>
       constexpr O safe_cast(const I& input) {
-        static_assert(true == std::is_integral_v<I> == std::is_integral_v<O>
+        static_assert((true == std::is_integral_v<I>) == std::is_integral_v<O>
             , "safe_cast only available for integral types!");
         if ( 
             static_cast<O>(input) >= std::numeric_limits<O>::min()

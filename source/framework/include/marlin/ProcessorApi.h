@@ -59,7 +59,7 @@ namespace marlin {
        *  @param  flags      the book flag policy
        */
       [[nodiscard]] static H1FEntry bookHist1F (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -78,7 +78,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H2FEntry bookHist2F (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -99,7 +99,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H3FEntry bookHist3F (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -121,7 +121,7 @@ namespace marlin {
        *  @param  flags      the book flag policy
        */
       [[nodiscard]] static H1DEntry bookHist1D (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -140,7 +140,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H2DEntry bookHist2D (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -161,7 +161,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H3DEntry bookHist3D (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -183,7 +183,7 @@ namespace marlin {
        *  @param  flags      the book flag policy
        */
       [[nodiscard]] static H1IEntry bookHist1I (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -202,7 +202,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H2IEntry bookHist2I (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -223,7 +223,7 @@ namespace marlin {
        *  @param  flags       the book flag policy
        */
       [[nodiscard]] static H3IEntry bookHist3I (
-        const Processor *proc, 
+        Processor *proc, 
         const std::filesystem::path &path, 
         const std::string_view &name,
         const std::string_view &title,
@@ -356,7 +356,7 @@ namespace marlin {
        *  @param name of object 
        */
       void write(
-          const Processor * proc, 
+          Processor * proc, 
           const std::filesystem::path &path,
           const std::string_view &name) ;
 
@@ -367,7 +367,7 @@ namespace marlin {
        *  @param name of object
        */
       void dontWrite(
-          const Processor * proc, 
+          Processor * proc, 
           const std::filesystem::path &path,
           const std::string_view &name) ;
 
@@ -377,7 +377,7 @@ namespace marlin {
        *  @param key of Entry to Object which should be stored.
        */
       void write(
-          const Processor *proc,
+          Processor *proc,
           const book::EntryKey &key) ;
 
       /**
@@ -385,7 +385,7 @@ namespace marlin {
        *  @param key of Entry to Object which should be stored.
        */
       void dontWrite(
-          const Processor *proc,
+          Processor *proc,
           const book::EntryKey &key) ;
     };
 

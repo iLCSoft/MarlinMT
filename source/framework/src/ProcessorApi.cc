@@ -39,13 +39,13 @@ namespace marlin {
   //--------------------------------------------------------------------------
   
   H1FEntry ProcessorApi::Book::bookHist1F (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist1F>(
+    return proc->app().bookStoreManager().bookHist<Hist1F>(
       constructPath(proc, path),
       name,
       title,
@@ -60,21 +60,21 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1F>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
 
   H2FEntry ProcessorApi::Book::bookHist2F (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager()->bookHist<Hist2F>(
+    return proc->app().bookStoreManager().bookHist<Hist2F>(
       constructPath(proc, path),
       name,
       title,
@@ -89,14 +89,14 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2F>(
-        *proc->app().bookStoreManager(),
+        proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   H3FEntry ProcessorApi::Book::bookHist3F (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
@@ -104,7 +104,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist3F>(
+    return proc->app().bookStoreManager().bookHist<Hist3F>(
       constructPath(proc, path),
       name,
       title,
@@ -119,20 +119,20 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3F>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   H1DEntry ProcessorApi::Book::bookHist1D (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist1D>(
+    return proc->app().bookStoreManager().bookHist<Hist1D>(
       constructPath(proc, path),
       name,
       title,
@@ -147,21 +147,21 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1D>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
 
   H2DEntry ProcessorApi::Book::bookHist2D (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager()->bookHist<Hist2D>(
+    return proc->app().bookStoreManager().bookHist<Hist2D>(
       constructPath(proc, path),
       name,
       title,
@@ -176,14 +176,14 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2D>(
-        *proc->app().bookStoreManager(),
+        proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   H3DEntry ProcessorApi::Book::bookHist3D (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
@@ -191,7 +191,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist3D>(
+    return proc->app().bookStoreManager().bookHist<Hist3D>(
       constructPath(proc, path),
       name,
       title,
@@ -206,20 +206,20 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3D>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   H1IEntry ProcessorApi::Book::bookHist1I (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist1I>(
+    return proc->app().bookStoreManager().bookHist<Hist1I>(
       constructPath(proc, path),
       name,
       title,
@@ -234,21 +234,21 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist1I>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
 
   H2IEntry ProcessorApi::Book::bookHist2I (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const BookFlag &flags) {
-    return proc->app().bookStoreManager()->bookHist<Hist2I>(
+    return proc->app().bookStoreManager().bookHist<Hist2I>(
       constructPath(proc, path),
       name,
       title,
@@ -263,14 +263,14 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist2I>(
-        *proc->app().bookStoreManager(),
+        proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   H3IEntry ProcessorApi::Book::bookHist3I (
-    const Processor *proc, 
+    Processor *proc, 
     const std::filesystem::path &path, 
     const std::string_view &name,
     const std::string_view &title,
@@ -278,7 +278,7 @@ namespace marlin {
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
     const BookFlag &flags )  {
-    return proc->app().bookStoreManager()->bookHist<Hist3I>(
+    return proc->app().bookStoreManager().bookHist<Hist3I>(
       constructPath(proc, path),
       name,
       title,
@@ -293,26 +293,26 @@ namespace marlin {
     const std::filesystem::path &path,
     const std::string_view &name ) {
     return getObject<Hist3I>( 
-        *proc->app().bookStoreManager(), 
+        proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
 
   //--------------------------------------------------------------------------
   
   void ProcessorApi::Book::write( 
-      const Processor *proc,
+      Processor *proc,
       const book::EntryKey &key) 
   {
-    proc->app().bookStoreManager()->addToWrite(key);
+    proc->app().bookStoreManager().addToWrite(key);
   }
 
   //--------------------------------------------------------------------------
   
   void ProcessorApi::Book::dontWrite(
-      const Processor *proc,
+      Processor *proc,
       const book::EntryKey &key)
   {
-    proc->app().bookStoreManager()->removeFromWrite(key);
+    proc->app().bookStoreManager().removeFromWrite(key);
   }
 
   //--------------------------------------------------------------------------

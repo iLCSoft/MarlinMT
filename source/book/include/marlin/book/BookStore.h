@@ -192,7 +192,7 @@ namespace marlin {
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      details::Entry &get( std::size_t const idx ) const {
+      const details::Entry &get( std::size_t const idx ) const {
         try {
           return *_entries[idx] ;
         } catch ( const std::out_of_range & ) {
@@ -204,7 +204,25 @@ namespace marlin {
        *  @brief get Entry from key.
        *  @throw BookStoreException key not exist in Store.
        */
-      details::Entry &get( const EntryKey &key ) const { return get( key.idx ); }
+      const details::Entry &get( const EntryKey &key ) const { return get( key.idx ); }
+
+      /**
+       *  @brief get Entry from key.
+       *  @throw BookStoreException key not exist in Store.
+       */
+      details::Entry &get( std::size_t const idx ) {
+        try {
+          return *_entries[idx] ;
+        } catch ( const std::out_of_range & ) {
+          MARLIN_BOOK_THROW( "Invalid key." ) ;
+        }
+      }
+
+      /**
+       *  @brief get Entry from key.
+       *  @throw BookStoreException key not exist in Store.
+       */
+      details::Entry &get( const EntryKey &key ) { return get( key.idx ); }
 
 
     public:

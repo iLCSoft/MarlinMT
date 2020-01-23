@@ -43,8 +43,7 @@ namespace marlin {
     // initialize logging
     _loggerMgr.init( this ) ;
     // initialize BookStore
-    _bookStoreManager = std::make_unique<BookStoreManager>();
-    _bookStoreManager->init( this ) ;
+    _bookStoreManager.init( this ) ;
     // check at this point for a scheduler instance
     if( nullptr == _scheduler ) {
       logger()->log<MESSAGE>() << "No scheduler set. Using SimpleScheduler (single threaded program)" << std::endl ;
@@ -100,7 +99,7 @@ namespace marlin {
     }
     _geometryMgr.clear() ;
     _scheduler->end() ;
-    _bookStoreManager->writeToDisk();
+    _bookStoreManager.writeToDisk();
     // end() ;
   }
 
@@ -436,7 +435,13 @@ namespace marlin {
   
   //--------------------------------------------------------------------------
   
-  const std::unique_ptr<BookStoreManager> &Application::bookStoreManager() const {
+  BookStoreManager &Application::bookStoreManager() {
+    return _bookStoreManager ;
+  }
+
+  //--------------------------------------------------------------------------
+  
+  const BookStoreManager &Application::bookStoreManager() const {
     return _bookStoreManager ;
   }
 

@@ -146,7 +146,13 @@ namespace marlin {
     /**
      *  @brief Get book store manager
      */
-    const std::unique_ptr<BookStoreManager> &bookStoreManager() const ;
+    BookStoreManager &bookStoreManager() ;
+
+    /**
+     *  @brief Get book store manager. For const object.
+     *  @return const ref to book store manager.
+     */
+    const BookStoreManager &bookStoreManager() const ;
 
     /**
      *  @brief  Set the scheduler instance to use in this application.
@@ -234,8 +240,7 @@ namespace marlin {
     ///< Initial processor runtime conditions from steering file
     ConditionsMap              _conditions {} ;
     ///< Managed data object shared between threads.
-    std::unique_ptr<BookStoreManager>
-                              _bookStoreManager {} ;
+    BookStoreManager           _bookStoreManager {} ;
     ///< Whether the currently pushed event is the first one
     bool                       _isFirstEvent {true} ;
     ///< number of concurrency with which the application runs.
