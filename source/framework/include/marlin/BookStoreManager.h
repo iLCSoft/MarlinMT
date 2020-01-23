@@ -17,9 +17,9 @@ namespace marlin {
    *  @brief  BookStoreManager class
    */
   class BookStoreManager {
+    static constexpr char OutPutFileParameterName[] = "StoreOutputFile";
   public:
-    using Logger = Logging::Logger ;
-    
+    using Logger = Logging::Logger;   
   public:
     BookStoreManager() = default;
     BookStoreManager( const BookStoreManager & ) = delete ;
@@ -28,7 +28,7 @@ namespace marlin {
     BookStoreManager &operator=( BookStoreManager && ) = delete ;
 
     /**
-     *  @brief reads output File from global StoreOutput. 
+     *  @brief reads output File from global StoreOutputFile. 
      *    if set to "" (empty) no output file will be generated. 
      */
     void writeToDisk() const ;

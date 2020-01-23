@@ -60,9 +60,15 @@ namespace marlin {
     }
     _application = app ;
     _logger = _application->createLogger( "BookStoreManager" ) ;
-    /*_storeFile = app->globalParameters()->getValue<std::string>(
-        );*/
-    _storeFile = "./out.root";
+    try {
+      _storeFile = app->globalParameters()
+        ->getValue<std::string>(OutPutFileParameterName);
+    } catch (const Exception& exception) {
+      _logger->log<WARNING>() 
+        << "No output File set!"
+          "Fetch global " << OutPutFileParameterName << " failed with: " 
+        << exception.what() << '\n';  
+    }
   }
   
   //--------------------------------------------------------------------------
