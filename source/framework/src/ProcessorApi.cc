@@ -27,16 +27,13 @@ namespace marlin {
   //--------------------------------------------------------------------------
 
   template<typename HistT>
-  book::Handle<book::Entry<HistT>> getObjectOrThrow(
+  book::Handle<book::Entry<HistT>> getObject(
     const BookStoreManager &storeManager,
     const std::filesystem::path &path,
     const std::string_view &name) {
-    if(auto res = storeManager.getObject<HistT>(
-        storeManager.getKey(path, name)))
-    {
-      return std::move(res.value());
-    }
-    MARLIN_THROW(" try to access not existing object!");
+
+    return storeManager.getObject<HistT>(
+        storeManager.getKey(path, name));
   }
 
   //--------------------------------------------------------------------------
@@ -62,7 +59,7 @@ namespace marlin {
     const Processor *proc,
     const std::filesystem::path &path,
     const std::string_view &name ) {
-    return getObjectOrThrow<Hist1F>( 
+    return getObject<Hist1F>( 
         proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
@@ -91,7 +88,7 @@ namespace marlin {
     const Processor *proc,
     const std::filesystem::path &path,
     const std::string_view &name ) {
-    return getObjectOrThrow<Hist2F>(
+    return getObject<Hist2F>(
         proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
@@ -119,7 +116,7 @@ namespace marlin {
     const Processor *proc,
     const std::filesystem::path &path,
     const std::string_view &name ) {
-    return getObjectOrThrow<Hist1D>( 
+    return getObject<Hist1D>( 
         proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }
@@ -148,7 +145,7 @@ namespace marlin {
     const Processor *proc,
     const std::filesystem::path &path,
     const std::string_view &name ) {
-    return getObjectOrThrow<Hist2D>(
+    return getObject<Hist2D>(
         proc->app().bookStoreManager(),
         constructPath(proc, path), name);
   }
@@ -178,7 +175,7 @@ namespace marlin {
     const Processor *proc,
     const std::filesystem::path &path,
     const std::string_view &name ) {
-    return getObjectOrThrow<Hist3D>( 
+    return getObject<Hist3D>( 
         proc->app().bookStoreManager(), 
         constructPath(proc, path), name);
   }

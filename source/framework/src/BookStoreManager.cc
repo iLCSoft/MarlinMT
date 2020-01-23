@@ -10,8 +10,8 @@
 namespace marlin {
 
 #define INSTANCIATIONS_HIST(type) \
-  template std::optional<book::Handle<book::Entry<type>>> BookStoreManager::getObject<type>(\
-    const book::EntryKey*) const ;\
+  template book::Handle<book::Entry<type>> BookStoreManager::getObject<type>(\
+    const book::EntryKey&) const ;\
                             \
   template book::Handle<book::Entry<type>> BookStoreManager::bookHist<type>(\
       const std::filesystem::path&,\
@@ -82,15 +82,15 @@ namespace marlin {
       (   book::Flags::Book::MultiCopy 
         | book::Flags::Book::MultiShared 
         | book::Flags::Book::Single) ;
-    std::optional<Entry_t> res = getObject<HistT>(getKey(path, name)) ;
-    if ( res ) {
-      const book::EntryKey& key = res.value().key();
-      if (   key.flags != flagsToPass
-          || key.type !=  std::type_index(typeid(Hist1F))) {
-        MARLIN_THROW("try to book to the same spot again");
-      } 
-      return std::move(res.value());
-    }
+    try {
+    Entry_t res = getObject<HistT>(getKey(path, name)) ;
+    const book::EntryKey& key = res.key();
+    if (   key.flags != flagsToPass
+        || key.type !=  std::type_index(typeid(Hist1F))) {
+      MARLIN_THROW("try to book to the same spot again");
+    } 
+    return res;
+    } catch (const BookStoreManager::ObjectNotFound& ) {}
 
     book::EntryData<HistT> data(title, axesconfig);
 
@@ -114,16 +114,12 @@ namespace marlin {
   //--------------------------------------------------------------------------
   
   template<typename T>
-  std::optional<book::Handle<book::Entry<T>>> BookStoreManager::getObject(
-      const book::EntryKey *key) const {
-      if (key) {
-        if (key->type == std::type_index(typeid(T))) {
-          return std::optional(_bookStore.entry<T>(*key));
-        } else {
-          MARLIN_THROW("try to access Object which wrong type!");
-        }
+  book::Handle<book::Entry<T>> BookStoreManager::getObject(
+      const book::EntryKey &key) const {
+      if (key.type == std::type_index(typeid(T))) {
+        return _bookStore.entry<T>(key);
       }
-      return std::nullopt;
+      throw ObjectNotFound("try to access Object which wrong type!");
   }
 
   //--------------------------------------------------------------------------
@@ -140,20 +136,18 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
   
-  const book::EntryKey* BookStoreManager::getKey(
+  const book::EntryKey& BookStoreManager::getKey(
     const std::filesystem::path &path,
     const std::string_view &name) const
   {
-    book::Selection res = _bookStore.find(
+    book::WeakEntry res = _bookStore.findFirst(
       book::ConditionBuilder()
         .setPath(path.string()) // TODO: life time check
         .setName(name) ) ;
-    if( res.size() != 1 ) {
-      _logger->log<MESSAGE>() << "Failed search for object!";
-      return nullptr;
+    if (!res.valid()) {
+      throw ObjectNotFound("Object for key not found.");
     }
-    return &res.get(0).key();
-      
+    return res.key();
   }
 
 }

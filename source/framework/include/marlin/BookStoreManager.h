@@ -65,15 +65,28 @@ namespace marlin {
     void removeFromWrite(const book::EntryKey& key) ;
 
     /**
+     *  @brief thrown when try to access not existing object. 
+     */
+    struct ObjectNotFound : public std::exception {  
+      ObjectNotFound(const std::string_view& msg) 
+        : m_msg(msg) {}
+      const char* what() const noexcept override { return m_msg.c_str(); }
+    private:
+      const std::string m_msg;
+    };
+
+    /**
      *  @brief receive key from Entry with given path and name.
      *  @param path absolute path of Object
      *  @param name of Object
+     *  @throw ObjectNotFound if path don't lead to Object.
      *  @return nullptr if path not exist or is not unique
      *  @return EntryKey address else
      */
-    const book::EntryKey* getKey(
+    const book::EntryKey& getKey(
         const std::filesystem::path &path,
         const std::string_view &name) const ;
+
 
     /**
      *  @brief access object managed by this store. For internal usage.
@@ -81,8 +94,8 @@ namespace marlin {
      *  @return optional which contains on success a Handle for the Entry for the Object.
      */
     template<typename T>
-    [[nodiscard]] std::optional<book::Handle<book::Entry<T>>> getObject( 
-        const book::EntryKey *key) const ;
+    [[nodiscard]] book::Handle<book::Entry<T>> getObject( 
+        const book::EntryKey &key) const ;
 
     
   private:

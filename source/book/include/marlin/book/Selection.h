@@ -28,11 +28,13 @@ namespace marlin {
      */
     class WeakEntry {
       friend Selection ;
+      friend BookStore ;
         
       // constructor
       explicit WeakEntry( const std::shared_ptr< const details::Entry > &entry ) ;
       // constructor
       explicit WeakEntry( const std::shared_ptr< details::Entry > &entry ) ;
+      WeakEntry() = default;
     public:
 
       /**
@@ -62,7 +64,7 @@ namespace marlin {
 
     private:
       /// wake reference to Entry
-      std::weak_ptr< const details::Entry > _entry ;
+      std::weak_ptr< const details::Entry > _entry {};
     } ;
 
     /**
@@ -79,10 +81,18 @@ namespace marlin {
        *  @param begin,end range of Entries
        *  @param cond Condition to filter Entries.
        *  @tparam T iterator type
-       *  @note For Library  internal usage, only instances for some types.
        */
       template < typename T >
       static Selection find( T begin, T end, const Condition &cond ) ;
+
+      /**
+       *  @brief Search for first Entry which matches condition.
+       *  @param begin,end range of Entries.
+       *  @param cond Condition to search.
+       *  @tparam T iterator type
+       */
+      template < typename T >
+      static WeakEntry findFirst( T begin, T end, const Condition &cond ) ;
 
       /**
        *  @brief random access const_iterator for Selections.
@@ -195,6 +205,22 @@ namespace marlin {
         }
       }
       return res ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename T >
+    WeakEntry Selection::findFirst(T begin, T end, const Condition &cond ) {
+      using value_type = std::remove_cv_t<std::remove_reference_t<decltype(*begin)>>;
+      static_assert(
+        std::is_same_v< value_type, std::shared_ptr<details::Entry>>
+        || std::is_same_v<value_type, std::shared_ptr<const details::Entry>>, "needs container of shared pointer to Entry");
+      for ( auto itr = begin; itr != end; ++itr ) {
+        if(cond((*itr)->key())) {
+          return WeakEntry(*itr);
+        }
+      }
+      return WeakEntry();
     }
 
 

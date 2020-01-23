@@ -41,10 +41,6 @@ namespace marlin {
      *  @brief group function for booking 
      */
     class Book {
-      template<typename T>
-      static std::optional<book::Handle<book::Entry<T>>>
-      getObject( const std::filesystem::path& pathName ) ;
-
     public:
       static constexpr book::Flag_t DefaultConfiguration{
           book::Flags::value(book::Flags::Book::MultiShared)

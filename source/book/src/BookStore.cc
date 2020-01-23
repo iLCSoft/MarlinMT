@@ -59,6 +59,12 @@ namespace marlin {
     }
 
     //--------------------------------------------------------------------------
+    
+     WeakEntry BookStore::findFirst( const Condition &cond) const {
+      return Selection::findFirst(_entries.cbegin(), _entries.cend(), cond); 
+     }
+
+    //--------------------------------------------------------------------------
 
     void BookStore::remove( const EntryKey &key ) { get( key ).clear(); }
 

@@ -241,6 +241,12 @@ namespace marlin {
       Selection find( const Condition &cond ) const ;
 
       /**
+       *  @brief find first Entry which match the condition.
+       *  @return WeakEntry which is not valid if no Entry was found.
+       */
+      WeakEntry findFirst(const Condition &cond ) const ;
+
+      /**
        *  @brief removes an Entry from BookStore.
        *  the handles are keeping a reference to the result.
        *  @attention modifying removed objects results in undefined behavior.
