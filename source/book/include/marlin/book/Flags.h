@@ -28,6 +28,13 @@ namespace marlin {
       explicit Flag_t( const std::bitset< AmtFlags > &val ) : _val{val} {}
 
       /**
+       *  @brief bitwise not for Flags 
+       */
+      Flag_t operator~() const {
+        return Flag_t(~_val);
+      }
+
+      /**
        *  @brief logical  AND on tow set of Flags.
        */
       Flag_t operator&( const Flag_t &f ) const {
@@ -93,6 +100,7 @@ namespace marlin {
       Flags::value( const Flag_t & /*flag*/ ) ;
     } ;
 
+
     /// Flags for different purposes in marlin::book
     namespace Flags {
       constexpr unsigned long long value( const Flag_t &flag ) {
@@ -114,6 +122,23 @@ namespace marlin {
       } // end namespace Book
 
     } // end namespace Flags
+
+    /// Masks to filter certain Flags
+    namespace Masks {
+      /// Masks for the Book Flags
+      namespace Book {
+        /// Mask for Flags with memory layout options
+        constexpr Flag_t MemoryLayout (
+          Flags::value(Flags::Book::Single)
+          | Flags::value(Flags::Book::MultiShared)
+          | Flags::value(Flags::Book::MultiCopy)) ; 
+
+        /// Mask for Flags with store option
+        constexpr Flag_t StoreOptions(
+          Flags::Book::Store) ;
+      } // end namespace Book
+      
+    } // end namespace Masks
 
   } // end namespace book
 } // end namespace marlin
