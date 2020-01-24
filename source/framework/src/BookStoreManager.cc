@@ -94,7 +94,9 @@ namespace marlin {
         paras->getValue<std::string>(
           ParameterNames::DefaultMemoryLayout, 
           "Default");
-      if ( str == "Share" ) {
+      if ( app->getConcurrency() == 1 ) {
+        _logger->log<MESSAGE>() << "No concurrency, use Single memory layout!\n";
+      } else if ( str == "Share" ) {
         memoryLayout = BookFlags::MultiShared ;
       } else if ( str == "Copy" ) {
         memoryLayout = BookFlags::MultiCopy ;
@@ -152,10 +154,11 @@ namespace marlin {
 
     bool store = usedFlag.contains(book::Flags::Book::Store);
 
-    BookFlag_t flagsToPass = usedFlag &
-      (   book::Flags::Book::MultiCopy 
-        | book::Flags::Book::MultiShared 
-        | book::Flags::Book::Single) ;
+    BookFlag_t flagsToPass = usedFlag & book::Masks::Book::MemoryLayout ;
+    if ( _application->getConcurrency() == 1 ) {
+      flagsToPass = book::Flags::Book::Single;
+    }
+
     try {
     Entry_t res = getObject<HistT>(getKey(path, name)) ;
     const book::EntryKey& key = res.key();
@@ -175,6 +178,12 @@ namespace marlin {
     } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
       entry =  _bookStore.book( path, name, data.multiShared() ) ;
     } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
+      if ( _application->getConcurrency() != 1) {
+        _logger->log<ERROR>() << "Single Memory layout can't be used"
+          " with concurrency! \n"
+          "\tuse Marlin for workflows without concurrency";
+        MARLIN_THROW("single only supported without concurrency!!");
+      }
       entry =  _bookStore.book( path, name, data.single() ) ;
     } else {
       MARLIN_THROW("Try to book without MemoryLayout Flag");
