@@ -7,6 +7,8 @@
 
 #include <marlin/book/StoreWriter.h>  
 
+#include <string>
+
 namespace marlin {
 
 #define INSTANCIATIONS_HIST(type) \
@@ -20,7 +22,7 @@ namespace marlin {
       const std::array<\
         const AxisConfig<typename type::Precision_t>*,\
         type::Dimension>&,\
-      const BookFlag&) 
+      const BookFlag_t&) 
 
   INSTANCIATIONS_HIST(Hist1F);
   INSTANCIATIONS_HIST(Hist1D);
@@ -53,6 +55,7 @@ namespace marlin {
   }
 
   //--------------------------------------------------------------------------
+  
 
   void BookStoreManager::init( const Application *app ) {
     if( isInitialized() ) {
@@ -61,21 +64,65 @@ namespace marlin {
     _application = app ;
     _logger = _application->createLogger( "BookStoreManager" ) ;
 
-    std::shared_ptr<StringParameters> paras =  app->storeParameters();
+    std::shared_ptr<StringParameters> paras =  app->bookStoreParameters();
     if (!paras) {
       _logger->log<WARNING>() 
         << "no <store> node exist on top level!\n"
         << "\tNo Output file set!\n"
         << "\tUse Default flags for Booking!\n";
+      _defaultFlag = BookFlags::MultiShared | BookFlags::Store ;  
     } else {
-      try {
-          _storeFile = paras->getValue<std::string>(OutPutFileParameterName);
-      } catch (const Exception& exception) {
-        _logger->log<WARNING>() 
-          << "No output File set!"
-            "Fetch global " << OutPutFileParameterName << " failed with: " 
-          << exception.what() << '\n';  
+      _storeFile =
+        paras->getValue<std::string>(ParameterNames::OutPutFile, "");
+      if (_storeFile == "") {
+        try { 
+          _storeFile = std::filesystem::temp_directory_path();
+        } catch (const std::filesystem::filesystem_error&) {
+          _storeFile = "";
+        }
+        std::stringstream strs{};
+        strs << "MarlinMT_" << std::this_thread::get_id() << ".root";
+        _storeFile /= strs.str(); 
+        _logger->log<WARNING>()
+          << "no output file for store defined, will write in temporary file: "
+          << _storeFile.string() << "\n";
       }
+
+      BookFlag_t memoryLayout(0);
+      BookFlag_t storeByDefault(0);
+      std::string str = 
+        paras->getValue<std::string>(
+          ParameterNames::DefaultMemoryLayout, 
+          "Default");
+      if ( str == "Share" ) {
+        memoryLayout = BookFlags::MultiShared ;
+      } else if ( str == "Copy" ) {
+        memoryLayout = BookFlags::MultiCopy ;
+      } else if ( str == "Default") {
+        memoryLayout = BookFlags::MultiShared ;
+      } else {
+        memoryLayout = BookFlags::MultiShared ;
+        _logger->log<WARNING>() << "not recognized input option: " 
+          << str << '\n';
+      }
+
+      str = 
+        paras->getValue<std::string>(
+          ParameterNames::StoreByDefault, 
+          "DEFAULT") ;
+      if ( str == "YES" ) {
+        storeByDefault = BookFlags::Store ; 
+      } else if ( str == "NO" ) {
+        storeByDefault = BookFlag_t(0);
+      } else if ( str == "DEFAULT" ){
+        storeByDefault = BookFlags::Store ;
+      } else {
+        storeByDefault = BookFlags::Store ;
+        _logger->log<WARNING>() << "not recognized option for: store::"
+          << ParameterNames::StoreByDefault << " set to: '"
+          << str << "' but supported are: YES,NO,DEFAULT";
+      }
+      _defaultFlag = storeByDefault | memoryLayout ;
     }
   }
   
@@ -95,13 +142,17 @@ namespace marlin {
     const std::array<
       const AxisConfig<typename HistT::Precision_t>*,
       HistT::Dimension> &axesconfig,
-    const BookFlag &flag) {
+    const BookFlag_t &flag) {
+
+    const BookFlag_t& usedFlag = flag == BookFlags::Default
+      ? _defaultFlag
+      : flag;
 
     using Entry_t = book::Handle<book::Entry<HistT>>;
 
-    bool store = flag.contains(book::Flags::Book::Store);
+    bool store = usedFlag.contains(book::Flags::Book::Store);
 
-    BookFlag flagsToPass = flag &
+    BookFlag_t flagsToPass = usedFlag &
       (   book::Flags::Book::MultiCopy 
         | book::Flags::Book::MultiShared 
         | book::Flags::Book::Single) ;
@@ -119,12 +170,14 @@ namespace marlin {
 
     book::Handle<book::Entry<HistT>> entry;
 
-    if( flag.contains(book::Flags::Book::MultiCopy)) {
+    if( usedFlag.contains(book::Flags::Book::MultiCopy)) {
       entry =  _bookStore.book( path, name, data.multiCopy(_application->getConcurrency()) ) ;
-    } else if ( flag.contains(book::Flags::Book::MultiShared)) {
+    } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
       entry =  _bookStore.book( path, name, data.multiShared() ) ;
-    } else {
+    } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
       entry =  _bookStore.book( path, name, data.single() ) ;
+    } else {
+      MARLIN_THROW("Try to book without MemoryLayout Flag");
     }
 
     if (store) {

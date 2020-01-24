@@ -17,7 +17,11 @@ namespace marlin {
    *  @brief  BookStoreManager class
    */
   class BookStoreManager {
-    static constexpr char OutPutFileParameterName[] = "OutputFile";
+    struct ParameterNames {
+      static constexpr char OutPutFile[] = "OutputFile" ;
+      static constexpr char DefaultMemoryLayout[] = "DefaultMemoryLayeut" ;
+      static constexpr char StoreByDefault[] = "StoreByDefault" ;
+    };
   public:
     using Logger = Logging::Logger;   
   public:
@@ -47,7 +51,7 @@ namespace marlin {
      *  @param  name       the histogram name
      *  @param  title      the histogram title
      *  @param  axisconfig the histogram X axis config
-     *  @param  flags      the book flag policy
+     *  @param  flags      the book flag policy. If equal BookFlags::Default select defaults depending on steering file.
      */
     template<typename HistT>
     [[nodiscard]] book::Handle<book::Entry<HistT>> bookHist (
@@ -57,7 +61,7 @@ namespace marlin {
       const std::array<
         const AxisConfig<typename HistT::Precision_t>*,
         HistT::Dimension> &axesconfig,
-      const BookFlag &flags ) ;
+      const BookFlag_t &flags ) ;
 
     /**
      *  @brief add entry key to write list.
@@ -115,6 +119,9 @@ namespace marlin {
     Logger                               _logger {nullptr} ;
     /// path to file to store objects
     std::filesystem::path                _storeFile{""};
+    /// default flag, used if flag == BookFlags::Default. 
+    /// Default is shared, store. Change is steering file with: store::DefaultMemoryLayeut and store::StoreByDefault.
+    BookFlag_t                           _defaultFlag{} ;
   };
 
   

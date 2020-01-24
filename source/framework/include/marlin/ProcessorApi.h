@@ -42,10 +42,6 @@ namespace marlin {
      */
     class Book {
     public:
-      static constexpr book::Flag_t DefaultConfiguration{
-          book::Flags::value(book::Flags::Book::MultiShared)
-        | book::Flags::value(book::Flags::Book::Store)};
-
       // book histogram float
 
       /**
@@ -64,7 +60,7 @@ namespace marlin {
         const std::string_view &name,
         const std::string_view &title,
         const AxisConfigD &axisconfig,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 2D, float type
@@ -84,7 +80,7 @@ namespace marlin {
         const std::string_view &title,
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 3D, float type
@@ -106,7 +102,7 @@ namespace marlin {
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
         const AxisConfigD &axisconfigZ,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       // book histogram double
 
@@ -126,7 +122,7 @@ namespace marlin {
         const std::string_view &name,
         const std::string_view &title,
         const AxisConfigD &axisconfig,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 2D, double type
@@ -146,7 +142,7 @@ namespace marlin {
         const std::string_view &title,
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 3D, double type
@@ -168,7 +164,7 @@ namespace marlin {
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
         const AxisConfigD &axisconfigZ,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       // book histogram integer 
       
@@ -188,7 +184,7 @@ namespace marlin {
         const std::string_view &name,
         const std::string_view &title,
         const AxisConfigD &axisconfig,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 2D, integer type
@@ -208,7 +204,7 @@ namespace marlin {
         const std::string_view &title,
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       /**
        *  @brief  Book  a histogram 3D, integer type
@@ -230,7 +226,7 @@ namespace marlin {
         const AxisConfigD &axisconfigX,
         const AxisConfigD &axisconfigY,
         const AxisConfigD &axisconfigZ,
-        const BookFlag &flags  = DefaultConfiguration) ; 
+        const BookFlag_t &flags  = BookFlags::Default ) ; 
 
       // get histogram float
 

@@ -20,7 +20,8 @@ namespace marlin {
   template <typename P, typename W, std::size_t D>
   using HistT = book::types::HistT<HistConfig<P, W, D>> ;
   
-  using BookFlag = book::Flag_t ;
+  using BookFlag_t = book::Flag_t ;
+	namespace BookFlags = book::Flags::Book ;
   
   template <typename T>
   class Entry ;

@@ -100,6 +100,8 @@ namespace marlin {
       }
       /// flags for booking
       namespace Book {
+        /// use default arguments
+        constexpr Flag_t Default( 0 ) ;
         /// vanilla object.
         constexpr Flag_t Single( 1U << 0U ) ;
         /// create one instance witch concurrent access.

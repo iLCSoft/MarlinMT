@@ -241,8 +241,8 @@ namespace marlin {
 
   //--------------------------------------------------------------------------
   
-  std::shared_ptr<StringParameters> Application::storeParameters () const {
-    return (nullptr == _parser) ? nullptr : _parser->getParameters( "Store" ) ;
+  std::shared_ptr<StringParameters> Application::bookStoreParameters () const {
+    return (nullptr == _parser) ? nullptr : _parser->getParameters( "BookStore" ) ;
   }
 
   //--------------------------------------------------------------------------

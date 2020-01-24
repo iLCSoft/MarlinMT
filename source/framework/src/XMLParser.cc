@@ -86,10 +86,10 @@ namespace marlin{
         }
 
         // optional store section
-        section = root->FirstChildElement("store");
+        section = root->FirstChildElement("bookstore");
         if(section != 0) {
-          _map[ "store" ] = std::make_shared<StringParameters>() ;
-          _current = _map[ "store" ].get() ;
+          _map[ "BookStore" ] = std::make_shared<StringParameters>() ;
+          _current = _map[ "BookStore" ].get() ;
           parametersFromNode( section, constants ) ;
         }
 

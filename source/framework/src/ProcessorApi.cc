@@ -44,7 +44,7 @@ namespace marlin {
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist1F>(
       constructPath(proc, path),
       name,
@@ -73,7 +73,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
-    const BookFlag &flags) {
+    const BookFlag_t &flags) {
     return proc->app().bookStoreManager().bookHist<Hist2F>(
       constructPath(proc, path),
       name,
@@ -103,7 +103,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist3F>(
       constructPath(proc, path),
       name,
@@ -131,7 +131,7 @@ namespace marlin {
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist1D>(
       constructPath(proc, path),
       name,
@@ -160,7 +160,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
-    const BookFlag &flags) {
+    const BookFlag_t &flags) {
     return proc->app().bookStoreManager().bookHist<Hist2D>(
       constructPath(proc, path),
       name,
@@ -190,7 +190,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist3D>(
       constructPath(proc, path),
       name,
@@ -218,7 +218,7 @@ namespace marlin {
     const std::string_view &name,
     const std::string_view &title,
     const AxisConfigD &axisconfig,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist1I>(
       constructPath(proc, path),
       name,
@@ -247,7 +247,7 @@ namespace marlin {
     const std::string_view &title,
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
-    const BookFlag &flags) {
+    const BookFlag_t &flags) {
     return proc->app().bookStoreManager().bookHist<Hist2I>(
       constructPath(proc, path),
       name,
@@ -277,7 +277,7 @@ namespace marlin {
     const AxisConfigD &axisconfigX,
     const AxisConfigD &axisconfigY,
     const AxisConfigD &axisconfigZ,
-    const BookFlag &flags )  {
+    const BookFlag_t &flags )  {
     return proc->app().bookStoreManager().bookHist<Hist3I>(
       constructPath(proc, path),
       name,

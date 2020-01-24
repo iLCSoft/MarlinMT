@@ -10,9 +10,11 @@
     <parameter name="Concurrency">3</parameter>
   </global>
 
-  <store>
+  <bookstore>
     <parameter name="OutputFile">histTest.root</parameter>
-  </store>
+    <parameter name="DefaultMemoryLayout">Copy</parameter>
+    <parameter name="StoreByDefault">YES</parameter>
+  </bookstore>
 
   <datasource type="LCIO">
     <parameter name="LCIOInputFiles">
