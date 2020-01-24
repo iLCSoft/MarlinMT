@@ -73,7 +73,7 @@ namespace marlin {
       _defaultFlag = BookFlags::MultiShared | BookFlags::Store ;  
     } else {
       _storeFile =
-        paras->getValue<std::string>(ParameterNames::OutPutFile, "");
+        paras->getValue<std::string>(ParameterNames::OutputFile, "");
       if (_storeFile == "") {
         try { 
           _storeFile = std::filesystem::temp_directory_path();

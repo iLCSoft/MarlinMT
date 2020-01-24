@@ -18,7 +18,7 @@ namespace marlin {
    */
   class BookStoreManager {
     struct ParameterNames {
-      static constexpr char OutPutFile[] = "OutputFile" ;
+      static constexpr char OutputFile[] = "OutputFile" ;
       static constexpr char DefaultMemoryLayout[] = "DefaultMemoryLayout" ;
       static constexpr char StoreByDefault[] = "StoreByDefault" ;
     };
@@ -120,7 +120,7 @@ namespace marlin {
     /// path to file to store objects
     std::filesystem::path                _storeFile{""};
     /// default flag, used if flag == BookFlags::Default. 
-    /// Default is shared, store. Change is steering file with: store::DefaultMemoryLayeut and store::StoreByDefault.
+    /// Default is shared, store. Change is steering file with: store::DefaultMemoryLayout and store::StoreByDefault.
     BookFlag_t                           _defaultFlag{} ;
   };
 
