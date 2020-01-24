@@ -5,9 +5,15 @@
 #include <marlin/Exceptions.h>
 #include <marlin/Processor.h>
 
+// -- MarlinBook headers
 #include <marlin/book/StoreWriter.h>  
 
+// -- std headers
 #include <string>
+
+// -- unix specific includes
+#include <sys/types.h>
+#include <unistd.h>
 
 namespace marlin {
 
@@ -74,19 +80,6 @@ namespace marlin {
     } else {
       _storeFile =
         paras->getValue<std::string>(ParameterNames::OutputFile, "");
-      if (_storeFile == "") {
-        try { 
-          _storeFile = std::filesystem::temp_directory_path();
-        } catch (const std::filesystem::filesystem_error&) {
-          _storeFile = "";
-        }
-        std::stringstream strs{};
-        strs << "MarlinMT_" << std::this_thread::get_id() << ".root";
-        _storeFile /= strs.str(); 
-        _logger->log<WARNING>()
-          << "no output file for store defined, will write in temporary file: "
-          << _storeFile.string() << "\n";
-      }
 
       BookFlag_t memoryLayout(0);
       std::string str = 
@@ -107,6 +100,13 @@ namespace marlin {
           << str << '\n';
       }
       _defaultFlag = BookFlags::Store | memoryLayout ;
+    }
+
+    if (_storeFile == "") {
+      _storeFile = "MarlinMT_" + std::to_string(getpid()) + ".root"; 
+      _logger->log<WARNING>()
+        << "no output file for store defined, output will written in: "
+        << _storeFile.string() << "\n";
     }
   }
   
