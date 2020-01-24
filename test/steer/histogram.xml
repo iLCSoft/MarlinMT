@@ -11,6 +11,7 @@
   </global>
 
   <bookstore>
+    <parameter name="OutputFile">TestHistogram.root</parameter>
     <parameter name="DefaultMemoryLayout">Copy</parameter>
   </bookstore>
 
