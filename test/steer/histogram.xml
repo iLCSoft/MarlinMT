@@ -13,7 +13,6 @@
   <bookstore>
     <parameter name="OutputFile">histTest.root</parameter>
     <parameter name="DefaultMemoryLayout">Copy</parameter>
-    <parameter name="StoreByDefault">YES</parameter>
   </bookstore>
 
   <datasource type="LCIO">

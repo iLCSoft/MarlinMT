@@ -89,7 +89,6 @@ namespace marlin {
       }
 
       BookFlag_t memoryLayout(0);
-      BookFlag_t storeByDefault(0);
       std::string str = 
         paras->getValue<std::string>(
           ParameterNames::DefaultMemoryLayout, 
@@ -107,24 +106,7 @@ namespace marlin {
         _logger->log<WARNING>() << "not recognized input option: " 
           << str << '\n';
       }
-
-      str = 
-        paras->getValue<std::string>(
-          ParameterNames::StoreByDefault, 
-          "DEFAULT") ;
-      if ( str == "YES" ) {
-        storeByDefault = BookFlags::Store ; 
-      } else if ( str == "NO" ) {
-        storeByDefault = BookFlag_t(0);
-      } else if ( str == "DEFAULT" ){
-        storeByDefault = BookFlags::Store ;
-      } else {
-        storeByDefault = BookFlags::Store ;
-        _logger->log<WARNING>() << "not recognized option for: store::"
-          << ParameterNames::StoreByDefault << " set to: '"
-          << str << "' but supported are: YES,NO,DEFAULT";
-      }
-      _defaultFlag = storeByDefault | memoryLayout ;
+      _defaultFlag = BookFlags::Store | memoryLayout ;
     }
   }
   
