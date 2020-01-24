@@ -52,11 +52,16 @@ namespace marlin {
           << _entriesToWrite.size() << " entries to write!\n";
       }
     } else {
+      if ( _entriesToWrite.empty() ) {
+        _logger->log<MESSAGE>() << "No Objects listed for writing to disk."
+          " No output file generated!\n";
+      } else {
       book::StoreWriter writer ( _storeFile ) ;
-      _bookStore.storeList(
-        writer,
-        _entriesToWrite.begin(), 
-        _entriesToWrite.end());
+        _bookStore.storeList(
+          writer,
+          _entriesToWrite.begin(), 
+          _entriesToWrite.end());
+      }
     }
   }
 
