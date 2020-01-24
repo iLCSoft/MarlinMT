@@ -19,7 +19,7 @@ namespace marlin {
   class BookStoreManager {
     struct ParameterNames {
       static constexpr char OutPutFile[] = "OutputFile" ;
-      static constexpr char DefaultMemoryLayout[] = "DefaultMemoryLayeut" ;
+      static constexpr char DefaultMemoryLayout[] = "DefaultMemoryLayout" ;
       static constexpr char StoreByDefault[] = "StoreByDefault" ;
     };
   public:
