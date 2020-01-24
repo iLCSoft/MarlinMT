@@ -173,11 +173,11 @@ namespace marlin {
 
     book::Handle<book::Entry<HistT>> entry;
 
-    if( usedFlag.contains(book::Flags::Book::MultiCopy)) {
+    if( flagsToPass.contains(book::Flags::Book::MultiCopy)) {
       entry =  _bookStore.book( path, name, data.multiCopy(_application->getConcurrency()) ) ;
-    } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
+    } else if ( flagsToPass.contains(book::Flags::Book::MultiShared)) {
       entry =  _bookStore.book( path, name, data.multiShared() ) ;
-    } else if ( usedFlag.contains(book::Flags::Book::MultiShared)) {
+    } else if ( flagsToPass.contains(book::Flags::Book::Single)) {
       if ( _application->getConcurrency() != 1) {
         _logger->log<ERROR>() << "Single Memory layout can't be used"
           " with concurrency! \n"
