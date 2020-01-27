@@ -96,6 +96,7 @@ set( MarlinMT_BINARIES MarlinShellCompletion MarlinDumpPlugins Marlin MarlinMT )
 foreach( binary ${MarlinMT_BINARIES} )
   add_executable( bin_${binary} main/${binary}.cc )
   target_link_libraries( bin_${binary} Marlin::Core )
+  set_target_properties( bin_${binary} PROPERTIES OUTPUT_NAME ${binary} )
   install( TARGETS bin_${binary} RUNTIME )
 endforeach()
 
