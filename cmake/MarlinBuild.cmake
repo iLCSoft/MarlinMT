@@ -56,6 +56,11 @@ marlin_option(
   VALUE OFF
   DOC "Set to ON to build/install mkdocs documentation"
 )
+marlin_option(
+	NAME MARLIN_BUILD_BENCHMARKS
+	VALUE OFF
+	DOC "Set to ON to build/install marlin benchmarking Processors"
+)
 marlin_option( 
   NAME MARLIN_WERROR
   VALUE OFF

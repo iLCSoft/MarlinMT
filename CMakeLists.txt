@@ -25,6 +25,11 @@ if( BUILD_TESTING )
   add_subdirectory( test )
 endif()
 
+#-- Benchmarking
+if ( MARLIN_BUILD_BENCHMARKS )
+	add_subdirectory( benchmarking )
+endif()
+
 #--- Documentation
 add_subdirectory( doc )
 
