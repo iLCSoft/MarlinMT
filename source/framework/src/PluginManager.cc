@@ -16,6 +16,7 @@ namespace marlin {
     _pluginFactories.insert( PluginFactoryMap::value_type(PluginType::Processor, FactoryMap()) ) ;
     _pluginFactories.insert( PluginFactoryMap::value_type(PluginType::GeometryPlugin, FactoryMap()) ) ;
     _pluginFactories.insert( PluginFactoryMap::value_type(PluginType::DataSource, FactoryMap()) ) ;
+    _pluginFactories.insert( PluginFactoryMap::value_type(PluginType::GenericPlugin, FactoryMap()) ) ;
     _logger = Logging::createLogger( "PluginManager" ) ;
     _logger->setLevel<MESSAGE>() ;
   }
@@ -136,6 +137,7 @@ namespace marlin {
       case PluginType::Processor: return "Processor" ;
       case PluginType::GeometryPlugin: return "GeometryPlugin" ;
       case PluginType::DataSource: return "DataSource" ;
+      case PluginType::GenericPlugin: return "GenericPlugin" ;
       default: throw;
     }
   }

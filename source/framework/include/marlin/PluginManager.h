@@ -38,6 +38,9 @@
 #define MARLIN_DECLARE_DATASOURCE_NAME( Class, NameStr ) MARLIN_DECLARE_PLUGIN( Class, NameStr, marlin::PluginType::DataSource )
 #define MARLIN_DECLARE_DATASOURCE( Class ) MARLIN_DECLARE_DATASOURCE_NAME( Class, #Class )
 
+// generic plugin declaration
+#define MARLIN_DECLARE_GENERIC( Class, NameStr ) MARLIN_DECLARE_PLUGIN( Class, NameStr, marlin::PluginType::GenericPlugin )
+
 namespace marlin {
 
   /**
@@ -48,7 +51,8 @@ namespace marlin {
   enum class PluginType : int {
     Processor,
     GeometryPlugin,
-    DataSource
+    DataSource,
+    GenericPlugin
   } ;
 
   //--------------------------------------------------------------------------
@@ -159,6 +163,14 @@ namespace marlin {
      */
     template <typename T>
     std::shared_ptr<T> create( PluginType type, const std::string &name ) const ;
+    
+    /**
+     *  @brief  Create a new plugin instance. Shortcut for generic plugins
+     *
+     *  @param  name the plugin name
+     */
+    template <typename T>
+    std::shared_ptr<T> create( const std::string &name ) const ;
 
     /**
      *  @brief  Dump plugin manager content in console
@@ -218,6 +230,13 @@ namespace marlin {
     }
     auto pointer = factoryIter->second._factory() ; // factory function call
     return std::static_pointer_cast<T, void>( pointer ) ;
+  }
+  
+  //--------------------------------------------------------------------------
+  
+  template <typename T>
+  inline std::shared_ptr<T> PluginManager::create( const std::string &name ) const {
+    return create<T>( PluginType::GenericPlugin, name ) ;
   }
 
 } // end namespace marlin
