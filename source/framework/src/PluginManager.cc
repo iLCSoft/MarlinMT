@@ -35,7 +35,10 @@ namespace marlin {
       _logger->log<DEBUG2>() << "PluginManager::registerPlugin: plugin '" << name << "' already registered! Skipping ..." << std::endl ;
     }
     else {
-      typeIter->second.insert( FactoryMap::value_type( name, factoryFunction ) ) ;
+      FactoryData fdata {} ;
+      fdata._libraryName = _currentLibrary ;
+      fdata._factory = factoryFunction ;
+      typeIter->second.insert( FactoryMap::value_type( name, fdata ) ) ;
       auto typeStr = pluginTypeToString( type ) ;
       _logger->log<DEBUG5>() << "New plugin registered: type '" << typeStr << "', name '" << name << "'" <<std::endl ;
     }
@@ -92,7 +95,9 @@ namespace marlin {
             << "    ->    Trying to load DUPLICATE library -->" << std::endl << std::endl ;
         return false ;
       }
+      _currentLibrary = library ;
       void* libPointer = dlopen( library.c_str() , RTLD_LAZY | RTLD_GLOBAL) ;
+      _currentLibrary.clear() ;
       if( nullptr == libPointer ) {
         _logger->log<ERROR>() << std::endl << "<!-- ERROR loading shared library : " << library << std::endl
                     << "    ->    "   << dlerror() << " -->" << std::endl << std::endl ;
@@ -117,7 +122,7 @@ namespace marlin {
       else {
         _logger->log<MESSAGE>() << " " << typeStr << " plugins:" << std::endl ;
         for ( auto iter : pluginIter.second ) {
-          _logger->log<MESSAGE>() << " - " << iter.first << std::endl ;
+          _logger->log<MESSAGE>() << " - " << iter.first << " [" << iter.second._libraryName << "]" << std::endl ;
         }
       }
     }

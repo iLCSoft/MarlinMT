@@ -66,7 +66,15 @@ namespace marlin {
     // typedefs
     typedef std::shared_ptr<void>                       PluginPtr ;
     typedef std::function<PluginPtr()>                  FactoryFunction ;
-    typedef std::map<std::string, FactoryFunction>      FactoryMap ;
+    
+    struct FactoryData {
+      /// The name of the library of the plugin 
+      std::string           _libraryName {} ;
+      /// The plugin factory
+      FactoryFunction       _factory {} ;
+    };
+    
+    typedef std::map<std::string, FactoryData>          FactoryMap ;
     typedef std::map<PluginType, FactoryMap>            PluginFactoryMap ;
     typedef std::vector<void*>                          LibraryList ;
     typedef Logging::Logger                             Logger ;
@@ -179,6 +187,8 @@ namespace marlin {
     mutable Logger             _logger {nullptr} ;
     /// The synchronization mutex
     mutable mutex_type         _mutex {} ;
+    /// The current library being loaded
+    std::string                _currentLibrary {} ;
   };
 
   //--------------------------------------------------------------------------
@@ -206,7 +216,7 @@ namespace marlin {
       _logger->log<DEBUG5>() << "Plugin not found: type '" << typeStr << "', name '" << name << "'" << std::endl ;
       return nullptr ;
     }
-    auto pointer = factoryIter->second() ; // factory function call
+    auto pointer = factoryIter->second._factory() ; // factory function call
     return std::static_pointer_cast<T, void>( pointer ) ;
   }
 
