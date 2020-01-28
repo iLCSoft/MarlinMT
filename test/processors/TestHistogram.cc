@@ -1,4 +1,5 @@
 #include <utility>
+#include <array>
 
 // -- marlin headers
 #include "marlin/Processor.h"
@@ -22,26 +23,36 @@ public:
   void end() final;
 
 private:
-  H1FEntry _histogram;
+  std::array<H1FEntry,2> _histogram;
 };
 
 TestHistogram::TestHistogram() :
   Processor("TestHistogram") {}
 
 void TestHistogram::init() {
-  _histogram = ProcessorApi::Book::bookHist1F(
+  _histogram[0] = ProcessorApi::Book::bookHist1F(
     this,
     "/someWhere/",
-    "hit",
-    "test histogram",
-      AxisConfigD(10, -1., 10.)
+    "share",
+    "test histogram shared",
+      AxisConfigD(10, -1., 10.),
+      BookFlags::MultiShared | BookFlags::Store
+  );
+  _histogram[1] = ProcessorApi::Book::bookHist1F(
+    this,
+    "/someWhere/",
+    "copy",
+    "test histogram copied",
+      AxisConfigD(10, -1., 10.),
+      BookFlags::MultiCopy | BookFlags::Store
   );
 }
 
 void TestHistogram::processEvent(EventStore * evt) {
   IMPL::LCEventImpl* event 
     = dynamic_cast<IMPL::LCEventImpl*>(evt->event<EVENT::LCEvent>().get());
-  H1FHandle hnd = _histogram.handle();
+  std::array<H1FHandle,2> 
+    hnd = {_histogram[0].handle(), _histogram[1].handle()};
   try {
     EVENT::LCCollection * coll 
       =  event->getCollection("MCParticle");
@@ -52,7 +63,8 @@ void TestHistogram::processEvent(EventStore * evt) {
       EVENT::MCParticle* par =
         dynamic_cast<EVENT::MCParticle*>(coll->getElementAt(i));
 
-      hnd.fill({par->getEnergy()}, 1.);
+      hnd[0].fill({par->getEnergy()}, 1.);
+      hnd[1].fill({par->getEnergy()}, 1.);
     }
   } catch ( EVENT::Exception& ) {
     streamlog_out(ERROR) << " failed to process event, LC error\n";
