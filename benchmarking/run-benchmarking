@@ -42,36 +42,64 @@ then
   exit 1
 fi
 
-OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,lazy,trigger,help -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,minhistcrunch:,maxhistcrunch:,histcrunchstep:,histsigmapercent:,nbins:,nhists:,nfills:,memorylayout:,steeringfile:,lazy,trigger,help -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
+# general configuration
 mincores=2
 maxcores=2
-mincrunch=500
-maxcrunch=1000
-crunchstep=500
-sigmapercent=0
 lazyUnpack="false"
 triggerUnpacking="false"
 inputfile=""
 steeringfile=${MARLIN_DIR}/benchmarking/cpu_crunching.xml
 
+# cpu_crunch configuration
+mincrunch=500
+maxcrunch=500
+crunchstep=500
+sigmapercent=0
+
+# histogram processor configuration
+minhistcrunch=$mincrunch
+maxhistcrunch=$maxcrunch
+histcrunchstep=$crunchstep
+histsigmapercent=$sigmapercent
+nbins=1000
+nhists=10
+nfills=1000
+memorylayout="Copy"
+
+
 while true; do
   case "$1" in
+	# general configuration
     --mincores ) mincores=$2; shift; shift ;;
     --maxcores ) maxcores=$2; shift; shift ;;
+    --inputfile ) inputfile=$2; shift; shift ;;
+    --lazy ) lazyUnpack="true"; shift ;;
+    --trigger ) triggerUnpacking="true"; shift ;;
+		--steeringfile ) steeringfile=$2; shift; shift;;
+	# cpu crunch configuration
     --mincrunch ) mincrunch=$2; shift; shift ;;
     --maxcrunch ) maxcrunch=$2; shift; shift ;;
     --crunchstep ) crunchstep=$2; shift; shift ;;
     --sigmacrunch ) sigmacrunch=$2; shift; shift ;;
-    --inputfile ) inputfile=$2; shift; shift ;;
-    --lazy ) lazyUnpack="true"; shift ;;
-    --trigger ) triggerUnpacking="true"; shift ;;
+	# histogram processor configuration
+		--minhistcrunch ) minhistcrunch=$2; shift; shift ;;
+		--maxhistcrunch ) maxhistcrunch=$2; shift; shift ;;
+		--histcrunchstep ) histcrunchstep=$2; shift; shift ;;
+		--histsigmapercent ) histsigmapercent=$2; shift; shift ;;
+		--nbins ) nbins=$2; shift; shift ;;
+		--nhists ) nhists=$2; shift; shift ;;
+		--nfills ) nfills=$2; shift; shift ;;
+		--memorylayout ) memorylayout=$2; shift; shift ;;
+	# other inputs
     -h | --help )  printUsage; exit 0 ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
 done
+
 
 if [ "$inputfile" == "" ]
 then
@@ -82,6 +110,7 @@ fi
 
 cores=`seq ${mincores} ${maxcores} | tr '\n' ' '`
 crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
+histcrunchtimes=`seq ${minhistcrunch} ${histcrunchstep} ${maxhistcrunch} | tr '\n' ' '`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
@@ -126,27 +155,42 @@ for c in ${cores}
 do
   for cr in ${crunchtimes}
   do
-    crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
-    echo "Running MarlinMT with:"
-    echo "-- N cores:            ${c}"
-    echo "-- Crunch time:        ${cr}"
-    echo "-- Crunch sigma:       ${crunchSigma}"
-    echo "-- Lazy unpacking:     ${lazyUnpack}"
-    echo "-- Trigger unpacking:  ${triggerUnpacking}"
-    MarlinMT \
-    ${steeringfile} \
-    --constant.TriggerUnpacking="${triggerUnpacking}" \
-    --datasource.LCIOInputFiles="${inputfile}" \
-    --datasource.LazyUnpack="${lazyUnpack}" \
-    --CPUCrunch.CrunchTime=${cr} \
-    --CPUCrunch.CrunchSigma=${crunchSigma} \
-    --global.Verbosity=MESSAGE \
-    --global.Concurrency=${c} > scaling_temp_$$.log 
-    serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
-    parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
-    scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )
-    echo "Result: ${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}"
-    echo "${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}" >> ${output}
-    echo ""
+		crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
+		for hcr in ${histcrunchtimes}
+		do
+			hCrunchSigma=`echo "(${hcr}*${histsigmapercent})" | bc`
+			echo "Running MarlinMT with:"
+			echo "  general:"
+			echo "  -- N cores:            ${c}"
+			echo "  -- Lazy unpacking:     ${lazyUnpack}"
+			echo "  -- Trigger unpacking:  ${triggerUnpacking}"
+			echo "  cpu_crunch:"
+			echo "  -- Crunch time:        ${cr}"
+			echo "  -- Crunch sigma:       ${crunchSigma}"
+			echo "  histogram filling:"
+			echo "  -- number histograms:  ${nhists}"
+			echo "  -- number bins:        ${nbins}"
+			echo "  -- number fills:       ${nfills}"
+			MarlinMT \
+			${steeringfile} \
+			--constant.TriggerUnpacking="${triggerUnpacking}" \
+			--datasource.LCIOInputFiles="${inputfile}" \
+			--datasource.LazyUnpack="${lazyUnpack}" \
+			--CPUCrunch.CrunchTime=${cr} \
+			--CPUCrunch.CrunchSigma=${crunchSigma} \
+			--HistFilling.NBins=${nbins} \
+			--HistFilling.NHists=${nhists} \
+			--HistFilling.NFills=${nfills} \
+			--HistFilling.CrunchTime=${hcr} \
+			--HistFilling.CrunchSigma=${hCrunchSigma} \
+			--global.Verbosity=MESSAGE \
+			--global.Concurrency=${c} > scaling_temp_$$.log 
+			serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
+			parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
+			scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )
+			echo "Result: ${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}"
+			echo "${c} ${cr} ${crunchSigma} ${serial} ${parallel} ${scaling}" >> ${output}
+			echo ""
+		done
   done
 done
