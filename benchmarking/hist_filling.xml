@@ -38,12 +38,10 @@
     <parameter name="CrunchSigma"> 100 </parameter>
   </processor>
 
-  <processor name="HistFilling" type="HistogramFilling">
+  <processor name="HistFilling" type="MarlinBenchHistProcessor">
     <parameter name="NBins">100</parameter>
     <parameter name="NHists">5</parameter>
     <parameter name="NFills">10000</parameter>
-    <parameter name="CrunchTime">300</parameter>
-    <parameter name="CrunchSigma">0</parameter>
   </processor>
 
 </marlin>
