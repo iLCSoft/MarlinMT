@@ -26,11 +26,11 @@ private:
   Property<marlin::size_t> _nFills {this, "NFills", "number of fill operations per event", 1000};
   std::vector<H1FEntry> _histograms;
   std::mt19937 _generator{ 0x1bff1822 };
-  std::normal_distribution<float> _distributionV{0, 30.f};
+  std::normal_distribution<float> _distributionV{0, 10.f};
 };
 
 MarlinBenchHistProcessor::MarlinBenchHistProcessor() :
-  Processor("HistogramFilling") {}
+  Processor("MarlinBenchHistProcessor") {}
 
 void MarlinBenchHistProcessor::init() {
   if (_histograms.empty()) {
@@ -50,6 +50,7 @@ void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
   for(auto itr = _histograms.begin(); itr != _histograms.end(); ++itr) {
     hists.emplace_back(itr->handle());
   }
+  
   for(marlin::size_t i = 0; i < _nFills; ++i) {
     for ( auto& hist : hists) {
       hist.fill({_distributionV(_generator)}, 1.);
