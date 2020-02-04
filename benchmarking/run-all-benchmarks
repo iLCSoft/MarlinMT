@@ -5,18 +5,18 @@
 # small times benchmarking
 #
 # trigger event unpack in worker thread
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 0 --maxcrunch 500 --crunchstep 50  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 0 --maxcrunch 500 --crunchstep 50  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
 # don't trigger it here
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 0 --maxcrunch 500 --crunchstep 50  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 0 --maxcrunch 500 --crunchstep 50  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
 
 #
 # large time benchmarking
 #
 # read and decode event in main thread
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio
 # don't unpack event anywhere
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio --lazy
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio --lazy
 # unpack event in worker thread
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --inputfile ~/pool/benchmarking_mt.slcio --lazy --trigger
 # don't unpack event anywhere, smear crunch time by 10%
-$MARLIN_DIR/benchmarking/run-benchmarking  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --sigmacrunch 0.1 --inputfile ~/pool/benchmarking_mt.slcio --lazy 
+$MARLIN_DIR/benchmarking/run-benchmarking-scheduler  --mincores 2 --maxcores 40 --mincrunch 500 --maxcrunch 2500 --crunchstep 500  --sigmacrunch 0.1 --inputfile ~/pool/benchmarking_mt.slcio --lazy 

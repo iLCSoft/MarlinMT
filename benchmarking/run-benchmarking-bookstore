@@ -9,7 +9,7 @@
 
 function printUsage() {
   echo "Usage:"
-  echo "run-benchmarking [options] --inputfile <slcio-file>"
+  echo "run-benchmarking-bookstore [options] --inputfile <slcio-file>"
   echo ""
   echo "Run MarlinMT for multi-core benchmarking"
   echo ""
