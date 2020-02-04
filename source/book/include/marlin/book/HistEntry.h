@@ -3,6 +3,7 @@
 
 // -- std includes
 #include <functional>
+#include <mutex>
 #include <type_traits>
 #include <vector>
 
@@ -259,6 +260,8 @@ namespace marlin {
       /// list of produced Filler to flush them when needed.
       std::vector< std::weak_ptr< types::HistConcurrentFiller< Config > > >
         _fillers ;
+      /// lock _fillers when extend memory 
+      std::mutex _fillersExtend {};
     } ;
   } // end namespace book
 } // end namespace marlin

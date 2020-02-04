@@ -237,7 +237,7 @@ namespace marlin {
         _fillMgr{
           std::make_shared< types::HistConcurrentFillManager< Config  > >(
             *_context.mem->at< Type >( 0 ) )},
-        _fillers( 0 ) {}
+        _fillers( 10 ) {}
 
     //--------------------------------------------------------------------------
 
@@ -255,7 +255,23 @@ namespace marlin {
       auto pFiller
         = std::make_shared< types::HistConcurrentFiller< Config > >(
           *_fillMgr ) ;
-      _fillers.push_back( pFiller ) ;
+      {
+        std::lock_guard<std::mutex> lock(_fillersExtend);
+        std::size_t capacity = _fillers.capacity();
+        if (_fillers.size() < capacity) {
+          _fillers.emplace_back(pFiller);
+        } else {
+          _fillers.erase(
+            std::remove_if(
+              _fillers.begin(), _fillers.end(),
+              [](auto& ptr){ return ptr.expired();}), 
+            _fillers.end());
+          if (_fillers.size() > capacity * 0.8f) {
+            _fillers.reserve(_fillers.size() * 1.5f);
+          }
+        }
+      }
+
       return Hnd_t(
         _context.mem,
         _context.mem->at< Type >( 0 ),

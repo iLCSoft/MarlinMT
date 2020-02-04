@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash 
 
 # if [ ! "$#" == "5" ]
 # then
@@ -46,23 +46,23 @@ eval set -- "$OPTS"
 
 # general configuration
 mincores=2
-maxcores=2
+maxcores=3
 lazyUnpack="false"
 triggerUnpacking="false"
 inputfile=""
 steeringfile=${MARLIN_DIR}/benchmarking/hist_filling.xml
 
 # cpu_crunch configuration
-mincrunch=500
-maxcrunch=500
-crunchstep=500
+mincrunch=50
+maxcrunch=100
+crunchstep=50
 sigmapercent=0
 
 # histogram processor configuration
 nbins=1000
 nhistsmin=20
 nhistsmax=40
-nhistsstep=5
+nhistsstep=20
 nfills=1000
 memorylayout="Copy"
 native="false"
@@ -154,6 +154,7 @@ fi
 echo "$memorylayout native: $nativeShared REMOVE! TODO"
 
 echo "Start benchmarking ..."
+echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,native,memory layout,serial time,parallel time,scaling factor" >> ${output}
 for c in ${cores}
 do
   for cr in ${crunchtimes}
@@ -200,7 +201,7 @@ do
 			echo "  serial Time:   ${serial}"
 			echo "  parallel Time: ${parallel}"
 			echo "  scaling:       ${scaling}"
-			echo "${c} ${cr} ${crunchSigma} ${nh} ${serial} ${parallel} ${scaling}" >> ${output}
+			echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${native},${memorylayout},${serial},${parallel},${scaling}" >> ${output}
 			echo ""
 		done
   done
