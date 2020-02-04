@@ -4,10 +4,10 @@
 #################################
 
 # create library
-aux_source_directory( plugins BenchmarkPlugins_sources )
-add_library( BenchmarkPlugins MODULE ${BenchmarkPlugins_sources} )
-add_library( Marlin::BenchmarkPlugins ALIAS BenchmarkPlugins )
-install( TARGETS BenchmarkPlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
-target_link_libraries( BenchmarkPlugins PUBLIC Marlin::Core)
+aux_source_directory( plugins MarlinBenchmarkPlugins_sources )
+add_library( MarlinBenchmarkPlugins MODULE ${BenchmarkPlugins_sources} )
+add_library( Marlin::BenchmarkPlugins ALIAS MarlinBenchmarkPlugins )
+install( TARGETS MarlinBenchmarkPlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+target_link_libraries( MarlinBenchmarkPlugins PUBLIC Marlin::Core)
 
-marlin_add_plugin_library( TARGETS BenchmarkPlugins )
+marlin_add_plugin_library( TARGETS MarlinBenchmarkPlugins )

@@ -126,7 +126,7 @@ else
   triggerUnpackingStr="notrig"
 fi
 
-output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}.txt"
+output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_MemoryLayout.${memorylayout}_Native.${native}.txt"
 
 if [ -f ${output} ]
 then
@@ -151,7 +151,6 @@ if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
 	echo "ERROR copied memory layout is native not possible!"
 	exit 1
 fi
-echo "$memorylayout native: $nativeShared REMOVE! TODO"
 
 echo "Start benchmarking ..."
 echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,native,memory layout,serial time,parallel time,scaling factor" >> ${output}
