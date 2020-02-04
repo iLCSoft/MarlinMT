@@ -25,8 +25,6 @@ private:
   Property<int> _nHist {this, "NHists", "number of histograms to create.", 5} ;
   Property<marlin::size_t> _nFills {this, "NFills", "number of fill operations per event", 1000};
   std::vector<H1FEntry> _histograms;
-  std::mt19937 _generator{ 0x1bff1822 };
-  std::normal_distribution<float> _distributionV{0, 10.f};
 };
 
 MarlinBenchHistProcessor::MarlinBenchHistProcessor() :
@@ -46,6 +44,9 @@ void MarlinBenchHistProcessor::init() {
 }
 
 void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
+  auto seed = ProcessorApi::getRandomSeed( this, evt ) ;
+  std::mt19937 generator{ seed };
+  std::normal_distribution<float> distributionV{0, 10.f};
   std::vector<H1FHandle> hists{}; 
   for(auto itr = _histograms.begin(); itr != _histograms.end(); ++itr) {
     hists.emplace_back(itr->handle());
@@ -53,7 +54,7 @@ void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
   
   for(marlin::size_t i = 0; i < _nFills; ++i) {
     for ( auto& hist : hists) {
-      hist.fill({_distributionV(_generator)}, 1.);
+      hist.fill({distributionV(generator)}, 1.);
     }
   }
 }
