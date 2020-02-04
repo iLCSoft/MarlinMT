@@ -153,7 +153,7 @@ if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
 fi
 
 echo "Start benchmarking ..."
-echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,native,memory layout,serial time,parallel time,scaling factor" >> ${output}
+echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,serial time,parallel time,scaling factor" >> ${output}
 for c in ${cores}
 do
   for cr in ${crunchtimes}
@@ -200,7 +200,7 @@ do
 			echo "  serial Time:   ${serial}"
 			echo "  parallel Time: ${parallel}"
 			echo "  scaling:       ${scaling}"
-			echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${native},${memorylayout},${serial},${parallel},${scaling}" >> ${output}
+			echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${serial},${parallel},${scaling}" >> ${output}
 			echo ""
 		done
   done
