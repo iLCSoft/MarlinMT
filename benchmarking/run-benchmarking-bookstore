@@ -126,7 +126,7 @@ else
   triggerUnpackingStr="notrig"
 fi
 
-output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_MemoryLayout.${memorylayout}_Native.${native}.txt"
+output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_Fills.${nfills}__MemoryLayout.${memorylayout}_Native.${native}.txt"
 
 if [ -f ${output} ]
 then

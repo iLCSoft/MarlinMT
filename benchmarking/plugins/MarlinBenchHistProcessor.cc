@@ -52,9 +52,11 @@ void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
     hists.emplace_back(itr->handle());
   }
   
+  auto itr = hists.begin();
   for(marlin::size_t i = 0; i < _nFills; ++i) {
-    for ( auto& hist : hists) {
-      hist.fill({distributionV(generator)}, 1.);
+    itr->fill({distributionV(generator)}, 1.);
+    if(++itr == hists.end()) {
+      itr = hists.begin();
     }
   }
 }
