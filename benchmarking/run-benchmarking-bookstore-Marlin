@@ -29,7 +29,7 @@ then
 fi
 
 
-OPTS=`getopt -o h -l mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfills:,steeringfile:,help -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h -l mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfillsmin:,nfillsmax,nfillsstep:,steeringfile:,help -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
 # general configuration
@@ -37,17 +37,19 @@ inputfile=""
 steeringfile=${MARLIN_DIR}/benchmarking/Marlin/steer.xml
 
 # cpu_crunch configuration
-mincrunch=50
-maxcrunch=100
-crunchstep=50
+mincrunch=0
+maxcrunch=10
+crunchstep=10
 sigmapercent=0
 
 # histogram processor configuration
 nbins=1000
 nhistsmin=20
-nhistsmax=40
-nhistsstep=20
-nfills=1000
+nhistsmax=2020
+nhistsstep=500
+nfillsmin=100000
+nfillsmax=300000
+nfillsstep=100000
 	
 
 while true; do
@@ -65,7 +67,9 @@ while true; do
 		--nhistsmin ) nhistsmin=$2; shift; shift ;;
 		--nhistsmax ) nhistsmax=$2; shift; shift ;;
 		--nhistsstep ) nhistsstep=$2; shift; shift ;;
-		--nfills ) nfills=$2; shift; shift ;;
+		--nfillsmin ) nfillsmin=$2; shift; shift ;;
+		--nfillsmax ) nfillsmax=$2; shift; shift ;;
+		--nfillsstep ) nfillsstep=$2; shift; shift ;;
 	# other inputs
     -h | --help )  printUsage; exit 0 ;;
     -- ) shift; break ;;
@@ -83,6 +87,7 @@ fi
 
 crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
 nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
+nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
@@ -101,7 +106,7 @@ else
   triggerUnpackingStr="notrig"
 fi
 
-output="MarlinBenchmarking_Sigma.${sigmapercent}_Fills.${nfills}.txt"
+output="MarlinBenchmarking_Sigma.${sigmapercent}.txt"
 
 if [ -f ${output} ]
 then
@@ -114,6 +119,7 @@ echo "  - crunch sigma percentage: $sigmapercent"
 echo "  - LCIO input file: $inputfile"
 echo "  - Marlin steering file: $steeringfile"
 echo "  - Benchmark output file: $output"
+echo "  - nfills: ${nfills}"
 
 # load the file in the cache for next
 echo "Loading input file into cache: ${inputfile}"
@@ -126,37 +132,39 @@ fi
 
 echo "Start benchmarking ..."
 echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,total Time real, total Time user, Total Time sys" >> ${output}
-
-for cr in ${crunchtimes}
+for nf in ${nfills}
 do
-	crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
-	for nh  in ${nhists}
+	for cr in ${crunchtimes}
 	do
-		echo "Running Marlin with:"
-		echo "  cpu_crunch:"
-		echo "  -- Crunch time:        ${cr}"
-		echo "  -- Crunch sigma:       ${crunchSigma}"
-		echo "  histogram filling:"
-		echo "  -- number histograms:  ${nh}"
-		echo "  -- number bins:        ${nbins}"
-		echo "  -- number fills:       ${nfills}"
-		totalTime=(`time (Marlin \
-		${steeringfile} \
-		--global.LCIOInputFiles="${inputfile}" \
-		--CPUCrunch.CrunchTime=${cr} \
-		--CPUCrunch.CrunchSigma=${crunchSigma} \
-		--HistFilling.NBins=${nbins} \
-		--HistFilling.NHists=${nh} \
-		--HistFilling.NFills=${nfills} \
-		> scaling_temp_$$.log) 2>&1 1>/dev/null `)
-		if [ $? -ne 0 ]; then
-			echo "MarlinMT failed!, stop benchmarks!"
-			exit 1
-		fi
-		real=${totalTime[1]}
-		user=${totalTime[3]}
-		sys=${totalTime[5]}
-		echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${real},${user},${sys}" >> ${output}
-		echo ""
+		crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
+		for nh  in ${nhists}
+		do
+			echo "Running Marlin with:"
+			echo "  cpu_crunch:"
+			echo "  -- Crunch time:        ${cr}"
+			echo "  -- Crunch sigma:       ${crunchSigma}"
+			echo "  histogram filling:"
+			echo "  -- number histograms:  ${nh}"
+			echo "  -- number bins:        ${nbins}"
+			echo "  -- number fills:       ${nf}"
+			totalTime=(`time (Marlin \
+			${steeringfile} \
+			--global.LCIOInputFiles="${inputfile}" \
+			--CPUCrunch.CrunchTime=${cr} \
+			--CPUCrunch.CrunchSigma=${crunchSigma} \
+			--HistFilling.NBins=${nbins} \
+			--HistFilling.NHists=${nh} \
+			--HistFilling.NFills=${nf} \
+			> scaling_temp_$$.log) 2>&1 1>/dev/null `)
+			if [ $? -ne 0 ]; then
+				echo "MarlinMT failed!, stop benchmarks!"
+				exit 1
+			fi
+			real=${totalTime[1]}
+			user=${totalTime[3]}
+			sys=${totalTime[5]}
+			echo "1,${cr},${crunchSigma},${nh},${nf},${nbins},${real},${user},${sys}" >> ${output}
+			echo ""
+		done
 	done
 done
