@@ -1,0 +1,162 @@
+#!/bin/bash 
+
+# run benchmarking-bookstore on single core at Marlin, 
+# must add processors lib beforehand to MARLIN_DLL!
+# MarlinBenchCpuCrunchProcessor, MarlinBenchHistProcessor
+
+function printUsage() {
+  echo "Usage:"
+  echo "run-benchmarking-bookstore [options] --inputfile <slcio-file>"
+  echo ""
+  echo "Run MarlinMT for multi-core benchmarking"
+  echo ""
+  echo "Options:"
+  echo "  --mincrunch <int>          The start crunch time (ms) [default=500]"
+  echo "  --maxcrunch <int>          The end crunch time (ms) [default=1000]"
+  echo "  --crunchstep <int>         The step in crunch time numbers [default=500]"
+  echo "  --sigmacrunch <float>      Introduce an event-by-event gaussian random"
+  echo "                             fluctuation in the crunch time [default=0]"
+  echo "  --inputfile <slcio-file>   The LCIO input file. Mandatory parameter !"
+  echo "  -h --help                  Print help and exit"
+  echo ""
+}
+
+
+if [ -z "$MARLIN_DIR" ]
+then
+  echo "MARLIN_DIR not set. Please setup your environment!"
+  exit 1
+fi
+
+
+OPTS=`getopt -o h -l mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfills:,steeringfile:,help -n 'parse-options' -- "$@"`
+eval set -- "$OPTS"
+
+# general configuration
+inputfile=""
+steeringfile=${MARLIN_DIR}/benchmarking/Marlin/steer.xml
+
+# cpu_crunch configuration
+mincrunch=50
+maxcrunch=100
+crunchstep=50
+sigmapercent=0
+
+# histogram processor configuration
+nbins=1000
+nhistsmin=20
+nhistsmax=40
+nhistsstep=20
+nfills=1000
+	
+
+while true; do
+  case "$1" in
+	# general configuration
+    --inputfile ) inputfile=$2; shift; shift ;;
+		--steeringfile ) steeringfile=$2; shift; shift;;
+	# cpu crunch configuration
+    --mincrunch ) mincrunch=$2; shift; shift ;;
+    --maxcrunch ) maxcrunch=$2; shift; shift ;;
+    --crunchstep ) crunchstep=$2; shift; shift ;;
+    --sigmacrunch ) sigmacrunch=$2; shift; shift ;;
+	# histogram processor configuration
+		--nbins ) nbins=$2; shift; shift ;;
+		--nhistsmin ) nhistsmin=$2; shift; shift ;;
+		--nhistsmax ) nhistsmax=$2; shift; shift ;;
+		--nhistsstep ) nhistsstep=$2; shift; shift ;;
+		--nfills ) nfills=$2; shift; shift ;;
+	# other inputs
+    -h | --help )  printUsage; exit 0 ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+
+if [ "$inputfile" == "" ]
+then
+  echo "ERROR: --inputfile argument is mandatory"
+  printUsage
+  exit 1
+fi
+
+crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
+nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
+
+lazyUnpackStr=""
+triggerUnpackingStr=""
+
+if [ "${lazyUnpack}" == "true" ]
+then
+  lazyUnpackStr="lazy"
+else
+  lazyUnpackStr="nolazy"
+fi
+
+if [ "${triggerUnpacking}" == "true" ]
+then
+  triggerUnpackingStr="trig"
+else
+  triggerUnpackingStr="notrig"
+fi
+
+output="MarlinBenchmarking_Sigma.${sigmapercent}_Fills.${nfills}.txt"
+
+if [ -f ${output} ]
+then
+  rm ${output}
+fi
+
+echo "Running with following settings:"
+echo "  - crunch times: ${crunchtimes}"
+echo "  - crunch sigma percentage: $sigmapercent"
+echo "  - LCIO input file: $inputfile"
+echo "  - Marlin steering file: $steeringfile"
+echo "  - Benchmark output file: $output"
+
+# load the file in the cache for next
+echo "Loading input file into cache: ${inputfile}"
+anajob ${inputfile} >> /dev/null
+
+if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
+	echo "ERROR copied memory layout is native not possible!"
+	exit 1
+fi
+
+echo "Start benchmarking ..."
+echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,total Time real, total Time user, Total Time sys" >> ${output}
+
+for cr in ${crunchtimes}
+do
+	crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
+	for nh  in ${nhists}
+	do
+		echo "Running Marlin with:"
+		echo "  cpu_crunch:"
+		echo "  -- Crunch time:        ${cr}"
+		echo "  -- Crunch sigma:       ${crunchSigma}"
+		echo "  histogram filling:"
+		echo "  -- number histograms:  ${nh}"
+		echo "  -- number bins:        ${nbins}"
+		echo "  -- number fills:       ${nfills}"
+		totalTime=(`time (Marlin \
+		${steeringfile} \
+		--global.LCIOInputFiles="${inputfile}" \
+		--CPUCrunch.CrunchTime=${cr} \
+		--CPUCrunch.CrunchSigma=${crunchSigma} \
+		--HistFilling.NBins=${nbins} \
+		--HistFilling.NHists=${nh} \
+		--HistFilling.NFills=${nfills} \
+		> scaling_temp_$$.log) 2>&1 1>/dev/null `)
+		if [ $? -ne 0 ]; then
+			echo "MarlinMT failed!, stop benchmarks!"
+			exit 1
+		fi
+		real=${totalTime[1]}
+		user=${totalTime[3]}
+		sys=${totalTime[5]}
+		echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${real},${user},${sys}" >> ${output}
+		echo ""
+	done
+done
