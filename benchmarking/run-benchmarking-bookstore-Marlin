@@ -89,24 +89,8 @@ crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
 nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
 nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
 
-lazyUnpackStr=""
-triggerUnpackingStr=""
 
-if [ "${lazyUnpack}" == "true" ]
-then
-  lazyUnpackStr="lazy"
-else
-  lazyUnpackStr="nolazy"
-fi
-
-if [ "${triggerUnpacking}" == "true" ]
-then
-  triggerUnpackingStr="trig"
-else
-  triggerUnpackingStr="notrig"
-fi
-
-output="MarlinBenchmarking_Sigma.${sigmapercent}.txt"
+output="MarlinBenchmarking_Sigma.${sigmapercent}_nBins.${nbins}.txt"
 
 if [ -f ${output} ]
 then
@@ -131,7 +115,10 @@ if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
 fi
 
 echo "Start benchmarking ..."
-echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,total Time real, total Time user, Total Time sys" >> ${output}
+
+echo "concurrency,crunchTime,crunchSigma,nHists,nFills,\
+tReal,tUser,tSys,tSerial,tParallel,scaling" > ${output}
+
 for nf in ${nfills}
 do
 	for cr in ${crunchtimes}
@@ -160,10 +147,16 @@ do
 				echo "MarlinMT failed!, stop benchmarks!"
 				exit 1
 			fi
+
+			sumT=$( cat scaling_temp_$$.log | sed -n 's/.*Total:\s*\([0-9\.\e+-]*\) s in.*/\1/p' ) 
 			real=${totalTime[1]}
 			user=${totalTime[3]}
 			sys=${totalTime[5]}
-			echo "1,${cr},${crunchSigma},${nh},${nf},${nbins},${real},${user},${sys}" >> ${output}
+			echo "1,\
+${cr},${crunchSigma},\
+${nh},${nf},\
+${real},${user},${sys},\
+${sumT},${sumT},1" >> ${output}
 			echo ""
 		done
 	done

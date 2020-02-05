@@ -41,7 +41,7 @@ then
   exit 1
 fi
 
-OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,histsigmapercent:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfills:,memorylayout:,steeringfile:,lazy,trigger,native,help -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,histsigmapercent:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfillsmin:,nfillsmax:,nfillsstep:,memorylayout:,steeringfile:,lazy,trigger,native,help -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
 # general configuration
@@ -61,9 +61,11 @@ sigmapercent=0
 # histogram processor configuration
 nbins=1000
 nhistsmin=20
-nhistsmax=40
-nhistsstep=20
-nfills=1000
+nhistsmax=2020
+nhistsstep=500
+nfillsmin=100000
+nfillsmax=300000
+nfillsstep=100000
 memorylayout="Copy"
 native="false"
 	
@@ -87,7 +89,9 @@ while true; do
 		--nhistsmin ) nhistsmin=$2; shift; shift ;;
 		--nhistsmax ) nhistsmax=$2; shift; shift ;;
 		--nhistsstep ) nhistsstep=$2; shift; shift ;;
-		--nfills ) nfills=$2; shift; shift ;;
+		--nfillsmin ) nfillsmin=$2; shift; shift ;;
+		--nfillsmax ) nfillsmax=$2; shift; shift ;;
+		--nfillsstep ) nfillsstep=$2; shift; shift ;;
 		--memorylayout ) memorylayout=$2; shift; shift ;;
 		--native ) native="true"; shift ;;
 	# other inputs
@@ -108,6 +112,7 @@ fi
 cores=`seq ${mincores} ${maxcores} | tr '\n' ' '`
 crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
 nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
+nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
@@ -126,7 +131,7 @@ else
   triggerUnpackingStr="notrig"
 fi
 
-output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_Fills.${nfills}__MemoryLayout.${memorylayout}_Native.${native}.txt"
+output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_MemoryLayout.${memorylayout}_Native.${native}_nBins.${nbins}.txt"
 
 if [ -f ${output} ]
 then
@@ -142,6 +147,7 @@ echo "  - trigger unpacking ? $triggerUnpacking"
 echo "  - LCIO input file: $inputfile"
 echo "  - Marlin steering file: $steeringfile"
 echo "  - Benchmark output file: $output"
+echo "  - nfills: ${nfills}"
 
 # load the file in the cache for next
 echo "Loading input file into cache: ${inputfile}"
@@ -153,55 +159,69 @@ if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
 fi
 
 echo "Start benchmarking ..."
-echo "concurrency,crunch Time,crunch Sigma,n Histograms,n Fills,n bins,serial time,parallel time,scaling factor" >> ${output}
+
+echo "concurrency,crunchTime,crunchSigma,nHists,nFills,\
+tReal,tUser,tSys,tSerial,tParallel,scaling" > ${output}
+
 for c in ${cores}
 do
-  for cr in ${crunchtimes}
-  do
-		crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
-		for nh  in ${nhists}
+	for nf in ${nfills}
+	do
+		for cr in ${crunchtimes}
 		do
-			echo "Running MarlinMT with:"
-			echo "  general:"
-			echo "  -- N cores:            ${c}"
-			echo "  -- Lazy unpacking:     ${lazyUnpack}"
-			echo "  -- Trigger unpacking:  ${triggerUnpacking}"
-			echo "  cpu_crunch:"
-			echo "  -- Crunch time:        ${cr}"
-			echo "  -- Crunch sigma:       ${crunchSigma}"
-			echo "  histogram filling:"
-			echo "  -- number histograms:  ${nh}"
-			echo "  -- number bins:        ${nbins}"
-			echo "  -- number fills:       ${nfills}"
-			MarlinMT \
-			${steeringfile} \
-			--constant.TriggerUnpacking="${triggerUnpacking}" \
-			--datasource.LCIOInputFiles="${inputfile}" \
-			--datasource.LazyUnpack="${lazyUnpack}" \
-			--CPUCrunch.CrunchTime=${cr} \
-			--CPUCrunch.CrunchSigma=${crunchSigma} \
-			--bookstore.DefaultMemoryLayout=${memorylayout} \
-			--HistFilling.NBins=${nbins} \
-			--HistFilling.NHists=${nh} \
-			--HistFilling.NFills=${nfills} \
-			--HistFillingNative.NBins=${nbins} \
-			--HistFillingNative.NHists=${nh} \
-			--HistFillingNative.NFills=${nfills} \
-			--constant.RunNative=${native} \
-			--global.Concurrency=${c} > scaling_temp_$$.log 
-			if [ $? -ne 0 ]; then
-				echo "MarlinMT failed!, stop benchmarks!"
-				exit 1
-			fi
-			serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
-			parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
-			scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )
-			echo "Result: "
-			echo "  serial Time:   ${serial}"
-			echo "  parallel Time: ${parallel}"
-			echo "  scaling:       ${scaling}"
-			echo "${c},${cr},${crunchSigma},${nh},${nfills},${nbins},${serial},${parallel},${scaling}" >> ${output}
-			echo ""
+			crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
+			for nh  in ${nhists}
+			do
+				echo "Running MarlinMT with:"
+				echo "  general:"
+				echo "  -- N cores:            ${c}"
+				echo "  -- Lazy unpacking:     ${lazyUnpack}"
+				echo "  -- Trigger unpacking:  ${triggerUnpacking}"
+				echo "  cpu_crunch:"
+				echo "  -- Crunch time:        ${cr}"
+				echo "  -- Crunch sigma:       ${crunchSigma}"
+				echo "  histogram filling:"
+				echo "  -- number histograms:  ${nh}"
+				echo "  -- number bins:        ${nbins}"
+				echo "  -- number fills:       ${nf}"
+				totalTime=(`time (MarlinMT \
+				${steeringfile} \
+				--constant.TriggerUnpacking="${triggerUnpacking}" \
+				--datasource.LCIOInputFiles="${inputfile}" \
+				--datasource.LazyUnpack="${lazyUnpack}" \
+				--CPUCrunch.CrunchTime=${cr} \
+				--CPUCrunch.CrunchSigma=${crunchSigma} \
+				--bookstore.DefaultMemoryLayout=${memorylayout} \
+				--HistFilling.NBins=${nbins} \
+				--HistFilling.NHists=${nh} \
+				--HistFilling.NFills=${nf} \
+				--HistFillingNative.NBins=${nbins} \
+				--HistFillingNative.NHists=${nh} \
+				--HistFillingNative.NFills=${nf} \
+				--constant.RunNative=${native} \
+				--global.Concurrency=${c} > scaling_temp_$$.log ) 2>&1 1>/dev/null `)
+				if [ $? -ne 0 ]; then
+					echo "MarlinMT failed!, stop benchmarks!"
+					exit 1
+				fi
+				serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
+				parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
+				scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )
+				real=${totalTime[1]}
+				user=${totalTime[3]}
+				sys=${totalTime[5]}
+				echo "Result: "
+				echo "  serial Time:   ${serial}"
+				echo "  parallel Time: ${parallel}"
+				echo "  scaling:       ${scaling}"
+				echo "  total Time:    ${real}"
+				echo "${c},\
+${cr}, ${crunchSigma},\
+${nh}, ${nf},\
+${real},${user},${sys},\
+${serial},${parallel},${scaling}" >> ${output}
+				echo ""
+			done
 		done
-  done
+	done
 done
