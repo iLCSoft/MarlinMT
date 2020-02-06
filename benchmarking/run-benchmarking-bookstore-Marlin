@@ -116,7 +116,7 @@ fi
 
 echo "Start benchmarking ..."
 
-echo "concurrency,crunchTime,crunchSigma,nHists,nFills,\
+echo "concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,\
 tReal,tUser,tSys,tSerial,tParallel,scaling" > ${output}
 
 for nf in ${nfills}
@@ -154,7 +154,7 @@ do
 			sys=${totalTime[5]}
 			echo "1,\
 ${cr},${crunchSigma},\
-${nh},${nf},\
+${nh},${nf},${nbins},\
 ${real},${user},${sys},\
 ${sumT},${sumT},1" >> ${output}
 			echo ""

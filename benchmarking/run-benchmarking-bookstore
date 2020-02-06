@@ -160,7 +160,7 @@ fi
 
 echo "Start benchmarking ..."
 
-echo "concurrency,crunchTime,crunchSigma,nHists,nFills,\
+echo "concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,\
 tReal,tUser,tSys,tSerial,tParallel,scaling" > ${output}
 
 for c in ${cores}
@@ -217,7 +217,7 @@ do
 				echo "  total Time:    ${real}"
 				echo "${c},\
 ${cr},${crunchSigma},\
-${nh},${nf},\
+${nh},${nf},${nbins},\
 ${real},${user},${sys},\
 ${serial},${parallel},${scaling}" >> ${output}
 				echo ""
