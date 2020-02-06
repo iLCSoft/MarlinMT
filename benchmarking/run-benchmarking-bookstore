@@ -216,8 +216,8 @@ do
 				echo "  scaling:       ${scaling}"
 				echo "  total Time:    ${real}"
 				echo "${c},\
-${cr}, ${crunchSigma},\
-${nh}, ${nf},\
+${cr},${crunchSigma},\
+${nh},${nf},\
 ${real},${user},${sys},\
 ${serial},${parallel},${scaling}" >> ${output}
 				echo ""

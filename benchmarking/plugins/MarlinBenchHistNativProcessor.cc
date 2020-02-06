@@ -37,6 +37,7 @@ MarlinBenchHistNativeProcessor::MarlinBenchHistNativeProcessor() :
   Processor("MarlinBenchHistNativeProcessor") {}
 
 void MarlinBenchHistNativeProcessor::init() {
+  ProcessorApi::registerForRandomSeeds( this ) ;
   if (_histograms.empty()) {
     for (int i = 0; i < _nHist; ++i) {
       _histograms.emplace_back(

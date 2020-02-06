@@ -36,8 +36,6 @@
   
   <geometry type="EmptyGeometry" />
 
-  <processor name="UnpackEvent" type="LCIOEventUnpacking"/>
-
   <processor name="CPUCrunch" type="CPUCrunching" clone="false" critical="false">
     <parameter name="Verbosity">WARNING</parameter>
     <parameter name="CrunchTime"> 50 </parameter>
