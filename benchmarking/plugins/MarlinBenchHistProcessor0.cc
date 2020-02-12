@@ -13,9 +13,9 @@ namespace marlin{
   using size_t = unsigned long long int;
 }
 
-class MarlinBenchHistProcessor : public Processor {
+class MarlinBenchHistProcessor0 : public Processor {
 public:
-  MarlinBenchHistProcessor() ;
+  MarlinBenchHistProcessor0() ;
   void init() final override;
   void processEvent( EventStore * evt) final override;
   void end() final override;
@@ -27,10 +27,10 @@ private:
   std::vector<H1FEntry> _histograms;
 };
 
-MarlinBenchHistProcessor::MarlinBenchHistProcessor() :
-  Processor("MarlinBenchHistProcessor") {}
+MarlinBenchHistProcessor0::MarlinBenchHistProcessor0() :
+  Processor("MarlinBenchHistProcessor0") {}
 
-void MarlinBenchHistProcessor::init() {
+void MarlinBenchHistProcessor0::init() {
   ProcessorApi::registerForRandomSeeds( this ) ;
   if (_histograms.empty()) {
     for (int i = 0; i < _nHist; ++i) {
@@ -44,7 +44,7 @@ void MarlinBenchHistProcessor::init() {
   }
 }
 
-void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
+void MarlinBenchHistProcessor0::processEvent(EventStore * evt) {
   auto seed = ProcessorApi::getRandomSeed( this, evt ) ;
   std::mt19937 generator{ seed };
   std::normal_distribution<float> distributionV{0, 10.f};
@@ -62,6 +62,6 @@ void MarlinBenchHistProcessor::processEvent(EventStore * evt) {
   }
 }
 
-void MarlinBenchHistProcessor::end() {}
+void MarlinBenchHistProcessor0::end() {}
 
-MARLIN_DECLARE_PROCESSOR( MarlinBenchHistProcessor )
+MARLIN_DECLARE_PROCESSOR( MarlinBenchHistProcessor0 )

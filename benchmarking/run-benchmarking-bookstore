@@ -41,7 +41,7 @@ then
   exit 1
 fi
 
-OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,histsigmapercent:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfillsmin:,nfillsmax:,nfillsstep:,memorylayout:,steeringfile:,lazy,trigger,native,help -n 'parse-options' -- "$@"`
+OPTS=`getopt -o h -l mincores:,maxcores:,mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,histsigmapercent:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfillsmin:,nfillsmax:,nfillsstep:,memorylayout:,steeringfile:,accesstype:,lazy,trigger,native,help -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
 # general configuration
@@ -68,6 +68,7 @@ nfillsmax=300000
 nfillsstep=100000
 memorylayout="Copy"
 native="false"
+accesstype="0"
 	
 
 while true; do
@@ -94,6 +95,7 @@ while true; do
 		--nfillsstep ) nfillsstep=$2; shift; shift ;;
 		--memorylayout ) memorylayout=$2; shift; shift ;;
 		--native ) native="true"; shift ;;
+		--accesstype ) accesstype=$2; shift; shift ;;
 	# other inputs
     -h | --help )  printUsage; exit 0 ;;
     -- ) shift; break ;;
@@ -110,9 +112,15 @@ then
 fi
 
 cores=`seq ${mincores} ${maxcores} | tr '\n' ' '`
-crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
-nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
-nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
+if [ $crunchstep -eq 0 ]; then crunchtimes=(${mincrunch}); else
+	crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
+fi
+if [ $nhistsstep -eq 0 ]; then nhists=(${nhistsmin}); else
+	nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
+fi
+if [ $nfillsstep -eq 0 ]; then nfills=(${nfillsmin}); else
+	nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
+fi
 
 lazyUnpackStr=""
 triggerUnpackingStr=""
@@ -131,7 +139,7 @@ else
   triggerUnpackingStr="notrig"
 fi
 
-output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_MemoryLayout.${memorylayout}_Native.${native}_nBins.${nbins}.txt"
+output="MarlinMTBenchmarking_Lazy.${lazyUnpackStr}_Trigger.${triggerUnpackingStr}_Sigma.${sigmapercent}_MemoryLayout.${memorylayout}_Native.${native}_AccessType.${accesstype}_nBins.${nbins}.txt"
 
 if [ -f ${output} ]
 then
@@ -181,20 +189,26 @@ do
 				echo "  -- Crunch time:        ${cr}"
 				echo "  -- Crunch sigma:       ${crunchSigma}"
 				echo "  histogram filling:"
+				echo "  -- memory layout: 	   ${memorylayout}"
+				echo "  -- access type:        ${accesstype}"
 				echo "  -- number histograms:  ${nh}"
 				echo "  -- number bins:        ${nbins}"
 				echo "  -- number fills:       ${nf}"
 				totalTime=(`time (MarlinMT \
 				${steeringfile} \
 				--constant.TriggerUnpacking="${triggerUnpacking}" \
+				--constant.AccesType="${accesstype}" \
 				--datasource.LCIOInputFiles="${inputfile}" \
 				--datasource.LazyUnpack="${lazyUnpack}" \
 				--CPUCrunch.CrunchTime=${cr} \
 				--CPUCrunch.CrunchSigma=${crunchSigma} \
 				--bookstore.DefaultMemoryLayout=${memorylayout} \
-				--HistFilling.NBins=${nbins} \
-				--HistFilling.NHists=${nh} \
-				--HistFilling.NFills=${nf} \
+				--HistFilling0.NBins=${nbins} \
+				--HistFilling0.NHists=${nh} \
+				--HistFilling0.NFills=${nf} \
+				--HistFilling1.NBins=${nbins} \
+				--HistFilling1.NHists=${nh} \
+				--HistFilling1.NFills=${nf} \
 				--HistFillingNative.NBins=${nbins} \
 				--HistFillingNative.NHists=${nh} \
 				--HistFillingNative.NFills=${nf} \

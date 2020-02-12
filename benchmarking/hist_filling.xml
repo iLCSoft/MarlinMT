@@ -4,7 +4,12 @@
   <execute>
     <processor name="CPUCrunch"/>
     <if condition="!${RunNative}">
-      <processor name="HistFilling"/>
+      <if condition="!${AccesType}">
+        <processor name="HistFilling0"/>
+      </if>
+      <if condition="${AccesType}">
+        <processor name="HistFilling1"/>
+      </if>
     </if>
     <if condition="${RunNative}">
       <processor name="HistFillingNative"/>
@@ -13,6 +18,7 @@
   <constants>
     <constant name="TriggerUnpacking" value="false"/>
     <constant name="RunNative" value="false"/>
+    <constant name="AccesType" value="0" />
   </constants>
 
   <global>
@@ -48,7 +54,12 @@
     <parameter name="NFills">1000</parameter>
     <parameter name="Shared">false</parameter>
   </processor>
-  <processor name="HistFilling" type="MarlinBenchHistProcessor">
+  <processor name="HistFilling0" type="MarlinBenchHistProcessor0">
+    <parameter name="NBins">100</parameter>
+    <parameter name="NHists">105</parameter>
+    <parameter name="NFills">1000</parameter>
+  </processor >
+  <processor name="HistFilling1" type="MarlinBenchHistProcessor1">
     <parameter name="NBins">100</parameter>
     <parameter name="NHists">105</parameter>
     <parameter name="NFills">1000</parameter>

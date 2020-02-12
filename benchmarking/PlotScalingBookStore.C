@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <cstring>
 #include <exception>
 #include <map>
 #include <fstream>
@@ -15,6 +16,12 @@
 #include "TAxis.h"
 #include "TLegend.h"
 #include "TFrame.h"
+#include "TText.h"
+
+enum struct Alignment : short { LEFT = 1, TOP=1, CENTER = 2, RIGHT = 3, BOTTOM=3};
+short RootAligment(const Alignment horizontal, const Alignment vertical)  {
+	return static_cast<short>(horizontal) * 10 + static_cast<short>(vertical);
+}
 
 std::istream& operator>>(std::istream& is, std::chrono::duration<float>& t) {
 	float m, s;
@@ -23,6 +30,9 @@ std::istream& operator>>(std::istream& is, std::chrono::duration<float>& t) {
 	if (mc != 'm' || sc != 's') {
 		throw std::runtime_error("can't parse time!");
 	}
+	t = 
+		std::chrono::duration<float>(s)
+		+ std::chrono::duration<float, std::ratio<60>>(m);
 	return is;
 }
 
@@ -83,11 +93,12 @@ struct Entry {
 		return os;
 	}
 	static bool checkHeader(const std::string_view& sv) {
-		bool res =  sv == 	"concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,"
-									"tReal,tUser,tSys,tSerial,tParallel,scaling";
+		static const char exp[] = "concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,"
+			"tReal,tUser,tSys,tSerial,tParallel,scaling";
+		bool res =  strncasecmp(exp, sv.data(), sizeof(exp)) == 0;
 		if (!res) {
 			std::cerr << "CSV header missmatch!:\n\texpected: "
-				<< sv << "\n\tget:      " << sv << '\n';
+				<< exp << "\n\tget:      " << sv << '\n';
 		}
 		return res;
 	}
@@ -108,7 +119,7 @@ using itr_t = typename map_t<MapFrom_t>::const_iterator;
 
 template<typename MapFrom_t, std::size_t I = 0> 
 void printForEach(
-	const std::string& title,
+	const std::string& name,
 	TCanvas* canvas,
 	itr_t<MapFrom_t>  begin, itr_t<MapFrom_t> end)
 {
@@ -141,7 +152,7 @@ void printForEach(
 		canvas->SetGridx();
 		canvas->SetGridy();
 
-		mGraph->SetTitle(title.c_str());
+		mGraph->SetTitle(MapFrom_t::title);
 
 		maxX *= 1.1f;
 		maxY *= 1.1f;
@@ -155,7 +166,9 @@ void printForEach(
 		y->SetRangeUser(0, MapFrom_t::bLinear ? maxX : maxY);
 
 
-		TLegend* legend = canvas->BuildLegend(0.15, 0.47, 0.47, 0.89, "");
+		TLegend* legend = MapFrom_t::aLegend == Alignment::LEFT
+			? canvas->BuildLegend(0.15, 0.47, 0.47, 0.89, "")
+			: canvas->BuildLegend(0.7, 0.5, 1., 0.9, "");
 		legend->SetTextSize(0.035);
 		legend->SetHeader(paramName, "C");
 		legend->SetBorderSize( 1 );
@@ -168,15 +181,23 @@ void printForEach(
 			xyline->Draw("same");
 		}
 
+		TText *t = new TText(0.01, 0.95, name.c_str());
+		t->SetNDC();
+		t->SetTextAlign(13);
+		t->SetTextColor(kGray+1);
+		t->SetTextFont(43);
+		t->SetTextSize(24);
+		t->Draw();
+
 		canvas->GetFrame()->SetFillColor(19);
-		canvas->SaveAs((title + ".pdf").c_str());
+		canvas->SaveAs((name + ".pdf").c_str());
 	} else {
 		auto b = begin;
 		auto itr = begin;
 		do {
 			auto key = std::get<I>(b->first.values);
 			while(itr != end && std::get<I>((++itr)->first.values) == std::get<I>(b->first.values)); 	
-			printForEach<MapFrom_t, I+1>(title + paramName + std::to_string(key).c_str(), canvas, b, itr);
+			printForEach<MapFrom_t, I+1>(name + paramName + std::to_string(key).c_str(), canvas, b, itr);
 			b = itr;
 		} while(itr != end);
 	}
@@ -185,7 +206,7 @@ void printForEach(
 template<typename MapFrom_t>
 void PlotScalingBookStore( 
 		const std::string &fname, 
-		const std::string &title = "") 
+		const std::string &name ) 
 {
 	// setup
   std::ifstream file ( fname ) ;
@@ -204,6 +225,7 @@ void PlotScalingBookStore(
   while( file >> entry ) {
 		if (!MapFrom_t::filter(entry)) continue;
 		tToEntries[MapFrom_t(entry)].push_back(entry);
+		std::cout << "\ttime: "  << entry._tReal.count() << '\n';
   }
 
 	if (tToEntries.empty()) {
@@ -213,7 +235,7 @@ void PlotScalingBookStore(
 	TCanvas *canvas = new TCanvas( MapFrom_t::name, MapFrom_t::title, 800, 800);
   canvas->SetMargin( 0.130326, 0.0538847, 0.130491, 0.0917313 ) ;
 
-	printForEach<MapFrom_t>(MapFrom_t::title, canvas, tToEntries.begin(), tToEntries.end());
+	printForEach<MapFrom_t>(name, canvas, tToEntries.begin(), tToEntries.end());
 }
 
 // helper functions
@@ -230,9 +252,11 @@ std::optional<bool> compare (
 }
 
 
+
 // output diagrams
 // scaling from filling depending on NBins, NHists, NFills, Crunch = 0
 struct ScalingToCores {
+	static constexpr Alignment aLegend{Alignment::LEFT};
 	static constexpr bool bLinear{true};
 	enum struct Values { NBins, NHists, NFills, SIZE};
 	static constexpr const char* valName[] = {"NBins", "NHists", "NFills"};
@@ -266,8 +290,44 @@ struct ScalingToCores {
 	};
 };
 
+// scaling plot with real time
+struct ScalingToCoresRealTime {
+	static constexpr Alignment aLegend{Alignment::RIGHT} ;
+	static constexpr bool bLinear{false};	
+	enum struct Values { NBins, NHists, NFills, SIZE};
+	static constexpr const char* valName[] = {"NBins", "NHists", "NFills"};
+	std::tuple<std::size_t, std::size_t, std::size_t> values;
+	template<std::size_t I>
+	using value_t = std::tuple_element_t<I, decltype(values)>;
+	static constexpr std::size_t dim = std::tuple_size_v<decltype(values)>;
+	static constexpr char name[] = "ScalingToCores";
+	static constexpr char title[] = "time for #Cores";
+	static constexpr char titleX[] = "# Cores";
+	static constexpr char titleY[] = "t in sec";
+	ScalingToCoresRealTime() = default;
+	ScalingToCoresRealTime(const Entry& e) : values{e._nBins, e._nHist, e._nFills}{}
+	static float getX(const Entry& e) { return e._ncores; }
+	static float getY(const Entry& e) { return e._tReal.count();}
+	struct Filter {
+		bool operator()(const Entry& e) const {
+			return e._crunchTime == 0;
+		}
+	};
+	static bool filter(const Entry& e) {
+		constexpr Filter f{};
+		return f(e);
+	}
+	struct Compare {
+		bool operator()(const ScalingToCoresRealTime& lh, const ScalingToCoresRealTime& rh) const {
+			if (auto res = compare(lh, rh, &ScalingToCoresRealTime::values)) return res.value();
+			return false;
+		}
+	};
+};
+
 // how much crunch is possible without losing time
 struct CrunchToScale {
+	static constexpr Alignment aLegend{Alignment::LEFT} ;
 	static constexpr bool bLinear{false};
 	enum struct Values { Cores, SIZE};
 	static constexpr const char* valName[] = {"Cores"}; 
@@ -302,5 +362,7 @@ struct CrunchToScale {
 	};
 };
 
+
 auto PlotScalingToCore = PlotScalingBookStore<ScalingToCores>;
 auto PlotCrunchToScale = PlotScalingBookStore<CrunchToScale>;
+auto PlotTimeToCores = PlotScalingBookStore<ScalingToCoresRealTime>;
