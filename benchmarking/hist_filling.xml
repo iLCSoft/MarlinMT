@@ -2,24 +2,9 @@
 
 <marlin>
   <execute>
-    <processor name="CPUCrunch"/>
-    <if condition="!${RunNative}">
-      <if condition="!${AccesType}">
-        <processor name="HistFilling0"/>
-      </if>
-      <if condition="${AccesType}">
-        <processor name="HistFilling1"/>
-      </if>
-    </if>
-    <if condition="${RunNative}">
-      <processor name="HistFillingNative"/>
-    </if>
+    <processor name="EventUnpacking" />
+    <processor name="HistFilling" />
   </execute>
-  <constants>
-    <constant name="TriggerUnpacking" value="false"/>
-    <constant name="RunNative" value="false"/>
-    <constant name="AccesType" value="0" />
-  </constants>
 
   <global>
     <parameter name="Verbosity"> MESSAGE </parameter>
@@ -29,12 +14,12 @@
 
   <bookstore>
     <parameter name="OutputFile">HistFill.root</parameter>
-    <parameter name="DefaultMemoryLayout">Copy</parameter>
+    <parameter name="DefaultMemoryLayout" options="Copy Shared">Copy</parameter>
   </bookstore>
 
   <datasource type="LCIO">
     <parameter name="LCIOInputFiles">  </parameter>
-    <parameter name="MaxRecordNumber" value="0"/>
+    <parameter name="MaxRecordNumber"></parameter>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="LazyUnpack" value="true"/>
   </datasource>
@@ -42,27 +27,18 @@
   
   <geometry type="EmptyGeometry" />
 
-  <processor name="CPUCrunch" type="CPUCrunching" clone="false" critical="false">
-    <parameter name="Verbosity">WARNING</parameter>
-    <parameter name="CrunchTime"> 50 </parameter>
-    <parameter name="CrunchSigma"> 0 </parameter>
-  </processor>
+  <processor name="EventUnpacking" type="LCIOEventUnpacking" clone="false" />
 
-  <processor name="HistFillingNative" type="MarlinBenchHistNativeProcessor">
-    <parameter name="NBins">100</parameter>
-    <parameter name="NHists">5</parameter>
-    <parameter name="NFills">1000</parameter>
-    <parameter name="Shared">false</parameter>
-  </processor>
-  <processor name="HistFilling0" type="MarlinBenchHistProcessor0">
-    <parameter name="NBins">100</parameter>
-    <parameter name="NHists">105</parameter>
-    <parameter name="NFills">1000</parameter>
-  </processor >
-  <processor name="HistFilling1" type="MarlinBenchHistProcessor1">
-    <parameter name="NBins">100</parameter>
-    <parameter name="NHists">105</parameter>
-    <parameter name="NFills">1000</parameter>
+
+  <processor name="HistFilling" type="MarlinHistFillingFromDST" clone="false">
+    <parameter name="NBins">1000</parameter>
+    <!-- NHists = 10 ^ NHists10-->
+    <parameter name="NHists10">2</parameter>
+    <!-- fills per histogram -->
+    <parameter name="NFills">10</parameter>
+    <!-- 0-Rotating 1-Continues -->
+    <parameter name="AccessType" options="0 1">0</parameter>
+    <parameter name="UseMutex">false</parameter>
   </processor >
 
 </marlin>
