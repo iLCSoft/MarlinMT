@@ -35,6 +35,48 @@ std::istream& operator>>(std::istream& is, std::chrono::duration<float>& t) {
 		+ std::chrono::duration<float, std::ratio<60>>(m);
 	return is;
 }
+enum struct MemLayout {NOTSET, Copy, Share};
+enum struct ProcessorType { NOTSET, WorstCase, BestCase };
+
+std::istream& operator>>(std::istream& is, ProcessorType& type) {
+	int t;
+	is >> t;
+	if (t == 0) { type = ProcessorType::WorstCase ; }
+	else if (t == 1) { type = ProcessorType::BestCase ; }
+	else { 
+		throw std::runtime_error(
+				"unknown processorType: '" + std::to_string(t) + "'"); }
+	return is;
+}
+
+std::istream& operator>>(std::istream& is, MemLayout& layout) {
+	std::string str;
+	is >> str;
+	if (str == "Copy") { layout = MemLayout::Copy; }
+	else if (str == "Share") { layout = MemLayout::Share; }
+	else {
+		throw std::runtime_error(
+			"unknown memLayout '" + str + "'");
+	}
+	return is;
+}
+
+namespace std {
+	string to_string(const MemLayout& layout) {
+		switch (layout) {
+			case MemLayout::Copy: return std::string("Copy");
+			case MemLayout::Share: return std::string("Share");
+			default: throw std::runtime_error("memlayout can't be stringified.");
+		};
+	}
+	string to_string(const ProcessorType& type) {
+		switch (type) {
+			case ProcessorType::BestCase: return std::string("best");
+			case ProcessorType::WorstCase: return std::string("worst");
+			default: throw std::runtime_error("processorType can't be strigified.");
+		}
+	}
+} // end namespace std
 
 struct Entry {
   std::size_t     _ncores {0} ;
@@ -49,6 +91,8 @@ struct Entry {
   double          _serialTime {0.} ;
   double          _parallelTime {0.} ;
   double          _speedup {0.} ;
+	ProcessorType   _processorType {ProcessorType::NOTSET};
+	MemLayout 			_memLayout {MemLayout::NOTSET};
 	static char& checkDelim(char& c) {
 		if (c != ',') {
 			std::cerr << "wrong delimiter '" << c << "' used!";
@@ -69,9 +113,11 @@ struct Entry {
 										if(is >> entry._tSys >> checkDelim(c))
 											if(is >> entry._serialTime >> checkDelim(c))
 												if(is >> entry._parallelTime  >> checkDelim(c))
-													if(is >> entry._speedup) {
-														checkDelim(c);
-														return is;
+													if(is >> entry._speedup >> checkDelim(c)) 
+														if (is >> entry._processorType >> checkDelim(c))
+																if (is >> entry._memLayout) {
+																	checkDelim(c);
+																	return is;
 													}
 			throw std::runtime_error("Entry parsing error!");
 		} else { return is; } 
@@ -94,7 +140,7 @@ struct Entry {
 	}
 	static bool checkHeader(const std::string_view& sv) {
 		static const char exp[] = "concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,"
-			"tReal,tUser,tSys,tSerial,tParallel,scaling";
+			"tReal,tUser,tSys,tSerial,tParallel,scaling,type,memLayout";
 		bool res =  strncasecmp(exp, sv.data(), sizeof(exp)) == 0;
 		if (!res) {
 			std::cerr << "CSV header missmatch!:\n\texpected: "
@@ -123,14 +169,16 @@ void printForEach(
 	TCanvas* canvas,
 	itr_t<MapFrom_t>  begin, itr_t<MapFrom_t> end)
 {
-	constexpr const char* const paramName = MapFrom_t::valName[I];
+	constexpr std::size_t id = static_cast<std::size_t>(
+			MapFrom_t::permutation[I]);
+	constexpr const char* const paramName = MapFrom_t::valName[id];
 	if constexpr (I + 1 == MapFrom_t::dim) {
 		int color = 0;
 		TMultiGraph *mGraph = new TMultiGraph();
 		float maxX = 0, maxY = 0;;
 		for(auto itr = begin; itr != end; ++itr, ++color) {
 			const auto& entries = itr->second;
-			auto key = std::get<I>(itr->first.values);
+			auto key = std::get<id>(itr->first.values);
 			TGraph *graph = new TGraph(entries.size());
 			graph->SetName(std::to_string(key).c_str());
 			graph->SetTitle(std::to_string(key).c_str());
@@ -195,8 +243,8 @@ void printForEach(
 		auto b = begin;
 		auto itr = begin;
 		do {
-			auto key = std::get<I>(b->first.values);
-			while(itr != end && std::get<I>((++itr)->first.values) == std::get<I>(b->first.values)); 	
+			auto key = std::get<id>(b->first.values);
+			while(itr != end && std::get<id>((++itr)->first.values) == std::get<id>(b->first.values)); 	
 			printForEach<MapFrom_t, I+1>(name + paramName + std::to_string(key).c_str(), canvas, b, itr);
 			b = itr;
 		} while(itr != end);
@@ -252,15 +300,64 @@ std::optional<bool> compare (
 }
 
 
+template<typename T>
+using Permutation_t = std::array<T, static_cast<std::size_t>(T::SIZE)>;
+
+template<typename MapFrom_t>
+struct PermCompare {
+	bool operator()(const MapFrom_t& lh, const MapFrom_t& rh) const {
+		return compare(lh, rh);
+	}
+	private:
+		template<std::size_t I = 0>
+		bool compare(const MapFrom_t& lh, const MapFrom_t& rh) const {
+			constexpr std::size_t id = 
+				static_cast<std::size_t>(MapFrom_t::permutation[I]);
+			auto lha = std::get<id>(lh.values);
+			auto rha = std::get<id>(rh.values);
+			if (lha != rha ) {
+				return lha < rha; 
+			}
+			if constexpr ( I + 1 < MapFrom_t::permutation.size()) {
+				return compare<I+1>(lh, rh);
+			} else {
+				return false;
+			}
+		}
+};
 
 // output diagrams
 // scaling from filling depending on NBins, NHists, NFills, Crunch = 0
 struct ScalingToCores {
 	static constexpr Alignment aLegend{Alignment::LEFT};
 	static constexpr bool bLinear{true};
-	enum struct Values { NBins, NHists, NFills, SIZE};
-	static constexpr const char* valName[] = {"NBins", "NHists", "NFills"};
-	std::tuple<std::size_t, std::size_t, std::size_t> values;
+	enum struct Values { 
+		NBins, 
+		NHists, 
+		NFills, 
+		Type,
+		MemLayout,
+		SIZE};
+	static constexpr Permutation_t<Values> permutation = {
+		Values::Type,
+		Values::MemLayout,
+		Values::NBins,
+		Values::NHists,
+		Values::NFills
+	}	;
+	static constexpr const char* valName[] = {
+		"NBins", 
+		"NHists", 
+		"NFills",
+		"Type",
+		"MemLayout",
+		};
+	std::tuple<
+		std::size_t, 
+		std::size_t, 
+		std::size_t,
+		ProcessorType,
+		MemLayout> values;
 	template<std::size_t I>
 	using value_t = std::tuple_element_t<I, decltype(values)>;
 	static constexpr std::size_t dim = std::tuple_size_v<decltype(values)>;
@@ -269,7 +366,8 @@ struct ScalingToCores {
 	static constexpr char titleX[] = "# Cores" ;
 	static constexpr char titleY[] = "Scaling";
 	ScalingToCores() = default;
-	ScalingToCores(const Entry& e) : values{e._nBins, e._nHist, e._nFills} {}
+	ScalingToCores(const Entry& e) : 
+		values{e._nBins, e._nHist, e._nFills, e._processorType, e._memLayout} {}
 	static float getX(const Entry& e) { return e._ncores; }
 	static float getY(const Entry& e) { return e._speedup; }
 	struct Filter {
@@ -281,22 +379,40 @@ struct ScalingToCores {
 		constexpr Filter f{};
 		return f(e);
 	}
-
-	struct Compare {
-		bool operator()(const ScalingToCores& lh, const ScalingToCores& rh) const {
-			if (auto res = compare(lh,rh,&ScalingToCores::values)) return res.value();
-			return false;
-		}
-	};
+	using Compare = PermCompare<ScalingToCores>;
 };
 
 // scaling plot with real time
 struct ScalingToCoresRealTime {
 	static constexpr Alignment aLegend{Alignment::RIGHT} ;
 	static constexpr bool bLinear{false};	
-	enum struct Values { NBins, NHists, NFills, SIZE};
-	static constexpr const char* valName[] = {"NBins", "NHists", "NFills"};
-	std::tuple<std::size_t, std::size_t, std::size_t> values;
+	enum struct Values { 
+		NBins, 
+		NHists, 
+		NFills, 
+		Type,
+		MemLayout,
+		SIZE};
+	static constexpr Permutation_t<Values> permutation = {
+		Values::MemLayout,
+		Values::NBins,
+		Values::NHists,
+		Values::NFills,
+		Values::Type
+	}	;
+	static constexpr const char* valName[] = {
+		"NBins", 
+		"NHists", 
+		"NFills",
+		"Type",
+		"MemLayout",
+		};
+	std::tuple<
+		std::size_t, 
+		std::size_t, 
+		std::size_t,
+		ProcessorType,
+		MemLayout> values;
 	template<std::size_t I>
 	using value_t = std::tuple_element_t<I, decltype(values)>;
 	static constexpr std::size_t dim = std::tuple_size_v<decltype(values)>;
@@ -305,9 +421,10 @@ struct ScalingToCoresRealTime {
 	static constexpr char titleX[] = "# Cores";
 	static constexpr char titleY[] = "t in sec";
 	ScalingToCoresRealTime() = default;
-	ScalingToCoresRealTime(const Entry& e) : values{e._nBins, e._nHist, e._nFills}{}
+	ScalingToCoresRealTime(const Entry& e) :
+		values{e._nBins, e._nHist, e._nFills, e._processorType, e._memLayout} {}
 	static float getX(const Entry& e) { return e._ncores; }
-	static float getY(const Entry& e) { return e._tReal.count();}
+	static float getY(const Entry& e) { return e._parallelTime;}
 	struct Filter {
 		bool operator()(const Entry& e) const {
 			return e._crunchTime == 0;
@@ -317,12 +434,7 @@ struct ScalingToCoresRealTime {
 		constexpr Filter f{};
 		return f(e);
 	}
-	struct Compare {
-		bool operator()(const ScalingToCoresRealTime& lh, const ScalingToCoresRealTime& rh) const {
-			if (auto res = compare(lh, rh, &ScalingToCoresRealTime::values)) return res.value();
-			return false;
-		}
-	};
+	using Compare = PermCompare<ScalingToCoresRealTime>;
 };
 
 // how much crunch is possible without losing time
@@ -330,6 +442,9 @@ struct CrunchToScale {
 	static constexpr Alignment aLegend{Alignment::LEFT} ;
 	static constexpr bool bLinear{false};
 	enum struct Values { Cores, SIZE};
+	static constexpr Permutation_t<Values> permutation = {
+		Values::Cores
+	}	;
 	static constexpr const char* valName[] = {"Cores"}; 
 	std::tuple<std::size_t> values;
 	template<std::size_t I>
@@ -354,12 +469,7 @@ struct CrunchToScale {
 		constexpr Filter f{};
 		return f(e);
 	}
-	struct Compare {
-		bool operator()(const CrunchToScale& lh, const CrunchToScale& rh) const {
-			if (auto res = compare(lh, rh, &CrunchToScale::values)) return res.value();
-			return false;
-		}
-	};
+	using Compare = PermCompare<CrunchToScale>;
 };
 
 
