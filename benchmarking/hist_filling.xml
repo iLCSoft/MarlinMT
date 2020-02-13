@@ -19,7 +19,7 @@
 
   <datasource type="LCIO">
     <parameter name="LCIOInputFiles">  </parameter>
-    <parameter name="MaxRecordNumber"></parameter>
+    <parameter name="MaxRecordNumber">0</parameter>
     <parameter name="SkipNEvents" value="0"/>
     <parameter name="LazyUnpack" value="true"/>
   </datasource>
