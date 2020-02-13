@@ -54,7 +54,7 @@ void MarlinBenchHistProcessor1::processEvent(EventStore * evt) {
   auto itr = _histograms.begin();
   for(marlin::size_t i = 0; i < _nFills;) {
     H1FHandle hist = itr->handle();
-    marlin::size_t end = std::min<marlin::size_t>(_nFills, i + (_nFills / _histograms.size()));
+    marlin::size_t end = std::max<marlin::size_t>(i + 1, std::min<marlin::size_t>(_nFills, i + static_cast<marlin::size_t>(((_nFills / static_cast<float>(_histograms.size())) + 0.5f))));
     for(;i < end; ++i) {
       hist.fill({distributionV(generator)}, 1.);  
     }
