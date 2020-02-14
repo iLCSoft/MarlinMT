@@ -33,8 +33,8 @@ eval set -- "$OPTS"
 steeringfile="${MARLIN_DIR}benchmarking/hist_filling.xml"
 cores=(4 8 12)
 nhists=(1 2 3)
-nfills=(1 10 100)
-nbins=(500 1000 1500)
+nfills=(30)
+nbins=(1000)
 accesstypes=("Rotating" "Continuous")
 memorylayouts=("Share" "Copy" "Mutex")
 
@@ -44,7 +44,7 @@ accesstype_to_id () {
 	elif [[ $1 == "Continuous" ]]; then
 		echo 1
 	else
-		>&2 echo "unrecognized access type: '$type'"
+		>&2 echo "unrecognized access type: '$1'"
 		exit 1
 	fi
 }
@@ -79,8 +79,7 @@ fi
 
 echo "Start benchmarking ..."
 
-echo "$c,$nf,$at,$ml,$nh,$nb,$serial,$parallel,$scaling,$real,$unpack,$fill"
-echo "concurrency,nFills,accessType,mutex,memoryLayout,nHists,nBins,tSerial,tParallel,scaling,tReal,tUnpack,tFill" > $output
+echo "concurrency,nFills,accessType,mutex,memoryLayout,nHists,nBins,tSerial,tParallel,scaling,tReal,tUnpack,tFill,nEvents" > $output
 
 
 echo "Running with following settings:"
@@ -95,7 +94,9 @@ echo "  - Benchmark output file: $output"
 
 # load the file in the cache for next
 echo "Loading input file into cache: ${inputfile}"
-# anajob ${inputfile} >> /dev/null
+anajob ${inputfile} >> /dev/null
+nEvents=`lcio_event_counter $inputfile`
+echo "n events $nEvents"
 
 for c in ${cores[@]}; do
 	for nf in ${nfills[@]}; do
@@ -151,7 +152,7 @@ for c in ${cores[@]}; do
 						echo "  real Time:     $real"
 						echo "  fill Time:     $fillTime"
 						echo "  unpackTime:    $unpackTime"
-						echo "$c,$nf,$at,$mutex,$ml,$nh,$nb,$serial,$parallel,$scaling,$real,$unpackTime,$fillTime" >> $output
+						echo "$c,$nf,$at,$mutex,$ml,$nh,$nb,$serial,$parallel,$scaling,$real,$unpackTime,$fillTime,$nEvents" >> $output
 					done
 				done
 			done
