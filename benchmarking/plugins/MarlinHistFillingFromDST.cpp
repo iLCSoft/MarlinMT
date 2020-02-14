@@ -94,8 +94,8 @@ void MarlinHistFillingFromDST::processEvent(EventStore * e) {
 				= evt->getCollection("MCParticle");	
 
 			switch (_at) {
-				case 0: continuesFill(mcp, handles); break;
-				case 1: rotatingFill(mcp, handles); break;
+				case 0: rotatingFill(mcp, handles); break;
+				case 1: continuesFill(mcp, handles); break;
 				default: 
 						throw std::runtime_error("not defined accestype");
 			}
