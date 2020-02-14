@@ -44,7 +44,6 @@ void MarlinBenchHistProcessor::init() {
       _hMCPEnergy.push_back(AIDAProcessor::histogramFactory(this)->
           createCloud1D( "hMCPEnergy", "energy of the MCParticles", _nBins, "autoconvert=true" ) ) ; 
     }
-    Global::EVENTSEEDER->registerProcessor(this);
 }
 
 
@@ -55,12 +54,10 @@ void MarlinBenchHistProcessor::processRunHeader( LCRunHeader* /*run*/) {
 
 
 void MarlinBenchHistProcessor::processEvent( LCEvent * /*evt*/ ) { 
-  auto seed = Global::EVENTSEEDER->getSeed(this);
-  std::mt19937 generator{ seed };
-  std::normal_distribution<float> distributionV{0, 10.f};
+  LCEvent
   auto itr = _hMCPEnergy.begin();
   for( int i = 0; i < _nFills; ++i) {
-    (*itr)->fill({distributionV(generator)}, 1.);
+    (*itr)->fill({}, 1.);
     if(++itr == _hMCPEnergy.end()) {
       itr = _hMCPEnergy.begin();
     }

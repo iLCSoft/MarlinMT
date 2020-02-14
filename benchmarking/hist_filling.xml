@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="us-ascii"?>
 
 <marlin>
+  <constants>
+    <constant name="FillingActive" value="true" />
+  </constants>
+
   <execute>
     <processor name="EventUnpacking" />
-    <processor name="HistFilling" />
+    <if condition="${FillingActive}" >
+      <processor name="HistFilling" />
+    </if>
   </execute>
 
   <global>

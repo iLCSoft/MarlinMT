@@ -31,8 +31,8 @@ eval set -- "$OPTS"
 
 # general configuration
 steeringfile="${MARLIN_DIR}benchmarking/hist_filling.xml"
-cores=(4 8 12)
-nhists=(1 2 3)
+cores=(4 8)
+nhists=(1 2)
 nfills=(30)
 nbins=(1000)
 accesstypes=("Rotating" "Continuous")
@@ -79,7 +79,7 @@ fi
 
 echo "Start benchmarking ..."
 
-echo "concurrency,nFills,accessType,mutex,memoryLayout,nHists,nBins,tSerial,tParallel,scaling,tReal,tUnpack,tFill,nEvents" > $output
+echo "concurrency,nFills,accessType,mutex,memoryLayout,nHists,nBins,tSerial,tParallel,scaling,tReal,tUnpack,tFill,nEvents,fillingActive" > $output
 
 
 echo "Running with following settings:"
@@ -94,11 +94,29 @@ echo "  - Benchmark output file: $output"
 
 # load the file in the cache for next
 echo "Loading input file into cache: ${inputfile}"
-anajob ${inputfile} >> /dev/null
+#anajob ${inputfile} >> /dev/null
 nEvents=`lcio_event_counter $inputfile`
 echo "n events $nEvents"
 
+read_results () {
+	totalProcessorTime=(`cat scaling_temp_.log | grep serial | awk '{print $7, $9, $11}'`)
+	serial=${totalProcessorTime[0]}
+	parallel=${totalProcessorTime[1]}
+	scaling=${totalProcessorTime[2]}
+	real=${totalTime[1]}
+}
+
 for c in ${cores[@]}; do
+	echo "Running MarlinMT without filling."
+	echo "  general"
+	echo "  -- N cores: ${c}"
+	totalTime=(`time ( MarlinMT \
+		${steeringfile} \
+		--datasource.LCIOInputFiles="$inputfile" \
+		--global.Concurrency=${c} \
+		--constant.FillingActive="false" > scaling_temp_.log ) 2>&1 1>/dev/null `)
+	read_results
+	echo "$c,0,null,null,null,0,0,$serial,$parallel,$scaling,$real,$unpackTime,0,$nEvents,false" >> $output
 	for nf in ${nfills[@]}; do
 		for at in ${accesstypes[@]}; do
 			atid=`accesstype_to_id $at`
@@ -129,18 +147,13 @@ for c in ${cores[@]}; do
 							--HistFilling.AccessType="$atid" \
 							--HistFilling.UseMutex="$mutex" \
 							--datasource.LCIOInputFiles="$inputfile" \
-							--datasource.LazyUnpack="true" \
 							--bookstore.DefaultMemoryLayout=${ml} \
 							--global.Concurrency=${c} > scaling_temp_.log ) 2>&1 1>/dev/null `)
 						if [ $? -ne 0 ]; then
 							>&2 echo "MarlinMT failed!, stop benchmarks!"
 							exit 1
 						fi
-						totalProcessorTime=(`cat scaling_temp_.log | grep serial | awk '{print $7, $9, $11}'`)
-						serial=${totalProcessorTime[0]}
-						parallel=${totalProcessorTime[1]}
-						scaling=${totalProcessorTime[2]}
-						real=${totalTime[1]}
+						read_results
 						unpackTime=`cat scaling_temp_.log \
 							| sed -n '/EventUnpacking.*==>/s/.*EventUnpacking\s*\(\S*\).*/\1/p'`
 						fillTime=`cat scaling_temp_.log \
@@ -152,7 +165,7 @@ for c in ${cores[@]}; do
 						echo "  real Time:     $real"
 						echo "  fill Time:     $fillTime"
 						echo "  unpackTime:    $unpackTime"
-						echo "$c,$nf,$at,$mutex,$ml,$nh,$nb,$serial,$parallel,$scaling,$real,$unpackTime,$fillTime,$nEvents" >> $output
+						echo "$c,$nf,$at,$mutex,$ml,$nh,$nb,$serial,$parallel,$scaling,$real,$unpackTime,$fillTime,$nEvents,true" >> $output
 					done
 				done
 			done

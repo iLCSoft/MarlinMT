@@ -40,18 +40,18 @@ Depending on the use case, the BookStore can provide your object in different wa
 
 **examples**
 
-* **for a single `RH1F`**
+* **for a single `Hist1F`**
 ```cpp
-	EntryData entry-data = EntryData<RH1F>("title", {"axis title", bins, min, max});
+	EntryData entry-data = EntryData<Hist1F>("title", {"axis title", bins, min, max});
 	auto entry = store.book("/path/to/object/", "name", entry-data.single());
 ```
-* **for a multi copy, with 4 instances, `RH1F`**
+* **for a multi copy, with 4 instances, `Hist1F`**
 ```cpp
-	auto entry = store.book("/path/", "name", EntryData<RH1F>(axis).multiCopy(4));
+	auto entry = store.book("/path/", "name", EntryData<Hist1F>(axis).multiCopy(4));
 ```
-* **for a single `RH2F`**
+* **for a single `Hist2F`**
 ```cpp
-	auto entry = store.book("/path/", "name", EntryData<RH2F>(axis1, axis2).single());
+	auto entry = store.book("/path/", "name", EntryData<Hist2F>(axis1, axis2).single());
 ```
 
 ## Writing to an object
@@ -60,16 +60,16 @@ Depending on the use case, the BookStore can provide your object in different wa
 `entry.handle()` will produce a new handle.  
 For EntryMultiCopy you need to pass the id of the instance you want to access `entry.handle(id)`.
 
-**example `RH1F`**
+**example `Hist1F`**
 ```cpp
 	// single
-	Handle<RH1F> entrySingle.handle();
+	Handle<Hist1F> entrySingle.handle();
 
 	// multi copy
-	Handle<RH1F> entryMultiCopy.handle(0);
+	Handle<Hist1F> entryMultiCopy.handle(0);
 
 	//multi shared
-	Handle<RH1F> entryMultiShared.handle();
+	Handle<Hist1F> entryMultiShared.handle();
 ```
 
 ### use the object specific modification functions.
@@ -77,13 +77,16 @@ For EntryMultiCopy you need to pass the id of the instance you want to access `e
 	 * `fill(position, weight)`  
 	    add one datum to the histogram, position array based type which fields equal to the number of dimensions from the histogram.    
 	    e.g 1D `fill({x}, w)`, 2D `fill({x,y},w)`, etc.
-	 * `fillN(span<…> positions, span<…> weights)`  
+	 * `fillN(containerType positions, containerType  weights)`  
 	     add mutable dates to the histogram.
 
-**example `RH1F`**
+**example `Hist1F`**
 ```cpp
 	handle.fill({1}, 1);
-	handle.fillN({{1}, {2}, {3}}, {1,1,1});
+
+	std::vector<typename Hist1F::Point_t> points = {…};
+	std::vector<typename Hist1F::Weight_t> weights = {…};
+	handle.fillN(points, weights);
 ```
 
 
@@ -91,9 +94,9 @@ For EntryMultiCopy you need to pass the id of the instance you want to access `e
 
 `entry.merged()` returns a const reference to the final object.
 
-**example `RH1F`**
+**example `Hist1F`**
 ```cpp
-	const RH1F& hist = entry.merged();
+	const Hist1F& hist = entry.merged();
 	// now you can read the histogram normally
 	std::cout << hist.GetBinContent({0}) << '\n';
 ```
@@ -128,7 +131,7 @@ A Condition for filtering entries. Constructed with `ConditionBuilder`.
 		.setPath(std::regex("^p[^/]*h")); // path must match regex
 ```
 
-**example** get a handle from every `RH1F` in '/path/to/dir'
+**example** get a handle from every `Hist1F` in `/path/to/dir`
 ```cpp
 
 	Selection selection = store.find(
@@ -137,7 +140,7 @@ A Condition for filtering entries. Constructed with `ConditionBuilder`.
 
 	try {
 		for(const entry& : selection) {
-			handles<RH1F>.push_back(entry.handle<RH1F>());
+			handles<Hist1F>.push_back(entry.handle<Hist1F>());
 		}
 	} catch (const marlin::BookStoreException&){}
 ```
