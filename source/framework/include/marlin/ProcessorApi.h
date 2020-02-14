@@ -351,7 +351,7 @@ namespace marlin {
        *  @param path to registered object 
        *  @param name of object 
        */
-      void write(
+      static void write(
           Processor * proc, 
           const std::filesystem::path &path,
           const std::string_view &name) ;
@@ -362,7 +362,7 @@ namespace marlin {
        *  @param path to register object
        *  @param name of object
        */
-      void dontWrite(
+      static void dontWrite(
           Processor * proc, 
           const std::filesystem::path &path,
           const std::string_view &name) ;
@@ -372,7 +372,7 @@ namespace marlin {
        *  The same effect can archived with passing the Store flag by registration
        *  @param key of Entry to Object which should be stored.
        */
-      void write(
+      static void write(
           Processor *proc,
           const book::EntryKey &key) ;
 
@@ -380,7 +380,7 @@ namespace marlin {
        *  @brief cancels writing of Object at end of lifetime.
        *  @param key of Entry to Object which should be stored.
        */
-      void dontWrite(
+      static void dontWrite(
           Processor *proc,
           const book::EntryKey &key) ;
     };
