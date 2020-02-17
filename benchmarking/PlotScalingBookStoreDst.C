@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <cstring>
@@ -70,9 +71,11 @@ std::istream& operator>>(std::istream& is, std::optional<bool>& b) {
 	std::string str;
 	std::getline(is, str, ',');
 	is.unget();
-	if (std::size_t pos = str.find('\n') != std::string::npos ) {
+	std::size_t pos = str.find('\n');
+	if ( pos != std::string::npos ) {
 		std::size_t diff = str.size() - pos;
 		for(auto i = 0; i < diff; ++i) {
+			str.pop_back();
 			is.unget();	
 		}
 		 
@@ -204,7 +207,7 @@ int getColor( int index ) {
 template<typename MapFrom_t>
 using map_t = std::map<MapFrom_t, std::vector<Entry>, typename MapFrom_t::Compare>;
 template<typename MapFrom_t>
-using itr_t = typename map_t<MapFrom_t>::const_iterator;
+using itr_t = typename map_t<MapFrom_t>::iterator;
 
 template<typename MapFrom_t, std::size_t I = 0> 
 void printForEach(
@@ -227,7 +230,7 @@ void printForEach(
 		TMultiGraph *mGraph = new TMultiGraph();
 		
 		auto MakeGraph = [&](itr_t<MapFrom_t> itr, std::size_t run) {
-			const auto& entries = itr->second;
+			auto& entries = itr->second;
 			std::string key_str;
 			if constexpr (multiY) {
 				key_str = std::string(MapFrom_t::yNames[run]);
@@ -242,6 +245,10 @@ void printForEach(
 			graph->SetLineColor( getColor(color) );
 			graph->SetMarkerStyle( 0 ) ;
 
+			struct {
+				bool operator()(const Entry& lh, const Entry& rh) const {return MapFrom_t::getX(lh) < MapFrom_t::getX(rh);}
+			} orderOnY;
+			std::sort(entries.begin(), entries.end(), orderOnY);
 			for(std::size_t i = 0; i < entries.size(); ++i) {
 				const Entry& entry = entries[i];
 				float x = MapFrom_t::getX(entry), y = MapFrom_t::getY(entry, run);
@@ -317,17 +324,12 @@ void printForEach(
 	}
 }
 
-template<typename MapFrom_t>
-void PlotScalingBookStore( 
-		const std::string &fname, 
-		const std::string &name ) 
-{
+void ReadEntries(std::vector<Entry>& vec, const std::string& filename) {
 	// setup
-  std::ifstream file ( fname ) ;
+  std::ifstream file ( filename ) ;
   if( not file ) {
     throw std::runtime_error( "Input file is invalid" ) ;
   }
-	map_t<MapFrom_t>  tToEntries;
 	
 	// parsing
 	Entry entry;
@@ -336,15 +338,110 @@ void PlotScalingBookStore(
 	if ( not Entry::checkHeader(header) ) {
 		throw std::runtime_error("Input has different csv header");
 	}
+	while(file >> entry) {
+		vec.push_back(entry);
+	}
+}
+
+void PrintMMTToHist (const std::string& filenameMMT, const std::string& filenameM, const std::string& prefix) {
+	std::vector<Entry> entriesMMT, entriesM;
+	ReadEntries(entriesMMT, filenameMMT);
+	ReadEntries(entriesM, filenameM);
+	std::vector<std::array<double,2>> entries;
+	for ( const auto& entryM : entriesM ) {
+		std::cout << "M\n";
+		if (entryM._processorType == ProcessorType::WorstCase) {
+			std::cout << "P\n";
+			bool match = false;
+			for (const auto& entryMMT : entriesMMT) {
+				if (entryMMT._ncores == 1 
+						&& entryMMT._processorType == entryM._processorType 
+						&& entryMMT._memLayout == MemLayout::Copy
+						&& entryMMT._fillingActive == true
+						&& entryMMT._mutex == false
+						&& entryMMT._nHist == entryM._nHist) {
+					if (match) throw std::runtime_error("nooooo!!");
+					match = true;
+					entries.push_back({{static_cast<double>(entryM._nHist), (entryMMT._tReal - entryM._tReal) / entryM._tReal}});
+					std::cout << "dot: " << entries.back()[0] << " : " << entries.back()[1] << '\n';
+				}
+			}
+		}
+	}
+		
+	TGraph *graph = new TGraph(entries.size());
+	graph->SetLineWidth( 3 );
+	graph->SetLineColor( getColor(kBlue) );
+	graph->SetMarkerStyle( 0 ) ;
+
+	std::array<std::array<double, 2>, 2> minmaxXY{{{{0,0}}, {{0,0}}}};
+	for(std::size_t i = 0; i < entries.size(); ++i) {
+		double x = entries[i][0], y = entries[i][1];
+		graph->SetPoint(i, x, y); 
+		minmaxXY[0][0] = std::min<double>(minmaxXY[0][0], x);
+		minmaxXY[1][0] = std::max<double>(minmaxXY[1][0], x);
+		minmaxXY[0][1] = std::min<double>(minmaxXY[0][1], y);
+		minmaxXY[1][1] = std::max<double>(minmaxXY[1][1], y);
+	}
+
+	TCanvas *canvas = new TCanvas( "MvMMTOverNHists", "M vs MMT over n histograms", 800, 800);
+  canvas->SetMargin( 0.130326, 0.0538847, 0.130491, 0.0917313 ) ;
+
+
+	canvas->cd();
+	canvas->SetGridx();
+	canvas->SetGridy();
+
+	graph->SetTitle("Marlin MarlinMT real time compares");
+
+	graph->Draw("alp");
+	TAxis *x = graph->GetXaxis(), *y = graph->GetYaxis();
+	x->SetTitle("amount of Histograms");
+	y->SetTitle("t(MMT) - t(M) / t(M)");
+	x->SetTitleSize( 0.05 );
+	y->SetTitleSize( 0.05 );
+	x->SetRangeUser(minmaxXY[0][0], minmaxXY[1][0]);
+	y->SetRangeUser(minmaxXY[0][1], minmaxXY[1][1]);
+
+
+
+	canvas->GetFrame()->SetFillColor(19);
+	canvas->SaveAs((prefix + "MvMT" + ".pdf").c_str());
+}
+
+template<typename MapFrom_t>
+void PlotScalingBookStore( 
+		const std::string &fname, 
+		const std::string &name ) 
+{
 	std::array<double, 2> maxXY{0,0};
-  while( file >> entry ) {
+	std::vector<Entry> uniEntries{};
+	map_t<MapFrom_t>  tToEntries;
+	std::vector<Entry> entries;
+	ReadEntries(entries, fname);
+
+  for (const auto& entry : entries) {
 		if (!MapFrom_t::filter(entry)) continue;
 		std::get<0>(maxXY) = std::max<double>(MapFrom_t::getX(entry), std::get<0>(maxXY));
 		for(std::size_t i = 0; i < MapFrom_t::yValues; ++i) {
 			std::get<1>(maxXY) = std::max<double>(MapFrom_t::getY(entry, i), std::get<1>(maxXY));
 		}
-		tToEntries[MapFrom_t(entry)].push_back(entry);
+		MapFrom_t key(entry);
+		if (key.isUniversal()) {
+			std::cout << "key found " << entry._nHist << '\n';
+			uniEntries.push_back(entry);	
+		} else {
+			tToEntries[key].push_back(entry);
+		}
   }
+
+	typename MapFrom_t::Spliter splitter{};
+	for(const auto& pair : tToEntries) {
+		splitter.addPheno(pair.first);
+	}
+	for(const auto& e : uniEntries) {
+		splitter.populate(tToEntries, e);
+	}
 
 	if (tToEntries.empty()) {
 		throw std::runtime_error("no entries left after filter!");
@@ -397,6 +494,23 @@ struct PermCompare {
 			}
 		}
 };
+template<typename MapFrom_t, typename MapFrom_t::Values V>
+struct Spliter {
+	void addPheno(const MapFrom_t& key) {
+		_phenos.insert(std::get<I>(key.values));
+	}
+	void populate( map_t<MapFrom_t>& map, const Entry& e) {
+		MapFrom_t base(e);
+		for(auto p : _phenos) {
+			MapFrom_t key = base;
+			std::get<I>(key.values) = p;
+			map[key].push_back(e);
+		}
+	}
+private:
+	static constexpr std::size_t I = static_cast<std::size_t>(V);
+	std::set<std::tuple_element_t<I, decltype(MapFrom_t::values)>> _phenos;
+};
 
 // output diagrams
 // scaling from filling depending on NBins, NHists, NFills, Crunch = 0
@@ -406,22 +520,18 @@ struct ScalingToCores {
 	static constexpr bool bLinear{true};
 	enum struct Values { 
 		NHists, 
-		Type,
 		Layout,
 		SIZE};
 	static constexpr Permutation_t<Values> permutation = {
-		Values::Type,
 		Values::NHists,
 		Values::Layout,
 	}	;
 	static constexpr const char* valName[] = {
 		"NHists", 
-		"Type",
 		"Storage"
 		};
 	std::tuple<
 		std::size_t, 
-		ProcessorType,
 		Storage> values;
 	template<std::size_t I>
 	using value_t = std::tuple_element_t<I, decltype(values)>;
@@ -432,19 +542,23 @@ struct ScalingToCores {
 	static constexpr char titleY[] = "Scaling";
 	ScalingToCores() = default;
 	ScalingToCores(const Entry& e) : 
-		values{e._nHist, e._processorType, {e._memLayout, e._mutex, e._fillingActive}} {}
+		values{e._nHist, {e._memLayout, e._mutex, e._fillingActive}} {}
 	static float getX(const Entry& e) { return e._ncores; }
 	static float getY(const Entry& e, std::size_t r ) { if (r != 0) { throw std::runtime_error("only supports 1 Y value!");} return e._speedup; }
+	bool isUniversal() const {
+		return std::get<0>(values) == 0;
+	}
+	using Compare = PermCompare<ScalingToCores>;
+	using Spliter = ::Spliter<ScalingToCores, Values::NHists>;
 	struct Filter {
 		bool operator()(const Entry& e) const {
-			return true;
+			return e._processorType != ProcessorType::BestCase;
 		}
 	};
 	static bool filter(const Entry& e) {
 		constexpr Filter f{};
 		return f(e);
 	}
-	using Compare = PermCompare<ScalingToCores>;
 };
 
 
@@ -456,9 +570,11 @@ struct TimeToCores : public ScalingToCores {
 	static constexpr char titleY[] = "Time in s";
 	static float getX(const Entry& e) { return e._ncores; }
 	static float getY(const Entry& e, std::size_t r) { if (r!=0) {throw std::runtime_error("only supports 1 Y value!"); }return e._tFill; }
+	using Spliter = ::Spliter<TimeToCores, Values::NHists>;
 	struct Filter {
+		static constexpr ScalingToCores::Filter base;
 		bool operator()(const Entry& e) const {
-			return e._fillingActive.value();
+			return base(e) && e._fillingActive.value();
 		}
 	};
 	static bool filter(const Entry& e) {
@@ -478,6 +594,7 @@ struct TimesToCores : public TimeToCores{
 			"fill",
 			"serial"
 		};
+		using Spliter = ::Spliter<TimesToCores, Values::NHists>;
 		static float getX(const Entry& e) { return e._ncores; }
 		static float getY(const Entry& e, std::size_t r) {
 			switch (r) {
@@ -489,6 +606,7 @@ struct TimesToCores : public TimeToCores{
 			}
 		}
 };
+
 
 
 auto PlotScalingToCore = PlotScalingBookStore<ScalingToCores>;

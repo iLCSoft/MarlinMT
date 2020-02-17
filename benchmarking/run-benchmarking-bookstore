@@ -7,7 +7,6 @@ function printUsage() {
   echo "Run MarlinMT for multi-core benchmarking"
   echo ""
   echo "Options:"
-  echo "  --lazy                     Whether use option LazyUnpack for LCIO reading [default=false]"
   echo "  -h --help                  Print help and exit"
   echo ""
 }
@@ -31,8 +30,8 @@ eval set -- "$OPTS"
 
 # general configuration
 steeringfile="${MARLIN_DIR}benchmarking/hist_filling.xml"
-cores=(4 8)
-nhists=(1 2)
+cores=(1 4 8 12)
+nhists=(1 2 3)
 nfills=(30)
 nbins=(1000)
 accesstypes=("Rotating" "Continuous")
@@ -52,7 +51,6 @@ accesstype_to_id () {
 while true; do
   case "$1" in
     --inputfile ) inputfile=$2; shift; shift ;;
-    --lazy ) lazyunpack="true"; shift ;;
 	# other inputs
     -h | --help )  printUsage; exit 0 ;;
     -- ) shift; break ;;
@@ -94,7 +92,7 @@ echo "  - Benchmark output file: $output"
 
 # load the file in the cache for next
 echo "Loading input file into cache: ${inputfile}"
-#anajob ${inputfile} >> /dev/null
+anajob ${inputfile} >> /dev/null
 nEvents=`lcio_event_counter $inputfile`
 echo "n events $nEvents"
 

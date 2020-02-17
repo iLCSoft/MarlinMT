@@ -1,75 +1,42 @@
-#!/bin/bash 
-
-# run benchmarking-bookstore on single core at Marlin, 
-# must add processors lib beforehand to MARLIN_DLL!
-# MarlinBenchCpuCrunchProcessor, MarlinBenchHistProcessor
+#!/bin/bash
 
 function printUsage() {
-  echo "Usage:"
-  echo "run-benchmarking-bookstore [options] --inputfile <slcio-file>"
-  echo ""
-  echo "Run MarlinMT for multi-core benchmarking"
-  echo ""
-  echo "Options:"
-  echo "  --mincrunch <int>          The start crunch time (ms) [default=500]"
-  echo "  --maxcrunch <int>          The end crunch time (ms) [default=1000]"
-  echo "  --crunchstep <int>         The step in crunch time numbers [default=500]"
-  echo "  --sigmacrunch <float>      Introduce an event-by-event gaussian random"
-  echo "                             fluctuation in the crunch time [default=0]"
-  echo "  --inputfile <slcio-file>   The LCIO input file. Mandatory parameter !"
-  echo "  -h --help                  Print help and exit"
-  echo ""
+	echo "Usage:"
+	echo "run-benchmarking-bookstore-Marlin [options] --inputfile <slcio-file>"
+	echo ""
+	echo "Options:"
+	echo " -h --help Print help and exit"
+	echo ""
 }
 
-
-if [ -z "$MARLIN_DIR" ]
-then
-  echo "MARLIN_DIR not set. Please setup your environment!"
-  exit 1
+if [ -z "$MARLIN_DIR" ]; then
+	echo "MARLIN_DIR not set. Please setup your env!"
+	exit 1;
 fi
 
+OPTS=`getopt -o h -1 inputfile: -n 'parse-options' -- "$@"`
+eval --set "$OPTS"
 
-OPTS=`getopt -o h -l mincrunch:,maxcrunch:,crunchstep:,sigmacrunch:,inputfile:,nbins:,nhistsmin:,nhistsmax:,nhistsstep:,nfillsmin:,nfillsmax,nfillsstep:,steeringfile:,help -n 'parse-options' -- "$@"`
-eval set -- "$OPTS"
+steeringfile="${MARLIN_DIR}benchmarking/Marlin/steer.xml"
+nhists=(1 2 3)
+nfills=(30)
+nbins=(1000)
+accesstypes=("Rotating" "Continuous")
 
-# general configuration
-inputfile=""
-steeringfile=${MARLIN_DIR}/benchmarking/Marlin/steer.xml
-
-# cpu_crunch configuration
-mincrunch=0
-maxcrunch=10
-crunchstep=10
-sigmapercent=0
-
-# histogram processor configuration
-nbins=1000
-nhistsmin=20
-nhistsmax=2020
-nhistsstep=500
-nfillsmin=100000
-nfillsmax=300000
-nfillsstep=100000
-	
+accesstype_to_id () {
+	if [[ $1 == "Rotating" ]]; then
+		echo 0
+	elif [[ $1 == "Continuous" ]]; then
+		echo 1
+	else
+		>&2 echo "unrecognized access type: '$1'"
+		exit 1
+	fi
+}
 
 while true; do
   case "$1" in
-	# general configuration
     --inputfile ) inputfile=$2; shift; shift ;;
-		--steeringfile ) steeringfile=$2; shift; shift;;
-	# cpu crunch configuration
-    --mincrunch ) mincrunch=$2; shift; shift ;;
-    --maxcrunch ) maxcrunch=$2; shift; shift ;;
-    --crunchstep ) crunchstep=$2; shift; shift ;;
-    --sigmacrunch ) sigmacrunch=$2; shift; shift ;;
-	# histogram processor configuration
-		--nbins ) nbins=$2; shift; shift ;;
-		--nhistsmin ) nhistsmin=$2; shift; shift ;;
-		--nhistsmax ) nhistsmax=$2; shift; shift ;;
-		--nhistsstep ) nhistsstep=$2; shift; shift ;;
-		--nfillsmin ) nfillsmin=$2; shift; shift ;;
-		--nfillsmax ) nfillsmax=$2; shift; shift ;;
-		--nfillsstep ) nfillsstep=$2; shift; shift ;;
 	# other inputs
     -h | --help )  printUsage; exit 0 ;;
     -- ) shift; break ;;
@@ -85,79 +52,60 @@ then
   exit 1
 fi
 
-crunchtimes=`seq ${mincrunch} ${crunchstep} ${maxcrunch} | tr '\n' ' '`
-nhists=`seq ${nhistsmin} ${nhistsstep} ${nhistsmax} | tr '\n' ' '`
-nfills=`seq ${nfillsmin} ${nfillsstep} ${nfillsmax} | tr '\n' ' '`
 
-
-output="MarlinBenchmarking_Sigma.${sigmapercent}_nBins.${nbins}.txt"
-
-if [ -f ${output} ]
-then
-  rm ${output}
-fi
-
-echo "Running with following settings:"
-echo "  - crunch times: ${crunchtimes}"
-echo "  - crunch sigma percentage: $sigmapercent"
-echo "  - LCIO input file: $inputfile"
-echo "  - Marlin steering file: $steeringfile"
-echo "  - Benchmark output file: $output"
-echo "  - nfills: ${nfills}"
-
-# load the file in the cache for next
-echo "Loading input file into cache: ${inputfile}"
-anajob ${inputfile} >> /dev/null
-
-if [[ "$native" == "true" ]] && [[ $memorylayout != "Shared" ]]; then
-	echo "ERROR copied memory layout is native not possible!"
-	exit 1
-fi
+output="MarlinBenchmarking.csv"
 
 echo "Start benchmarking ..."
 
-echo "concurrency,crunchTime,crunchSigma,nHists,nFills,nBins,\
-tReal,tUser,tSys,tSerial,tParallel,scaling" > ${output}
+echo "concurrency,nFills,accessType,mutex,memoryLayout,nHists,nBins,tSerial,tParallel,scaling,tReal,tUnpack,tFill,nEvents,fillingActive" > $output
 
-for nf in ${nfills}
-do
-	for cr in ${crunchtimes}
-	do
-		crunchSigma=`echo "(${cr}*${sigmapercent})" | bc`
-		for nh  in ${nhists}
-		do
-			echo "Running Marlin with:"
-			echo "  cpu_crunch:"
-			echo "  -- Crunch time:        ${cr}"
-			echo "  -- Crunch sigma:       ${crunchSigma}"
-			echo "  histogram filling:"
-			echo "  -- number histograms:  ${nh}"
-			echo "  -- number bins:        ${nbins}"
-			echo "  -- number fills:       ${nf}"
-			totalTime=(`time (Marlin \
-			${steeringfile} \
-			--global.LCIOInputFiles="${inputfile}" \
-			--CPUCrunch.CrunchTime=${cr} \
-			--CPUCrunch.CrunchSigma=${crunchSigma} \
-			--HistFilling.NBins=${nbins} \
-			--HistFilling.NHists=${nh} \
-			--HistFilling.NFills=${nf} \
-			> scaling_temp_$$.log) 2>&1 1>/dev/null `)
-			if [ $? -ne 0 ]; then
-				echo "MarlinMT failed!, stop benchmarks!"
-				exit 1
-			fi
+echo "Running with following settings:"
+echo "  - n fills:      ${nfills[@]}"
+echo "  - n Hists:      10^(${nhists[@]})"
+echo "  - n bins:       ${nbins[@]}"
+echo "  - access types: ${accesstypes[@]}"
+echo "  - Marlin steering file: $steeringfile"
+echo "  - Benchmark output file: $output"
 
-			sumT=$( cat scaling_temp_$$.log | sed -n 's/.*Total:\s*\([0-9\.\e+-]*\) s in.*/\1/p' ) 
-			real=${totalTime[1]}
-			user=${totalTime[3]}
-			sys=${totalTime[5]}
-			echo "1,\
-${cr},${crunchSigma},\
-${nh},${nf},${nbins},\
-${real},${user},${sys},\
-${sumT},${sumT},1" >> ${output}
-			echo ""
+# load the file in the cache for next
+echo "Loading input file into cache: ${inputfile}"
+#anajob ${inputfile} >> /dev/null
+nEvents=`lcio_event_counter $inputfile`
+echo "n events $nEvents"
+
+for nf in ${nfills[@]}; do
+	for at in ${accesstypes[@]}; do
+		atid=`accesstype_to_id $at`
+		for nh in ${nhists[@]}; do
+			for nb in ${nbins[@]}; do
+				echo "Running Marlin with:"
+				echo "  histogram filling:"
+				echo "  -- access type:       ${at}"
+				echo "  -- number histograms: ${nh}"
+				echo "  -- number bins:       $nb"
+				echo "  -- number fills:      $nf"
+				totalTime=(`time ( Marlin \
+					$steeringfile \
+					--HistFilling.NBins="$nb" \
+					--HistFilling.NHists10="$nh" \
+					--HistFilling.NFills="$nf" \
+					--HistFilling.AccessType="$atid" \
+					--global.LCIOInputFiles="$inputfile" > scaling_temp_.log 2>&1) \
+					2>&1 1>/dev/null `)
+			  if [ $? -ne 0 ]; then
+					>&2 echo "Marlin failed!, stop benchmarks!"
+					exit 1
+				fi
+				real=${totalTime[1]}
+				fillT=$(cat scaling_temp_.log | sed -n '/\[ MESSAGE "Marlin"\]/s/.*HistFilling\s*\([0-9\.+-e]*\).*/\1/p')
+				sumT=$( cat scaling_temp_.log | sed -n 's/.*Total:\s*\([0-9\.\e+-]*\) s in.*/\1/p' ) 
+
+				echo "Result:"
+				echo "  real Time:  $real"
+				echo "  total Time: $sumT"
+				echo "  fill Time:  $fillT"
+				echo "1,$nf,$at,null,null,$nh,$nb,$sumT,$sumT,1,$real,0,$fillT,$nEvents,true" >> $output
+		done
 		done
 	done
 done

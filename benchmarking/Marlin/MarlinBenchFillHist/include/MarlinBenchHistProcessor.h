@@ -50,7 +50,7 @@ class MarlinBenchHistProcessor : public Processor {
   
  protected:
   std::vector<AIDA::ICloud1D*> _hMCPEnergy {} ; 
-  int _nBins{0}, _nHist{0}, _nFills{0};
+  int _nBins{0}, _nHist10{0}, _nHist{0}, _nFills{0}, _accessType{0};
 } ;
 
 

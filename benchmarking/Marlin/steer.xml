@@ -3,7 +3,6 @@
 
  <execute>
    <processor name="MyAIDAProcessor"/>
-   <processor name="CPUCrunch"/>
    <processor name="HistFilling"/>
  </execute>
 
@@ -21,15 +20,12 @@
   <parameter name="FileType" type="string">root </parameter>
  </processor>
 
- <processor name="CPUCrunch" type="MarlinBenchCpuCrunchProcessor">
-  <parameter name="CrunchSigma" type="float">0 </parameter>
-  <parameter name="CrunchTime" type="int">200 </parameter>
- </processor>
 
  <processor name="HistFilling" type="MarlinBenchHistProcessor">
   <parameter name="NBins" type="int">1000 </parameter>
   <parameter name="NFills" type="int">1000 </parameter>
-  <parameter name="NHists" type="int">5 </parameter>
+  <parameter name="NHists10" type="int">5 </parameter>
+  <parameter name="AccessType" type="int">0</parameter>
  </processor>
 
 
