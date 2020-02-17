@@ -239,8 +239,8 @@ namespace marlin {
 
       EntryMultiShared(const EntryMultiShared&) = default;
       EntryMultiShared& operator=(const EntryMultiShared&) = default ;
-      EntryMultiShared(EntryMultiShared&&) noexcept = default;
-      EntryMultiShared& operator=(EntryMultiShared && ) noexcept     = default;
+      EntryMultiShared(EntryMultiShared&&)  = default;
+      EntryMultiShared& operator=(EntryMultiShared && ) = default;
 
       /**
        *  @brief creates a new Handle.

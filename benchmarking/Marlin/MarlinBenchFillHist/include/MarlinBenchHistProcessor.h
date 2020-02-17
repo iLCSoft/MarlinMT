@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#ifdef MARLIN_USE_AIDA
 #include <marlin/AIDAProcessor.h>
 #include <AIDA/IHistogramFactory.h>
 #include <AIDA/ICloud1D.h>
 #include <AIDA/IHistogram1D.h>
-#endif // MARLIN_USE_AIDA
+
+#include <TH1.h>
 
 
 
@@ -21,7 +21,7 @@ class MarlinBenchHistProcessor : public Processor {
   
  public:
   
-  virtual Processor*  newProcessor() { return new MarlinBenchHistProcessor ; }
+  virtual Processor*  newProcessor() { return new MarlinBenchHistProcessor{} ; }
   
   
   MarlinBenchHistProcessor() ;
@@ -49,7 +49,7 @@ class MarlinBenchHistProcessor : public Processor {
   
   
  protected:
-  std::vector<AIDA::ICloud1D*> _hMCPEnergy {} ; 
+  std::vector<TH1F*> _hMCPEnergy {} ; 
   int _nBins{0}, _nHist10{0}, _nHist{0}, _nFills{0}, _accessType{0};
 } ;
 

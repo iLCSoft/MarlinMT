@@ -10,17 +10,14 @@
 // ----- include for verbosity dependend logging ---------
 #include "marlin/VerbosityLevels.h"
 
-#ifdef MARLIN_USE_AIDA
 #include <marlin/AIDAProcessor.h>
 #include <AIDA/IHistogramFactory.h>
 #include <AIDA/ICloud1D.h>
 #include <AIDA/IHistogram1D.h>
-#endif // MARLIN_USE_AIDA
 
 
 using namespace lcio ;
 using namespace marlin ;
-
 
 MarlinBenchHistProcessor aMarlinBenchHistProcessor ;
 
@@ -42,8 +39,8 @@ void MarlinBenchHistProcessor::init() {
 
     _nHist = static_cast<int>(powl(10, _nHist10));
     for(int i = 0; i < _nHist; ++i) {
-      _hMCPEnergy.push_back(AIDAProcessor::histogramFactory(this)->
-          createCloud1D( "hMCPEnergy", "energy of the MCParticles", _nBins, "autoconvert=true" ) ) ; 
+      _hMCPEnergy.push_back(
+          new TH1F( "hMCPEnergy", "energy of the MCParticles", _nBins, -1., 1.)) ; 
     }
 }
 
@@ -80,7 +77,7 @@ void MarlinBenchHistProcessor::processEvent( LCEvent * evt ) {
       for (int i = 0; i < _nFills; ++i) {
         MCParticle *mcp = dynamic_cast<MCParticle*>(col->getElementAt(i));
         if (!mcp) throw std::runtime_error("null mcp");
-        _hMCPEnergy[j]->fill({getValue(mcp, j)},1.);
+        _hMCPEnergy[j]->Fill(getValue(mcp, j),1.);
       }
     }
 
@@ -90,7 +87,7 @@ void MarlinBenchHistProcessor::processEvent( LCEvent * evt ) {
       for (int j = 0; j < _nHist; ++j) {
         MCParticle *mcp = dynamic_cast<MCParticle*>(col->getElementAt(i));
         if (!mcp) throw std::runtime_error("null mcp");
-        _hMCPEnergy[j]->fill({getValue(mcp, j)}, 1.);
+        _hMCPEnergy[j]->Fill(getValue(mcp, j), 1.);
       }
     }
   } else {
