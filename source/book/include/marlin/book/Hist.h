@@ -40,9 +40,9 @@ namespace marlin {
 
     template < typename Config >
     EntryData< types::HistT<Config>, Flags::value(Flags::Book::MultiShared) >
-    EntryDataBase< types::HistT<Config> >::multiShared() const {
+    EntryDataBase< types::HistT<Config> >::multiShared(std::size_t n) const {
       return EntryData< types::HistT<Config>,
-                        Flags::value(Flags::Book::MultiShared) >( *this ) ;
+                        Flags::value(Flags::Book::MultiShared) >( *this, n ) ;
     }
 
     //--------------------------------------------------------------------------
@@ -237,7 +237,16 @@ namespace marlin {
         _fillMgr{
           std::make_shared< types::HistConcurrentFillManager< Config  > >(
             *_context.mem->at< Type >( 0 ) )},
-        _fillers( 10 ) {}
+        _fillers( 10 ) 
+    {
+      for ( std::size_t i = 0; i < context.nInstances; ++i) {
+        _staticFiller.push_back(
+            std::make_shared<
+              types::HistConcurrentFiller<Config>>(
+                *_fillMgr));
+        _fillers.push_back(_staticFiller.back());
+      }
+    }
 
     //--------------------------------------------------------------------------
 
@@ -278,6 +287,20 @@ namespace marlin {
         pFiller,
         Flags::Book::MultiShared,
         [this]() { this->flush(); } ) ;
+    }
+
+    //--------------------------------------------------------------------------
+    
+    template < typename Config >
+    Handle< types::HistT<Config> >
+    EntryMultiShared< types::HistT<Config> >::handle(
+        std::size_t idx) {
+      return Handle<Type>(
+          _context.mem,
+          _context.mem->at< Type > ( 0 ),
+          _staticFiller[idx],
+          Flags::Book::MultiShared,
+          [this](){this->flush();});
     }
 
     //--------------------------------------------------------------------------
@@ -386,7 +409,7 @@ namespace marlin {
       return store.bookMultiShared< Object_t,
                                     const std::string_view &,
                                     const typename types::HistT<Config>::AxisConfig_t & >(
-        args..., _data.title(), *_data.axis(0) ) ;
+        _n, args..., _data.title(), *_data.axis(0) ) ;
     }
 
     //--------------------------------------------------------------------------
@@ -400,7 +423,7 @@ namespace marlin {
                                     const std::string_view &,
                                     const typename types::HistT<Config>::AxisConfig_t &,
                                     const typename types::HistT<Config>::AxisConfig_t & >(
-        args..., _data.title(), *_data.axis(0), *_data.axis(1) ) ;
+        _n, args..., _data.title(), *_data.axis(0), *_data.axis(1) ) ;
     }
 
     //--------------------------------------------------------------------------
@@ -415,6 +438,7 @@ namespace marlin {
                                     const typename types::HistT<Config>::AxisConfig_t &,
                                     const typename types::HistT<Config>::AxisConfig_t &,
                                     const typename types::HistT<Config>::AxisConfig_t & >(
+        _n,                               
         args...,
         _data.title(),
         *_data.axis(0),

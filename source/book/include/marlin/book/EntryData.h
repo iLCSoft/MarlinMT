@@ -74,11 +74,14 @@ namespace marlin {
       Context() = default ;
 
       /// constructor
-      explicit Context( std::shared_ptr< MemLayout > memLayout )
-        : mem{std::move( memLayout )} {}
+      explicit Context( std::shared_ptr< MemLayout > memLayout, 
+          std::size_t numInstances)
+        : mem{std::move( memLayout )},
+          nInstances{numInstances} {}
 
       /// reference to Memory object. For editing and reading data.
       std::shared_ptr< MemLayout > mem{nullptr} ;
+      std::size_t nInstances{0};
     } ;
 
     /// Base type for Entries. To avoid void pointer.

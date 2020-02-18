@@ -171,15 +171,17 @@ namespace marlin {
         std::filesystem::path path,
         Args_t... ctor_p ) ;
 
+
       /**
        *  @brief creates an Entry for parallel access.
        *  Creates one object in Memory and modifiers.
-       *  \see BookStore::book
+       *  @param n number of Static Modifiers
        */
       template < class T, typename... Args_t >
-      std::shared_ptr< details::Entry > bookMultiShared( 
+      std::shared_ptr<details::Entry> bookMultiShared(
+          std::size_t n,
           std::filesystem::path path,
-          Args_t... ctor_p ) ;
+          Args_t... ctor_p) ;
 
       /**
        *  @brief normalize and check path for internal usage. 
@@ -335,7 +337,7 @@ namespace marlin {
       key.flags      = Flags::Book::Single ;
 
       auto entry = std::make_shared< EntrySingle< T > >( Context(
-        std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) ) ) ;
+        std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ), 1) ) ;
 
       return addEntry( entry, key ) ;
     }
@@ -357,24 +359,25 @@ namespace marlin {
 
       auto entry     = std::make_shared< EntryMultiCopy< T > >(
         Context( std::make_shared< SharedMemLayout< T, MERGE, Args_t... > >(
-          n, ctor_p... ) ) ) ;
+          n, ctor_p... ) , n) ) ;
 
       return addEntry( entry, key ) ;
     }
 
     //--------------------------------------------------------------------------
-
     template < class T, typename... Args_t >
     std::shared_ptr< details::Entry >
-    BookStore::bookMultiShared( std::filesystem::path path,
-                                Args_t...              ctor_p ) {
+    BookStore::bookMultiShared( 
+        std::size_t n,
+        std::filesystem::path path,
+        Args_t...           ctor_p ) {
       EntryKey key{std::type_index( typeid( T ) )} ;
       key.path       = std::move(path) ;
-      key.mInstances = 1 ;
+      key.mInstances = std::max<std::size_t>(1, n) ;
       key.flags      = Flags::Book::MultiShared ;
 
       auto entry = std::make_shared< EntryMultiShared< T > >( Context(
-        std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) ) ) ;
+        std::make_shared< SingleMemLayout< T, Args_t... > >( ctor_p... ) , n ) ) ;
 
       return addEntry( entry, key ) ;
     }
@@ -458,7 +461,8 @@ namespace marlin {
 
     template < typename T >
     Handle< T > Handle< Entry< T > >::handle() {
-      return _entry->handle< T >( unmap( std::this_thread::get_id()) ) ;
+      std::size_t id = unmap( std::this_thread::get_id() ) ;
+      return _entry->handle< T >( id <  _entry->key().mInstances ? id : -1) ;
     }
 
     //--------------------------------------------------------------------------

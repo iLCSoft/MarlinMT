@@ -149,27 +149,53 @@ namespace marlin {
             } 
           }
 
-          enum struct Need { Void, Index };
+          enum struct Need { Void, Index, VoidIndex };
 
           template<typename R, typename ET, R(ET::*)(std::size_t)>
-          struct need_index { };
+          struct need_index { 
+            static constexpr bool value = true;};
 
           template<typename R, typename ET, R(ET::*)(void)>
-          struct need_void { };
+          struct need_void {
+            static constexpr bool value = true;};
+
+          template<typename T, typename TF>
+          struct Conclusion {
+            template<typename R, typename ET>
+            static constexpr std::true_type 
+              n_index(need_index<R, ET, &ET::handle>*) 
+                {return {};}  
+            template<typename, typename>
+            static constexpr std::false_type n_index(...) 
+              {return {};}
+
+            template<typename R, typename ET>
+            static constexpr std::true_type
+              n_void(need_void<R, ET, &ET::handle>*){return{};}
+            template<typename, typename>
+            static constexpr std::false_type 
+              n_void(...) {return{};}
+
+            static constexpr Need needs() {
+              static_assert(
+                n_index<T,TF>(nullptr).value
+                || n_void<T,TF>(nullptr).value, "no valid handle");
+              if constexpr (
+                  n_index<T,TF>(nullptr).value 
+                  && n_void<T,TF>(nullptr).value) {
+                return Need::VoidIndex;
+              } else if constexpr (
+                  n_index<T,TF>(nullptr).value) {
+                return Need::Index;
+              } else  {
+                return Need::Void;
+              }
+            }
+          };
 
           template<typename T, typename ET>
-          static constexpr Need handle_need(
-              need_index<Handle<T>, ET, &ET::handle>* /*null*/) {
-            return Need::Index ;
-          }
-          template<typename T, typename ET>
-          static constexpr Need handle_need(
-            need_void<Handle<T>, ET, &ET::handle>* /*null*/) {
-            return Need::Void ; 
-          }
-
-          template<typename T, typename ET>
-          static constexpr Need handle_need_v = handle_need<T,ET>(nullptr);
+          static constexpr Need handle_need_v =
+            Conclusion<Handle<T>,ET>::needs();
 
           template<typename T, std::size_t I = 0>
           [[nodiscard]]
@@ -180,14 +206,22 @@ namespace marlin {
             using EntryType = std::tuple_element_t<I, EntryTypes<T>>;
 
             if (key.flags == EntryType::Flag) {
-              if constexpr (handle_need_v<T, EntryType> == Need::Index) {
-
+              constexpr Need need = handle_need_v<T, EntryType>;
+              std::shared_ptr<EntryType>  pEntry = 
+                std::static_pointer_cast<EntryType>(entry);
+              if constexpr (need == Need::Index) {
                 ThrowIfOutOfBound(key, idx);
-
-                return std::static_pointer_cast<EntryType>(entry)->handle(idx);
-              } else if constexpr (handle_need_v<T, EntryType> == Need::Void){
-                return std::static_pointer_cast<EntryType>(entry)->handle();
-              } else {
+                return pEntry->handle(idx);
+              } else if constexpr (need == Need::Void){
+                return pEntry->handle();
+              } else if constexpr (need == Need::VoidIndex) { 
+                if (idx != -1) {
+                  ThrowIfOutOfBound(key, idx);
+                  return pEntry->handle(idx);
+                } else {
+                  return pEntry->handle();
+                }
+              }else {
                 static_assert(I!=I, "no callable Handle function");
               }
             }

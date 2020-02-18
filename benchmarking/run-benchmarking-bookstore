@@ -30,11 +30,11 @@ eval set -- "$OPTS"
 
 # general configuration
 steeringfile="${MARLIN_DIR}benchmarking/hist_filling.xml"
-cores=(1 4 8 12)
-nhists=(1 2 3)
+cores=(4) # (1 4 8 12)
+nhists=(3) # (1 2 3)
 nfills=(30)
 nbins=(1000)
-accesstypes=("Rotating" "Continuous")
+accesstypes=("Rotating") # "Continuous")
 memorylayouts=("Share" "Copy" "Mutex")
 
 accesstype_to_id () {
@@ -102,6 +102,10 @@ read_results () {
 	parallel=${totalProcessorTime[1]}
 	scaling=${totalProcessorTime[2]}
 	real=${totalTime[1]}
+	unpackTime=`cat scaling_temp_.log \
+		| sed -n '/EventUnpacking.*==>/s/.*EventUnpacking\s*\(\S*\).*/\1/p'`
+	fillTime=`cat scaling_temp_.log \
+		| sed -n '/HistFilling.*==>/s/.*HistFilling\s*\(\S*\).*/\1/p'`
 }
 
 for c in ${cores[@]}; do
@@ -152,10 +156,6 @@ for c in ${cores[@]}; do
 							exit 1
 						fi
 						read_results
-						unpackTime=`cat scaling_temp_.log \
-							| sed -n '/EventUnpacking.*==>/s/.*EventUnpacking\s*\(\S*\).*/\1/p'`
-						fillTime=`cat scaling_temp_.log \
-							| sed -n '/HistFilling.*==>/s/.*HistFilling\s*\(\S*\).*/\1/p'`
 						echo "Result:"
 						echo "  serial Time:   $serial"
 						echo "  parallel Time: $parallel"

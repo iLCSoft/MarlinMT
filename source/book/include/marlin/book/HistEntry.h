@@ -249,6 +249,11 @@ namespace marlin {
        */
       Handle< Type > handle() ;
 
+      /**
+       *  @brief creates a new Handle with existing buffer.
+       */
+      Handle< Type > handle( std::size_t idx ) ;
+
       /// flush every Buffer from each Handle.
       void flush() ;
 
@@ -260,6 +265,9 @@ namespace marlin {
       /// list of produced Filler to flush them when needed.
       std::vector< std::weak_ptr< types::HistConcurrentFiller< Config > > >
         _fillers ;
+      /// list of permanent Filler
+      std::vector< 
+        std::shared_ptr<types::HistConcurrentFiller< Config > > > _staticFiller {};
       /// lock _fillers when extend memory 
       std::mutex _fillersExtend {};
     } ;

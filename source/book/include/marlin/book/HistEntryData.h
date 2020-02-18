@@ -186,8 +186,9 @@ namespace marlin {
       static constexpr int D = Object_t::Dimension;
 
       explicit EntryData(
-        const EntryDataBase< Object_t > &data )
-        : _data{data} {}
+        const EntryDataBase< Object_t > &data,
+        std::size_t n)
+        : _data{data}, _n{n} {}
 
       /**
        *  @brief book Histogram in MultiCopy Mode. Only available for 1D Hist.
@@ -214,6 +215,7 @@ namespace marlin {
       book( BookStore &store, const Args_t &... args ) const ;
 
       const EntryDataBase< Object_t > &_data ;
+      const std::size_t _n;
     } ;
 
   } // end namespace book

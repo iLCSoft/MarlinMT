@@ -76,7 +76,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     {
 
       Handle< Entry< H1I > > entry = store.book(
-        "/path_3/", "name", EntryData< H1I >( axis ).multiShared() ) ;
+        "/path_3/", "name", EntryData< H1I >( axis ).multiShared(2) ) ;
 
       std::thread t1([&entry]() { 
           auto hnd = entry.handle(); 

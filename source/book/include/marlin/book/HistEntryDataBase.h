@@ -44,7 +44,7 @@ namespace marlin {
        *  @brief construct EntryData for multi shared booking.
        */
       [[nodiscard]] EntryData< Type, Flags::value( Flags::Book::MultiShared ) >
-      multiShared() const ;
+      multiShared( std::size_t n = 0) const ;
 
     protected:
 
