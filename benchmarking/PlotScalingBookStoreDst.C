@@ -167,6 +167,7 @@ struct Entry {
 		} else { return is; } 
 	}
 	friend std::ostream& operator<<(std::ostream& os, const Entry& entry) {
+		os << "Entry serialization not implemented yet!";
 		/*os
 			<< entry._ncores << ", "
 			<< entry._nFills << ", "
@@ -350,7 +351,8 @@ void PrintMMTToHist (const std::string& filenameMMT, const std::string& filename
 	std::vector<std::array<double,2>> entries;
 	for ( const auto& entryM : entriesM ) {
 		std::cout << "M\n";
-		if (entryM._processorType == ProcessorType::WorstCase) {
+		if (entryM._processorType == ProcessorType::WorstCase
+				&& entryM._nBins == 1000) {
 			std::cout << "P\n";
 			bool match = false;
 			for (const auto& entryMMT : entriesMMT) {
@@ -359,6 +361,7 @@ void PrintMMTToHist (const std::string& filenameMMT, const std::string& filename
 						&& entryMMT._memLayout == MemLayout::Copy
 						&& entryMMT._fillingActive == true
 						&& entryMMT._mutex == false
+						&& entryMMT._nBins == entryM._nBins
 						&& entryMMT._nHist == entryM._nHist) {
 					if (match) throw std::runtime_error("nooooo!!");
 					match = true;
@@ -494,20 +497,43 @@ struct PermCompare {
 			}
 		}
 };
+
+template<typename MapFrom_t, typename MapFrom_t::Values V, typename MapFrom_t::Values ... Vs>
+struct Spliter : public Spliter<MapFrom_t, V>{
+	void addPheno(const MapFrom_t& key) {
+		Spliter<MapFrom_t, V>::addPheno(key);
+		_child.addPheno(key);
+	}
+	void populate(map_t<MapFrom_t>& map, const MapFrom_t& base, const Entry& e) {
+		for(auto p : Spliter<MapFrom_t,V>::_phenos) {
+			MapFrom_t key = base;
+			std::get<Spliter<MapFrom_t,V>::I>(key.values) = p;
+			_child.populate(map, key, e);
+		}
+	}
+	void populate(map_t<MapFrom_t>& map, const Entry& e) {
+		populate(map, MapFrom_t(e), e);
+	}
+private:
+	Spliter<MapFrom_t, Vs...> _child;	
+};
+
 template<typename MapFrom_t, typename MapFrom_t::Values V>
-struct Spliter {
+struct Spliter<MapFrom_t, V> {
 	void addPheno(const MapFrom_t& key) {
 		_phenos.insert(std::get<I>(key.values));
 	}
-	void populate( map_t<MapFrom_t>& map, const Entry& e) {
-		MapFrom_t base(e);
+	void populate( map_t<MapFrom_t>& map, const MapFrom_t& base, const Entry& e) {
 		for(auto p : _phenos) {
 			MapFrom_t key = base;
 			std::get<I>(key.values) = p;
 			map[key].push_back(e);
 		}
 	}
-private:
+	void populate( map_t<MapFrom_t>& map, const Entry& e) {
+		populate(map, MapFrom_t(e), e);
+	}
+protected:
 	static constexpr std::size_t I = static_cast<std::size_t>(V);
 	std::set<std::tuple_element_t<I, decltype(MapFrom_t::values)>> _phenos;
 };
@@ -519,19 +545,23 @@ struct ScalingToCores {
 	static constexpr Alignment aLegend{Alignment::LEFT};
 	static constexpr bool bLinear{true};
 	enum struct Values { 
+		NBins,
 		NHists, 
 		Layout,
 		SIZE};
 	static constexpr Permutation_t<Values> permutation = {
+		Values::NBins,
 		Values::NHists,
 		Values::Layout,
 	}	;
 	static constexpr const char* valName[] = {
+		"NBins",
 		"NHists", 
 		"Storage"
 		};
 	std::tuple<
 		std::size_t, 
+		std::size_t,
 		Storage> values;
 	template<std::size_t I>
 	using value_t = std::tuple_element_t<I, decltype(values)>;
@@ -542,14 +572,14 @@ struct ScalingToCores {
 	static constexpr char titleY[] = "Scaling";
 	ScalingToCores() = default;
 	ScalingToCores(const Entry& e) : 
-		values{e._nHist, {e._memLayout, e._mutex, e._fillingActive}} {}
+		values{e._nBins, e._nHist, {e._memLayout, e._mutex, e._fillingActive}} {}
 	static float getX(const Entry& e) { return e._ncores; }
 	static float getY(const Entry& e, std::size_t r ) { if (r != 0) { throw std::runtime_error("only supports 1 Y value!");} return e._speedup; }
 	bool isUniversal() const {
-		return std::get<0>(values) == 0;
+		return std::get<0>(values) == 0 && std::get<1>(values) == 0;
 	}
 	using Compare = PermCompare<ScalingToCores>;
-	using Spliter = ::Spliter<ScalingToCores, Values::NHists>;
+	using Spliter = ::Spliter<ScalingToCores, Values::NHists, Values::NBins>;
 	struct Filter {
 		bool operator()(const Entry& e) const {
 			return e._processorType != ProcessorType::BestCase;
