@@ -1,4 +1,5 @@
 #!/bin/bash
+# script to run multiple Marlin BookStore scenarios for benchmarking
 
 function printUsage() {
 	echo "Usage:"
@@ -17,7 +18,7 @@ fi
 OPTS=`getopt -o h -1 inputfile: -n 'parse-options' -- "$@"`
 eval --set "$OPTS"
 
-steeringfile="${MARLIN_DIR}benchmarking/Marlin/steer.xml"
+steeringfile="${MARLIN_DIR}benchmarking/Marlin/hist_filling.xml"
 nhists=(1 2 3)
 nfills=(30)
 nbins=(1000)
