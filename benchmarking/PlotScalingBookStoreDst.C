@@ -112,7 +112,7 @@ namespace std {
 	}
 	string to_string(const Storage& store) {
 		if (!std::get<2>(store).value()) return std::string("No Filling");
-		if (std::get<1>(store).value()) return std::string("Mutex");
+		if (std::get<1>(store).value()) return std::string("Lock");
 		return std::to_string(std::get<0>(store));
 	}
 } // end namespace std
@@ -351,14 +351,14 @@ void PrintMMTToHist (const std::string& filenameMMT, const std::string& filename
 	std::vector<std::array<double,2>> entries;
 	for ( const auto& entryM : entriesM ) {
 		std::cout << "M\n";
-		if (entryM._processorType == ProcessorType::WorstCase
+		if (entryM._processorType == ProcessorType::BestCase
 				&& entryM._nBins == 1000) {
 			std::cout << "P\n";
 			bool match = false;
 			for (const auto& entryMMT : entriesMMT) {
 				if (entryMMT._ncores == 1 
 						&& entryMMT._processorType == entryM._processorType 
-						&& entryMMT._memLayout == MemLayout::Copy
+						&& entryMMT._memLayout == MemLayout::Share
 						&& entryMMT._fillingActive == true
 						&& entryMMT._mutex == false
 						&& entryMMT._nBins == entryM._nBins
@@ -380,7 +380,7 @@ void PrintMMTToHist (const std::string& filenameMMT, const std::string& filename
 	std::array<std::array<double, 2>, 2> minmaxXY{{{{0,0}}, {{0,0}}}};
 	for(std::size_t i = 0; i < entries.size(); ++i) {
 		double x = entries[i][0], y = entries[i][1];
-		graph->SetPoint(i, x, y); 
+		graph->SetPoint(i, pow(10, x), y); 
 		minmaxXY[0][0] = std::min<double>(minmaxXY[0][0], x);
 		minmaxXY[1][0] = std::max<double>(minmaxXY[1][0], x);
 		minmaxXY[0][1] = std::min<double>(minmaxXY[0][1], y);
@@ -388,28 +388,98 @@ void PrintMMTToHist (const std::string& filenameMMT, const std::string& filename
 	}
 
 	TCanvas *canvas = new TCanvas( "MvMMTOverNHists", "M vs MMT over n histograms", 800, 800);
-  canvas->SetMargin( 0.130326, 0.0538847, 0.130491, 0.0917313 ) ;
+  canvas->SetMargin( 0.230326, 0.0538847, 0.130491, 0.0917313 ) ;
 
 
 	canvas->cd();
-	canvas->SetGridx();
 	canvas->SetGridy();
+	canvas->SetLogx();
 
 	graph->SetTitle("Marlin MarlinMT real time compares");
 
 	graph->Draw("alp");
 	TAxis *x = graph->GetXaxis(), *y = graph->GetYaxis();
-	x->SetTitle("amount of Histograms");
-	y->SetTitle("t(MMT) - t(M) / t(M)");
+	x->SetTitle("number of Histograms");
+	y->SetTitle("(t_MMT - t_M) / t_M");
 	x->SetTitleSize( 0.05 );
-	y->SetTitleSize( 0.05 );
-	x->SetRangeUser(minmaxXY[0][0], minmaxXY[1][0]);
-	y->SetRangeUser(minmaxXY[0][1], minmaxXY[1][1]);
+	y->SetTitleSize( 0.04 );
+	double max = std::max<double>(std::abs(minmaxXY[0][1]), std::abs(minmaxXY[1][1])) + 0.1;
+	y->SetRangeUser( -max,max);
 
 
 
 	canvas->GetFrame()->SetFillColor(19);
 	canvas->SaveAs((prefix + "MvMT" + ".pdf").c_str());
+}
+
+void PrintCvsR(const std::string& filename, const std::string& prefix) {
+	std::vector<Entry> entriesMT;
+	ReadEntries(entriesMT, filename);
+	std::vector<std::array<double,2>> entries;
+	for ( const auto& entryMB : entriesMT ) {
+		std::cout << "M\n";
+		if (entryMB._processorType == ProcessorType::BestCase
+				&& entryMB._memLayout == MemLayout::Share
+				&& entryMB._fillingActive == true
+				&& entryMB._mutex == false
+				&& entryMB._nHist == 3 
+				&& entryMB._nBins == 1000) {
+			std::cout << "P\n";
+			bool match = false;
+			for (const auto& entryMW : entriesMT) {
+		if (entryMW._processorType == ProcessorType::WorstCase
+				&& entryMW._ncores == entryMB._ncores
+				&& entryMW._memLayout ==entryMB._memLayout 
+				&& entryMW._fillingActive == true
+				&& entryMW._mutex == false
+				&& entryMW._nHist == entryMB._nHist 
+				&& entryMW._nBins == 1000) {
+					if (match) throw std::runtime_error("nooooo!!");
+					match = true;
+					entries.push_back({{static_cast<double>(entryMB._ncores), (entryMB._tFill - entryMW._tFill) / entryMW._tFill}});
+					std::cout << "dot: " << entries.back()[0] << " : " << entries.back()[1] << '\n';
+				}
+			}
+		}
+	}
+		
+	TGraph *graph = new TGraph(entries.size());
+	graph->SetLineWidth( 3 );
+	graph->SetLineColor( getColor(kRed) );
+	graph->SetMarkerStyle( 0 ) ;
+
+	std::array<std::array<double, 2>, 2> minmaxXY{{{{0,0}}, {{0,0}}}};
+	for(std::size_t i = 0; i < entries.size(); ++i) {
+		double x = entries[i][0], y = entries[i][1];
+		graph->SetPoint(i, x, y); 
+		minmaxXY[0][0] = std::min<double>(minmaxXY[0][0], x);
+		minmaxXY[1][0] = std::max<double>(minmaxXY[1][0], x);
+		minmaxXY[0][1] = std::min<double>(minmaxXY[0][1], y);
+		minmaxXY[1][1] = std::max<double>(minmaxXY[1][1], y);
+	}
+
+	TCanvas *canvas = new TCanvas( "ContinuesVsRotating", "continues vs rotating access over n cores", 800, 800);
+  canvas->SetMargin( 0.230326, 0.0538847, 0.130491, 0.0917313 ) ;
+
+
+	canvas->cd();
+	canvas->SetGridy();
+
+	graph->SetTitle("Compare Fill Access pattern");
+
+	graph->Draw("alp");
+	TAxis *x = graph->GetXaxis(), *y = graph->GetYaxis();
+	x->SetTitle("number of Cores");
+	y->SetTitle("(t_MC - t_MR) / t_MR");
+	x->SetTitleSize( 0.05 );
+	y->SetTitleSize( 0.04 );
+	double max = std::max<double>(std::abs(minmaxXY[0][1]), std::abs(minmaxXY[1][1])) + 0.1;
+	y->SetRangeUser( -max,max);
+
+
+
+	canvas->GetFrame()->SetFillColor(19);
+	canvas->SaveAs((prefix + "RvC" + ".pdf").c_str());
 }
 
 template<typename MapFrom_t>
@@ -617,9 +687,8 @@ struct TimesToCores : public TimeToCores{
 		using TimeToCores::TimeToCores;
 		static constexpr char name[] = "TimesToCores";
 		static constexpr char title[] = "Times for #Cores";
-		static constexpr std::size_t yValues = 4;
+		static constexpr std::size_t yValues = 3;
 		static constexpr const char* yNames[] = {
-			"real",
 			"unpack",
 			"fill",
 			"serial"
@@ -628,13 +697,58 @@ struct TimesToCores : public TimeToCores{
 		static float getX(const Entry& e) { return e._ncores; }
 		static float getY(const Entry& e, std::size_t r) {
 			switch (r) {
-				case 0: return e._tReal.count();
-				case 1: return e._tUnpack;
-				case 2: return e._tFill;
-				case 3: return e._serialTime;
+				case 0: return e._tUnpack;
+				case 1: return e._tFill;
+				case 2: return e._serialTime;
 				default: throw std::runtime_error("only supports 3 Y values! Got '" + std::to_string(r) + "'");
 			}
 		}
+};
+
+struct PlotAccessToCores {
+	static constexpr std::size_t yValues = 1;
+	static constexpr Alignment aLegend{Alignment::LEFT};
+	static constexpr bool bLinear{false};
+	enum struct Values { 
+		ProcessorType,
+		SIZE};
+	static constexpr Permutation_t<Values> permutation = {
+		Values::ProcessorType
+	}	;
+	static constexpr const char* valName[] = {
+		"Access Type"
+		};
+	std::tuple<
+		ProcessorType> values;
+	template<std::size_t I>
+	using value_t = std::tuple_element_t<I, decltype(values)>;
+	static constexpr std::size_t dim = std::tuple_size_v<decltype(values)>;
+	static constexpr char name[] = "filltimetocores";
+	static constexpr char title[] = "fill time to cores";
+	static constexpr char titleX[] = "# Cores" ;
+	static constexpr char titleY[] = "fill time in s";
+	PlotAccessToCores() = default;
+	PlotAccessToCores(const Entry& e) : 
+		values{e._processorType} {}
+	static float getX(const Entry& e) { return e._ncores; }
+	static float getY(const Entry& e, std::size_t r ) { if (r != 0) { throw std::runtime_error("only supports 1 Y value!");} return e._tFill; }
+	bool isUniversal() const {
+		return false;
+	}
+	using Compare = PermCompare<PlotAccessToCores>;
+	using Spliter = ::Spliter<PlotAccessToCores, Values::ProcessorType>;
+	struct Filter {
+		bool operator()(const Entry& e) const {
+			return e._nHist == 3 
+				&& e._memLayout == MemLayout::Share
+				&& e._mutex.value() == false
+				&& e._nBins == 1000;
+		}
+	};
+	static bool filter(const Entry& e) {
+		constexpr Filter f{};
+		return f(e);
+	}
 };
 
 
@@ -642,3 +756,4 @@ struct TimesToCores : public TimeToCores{
 auto PlotScalingToCore = PlotScalingBookStore<ScalingToCores>;
 auto PlotTimeToCore = PlotScalingBookStore<TimeToCores>;
 auto PlotTimesToCore = PlotScalingBookStore<TimesToCores>;
+auto PlotAccessToCore = PlotScalingBookStore<PlotAccessToCores>;

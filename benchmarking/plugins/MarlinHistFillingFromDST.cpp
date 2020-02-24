@@ -3,6 +3,8 @@
 #include <mutex>
 #include <memory>
 #include <cmath>
+#include <fstream>
+#include <cstdlib>
 
 #include <marlin/Processor.h>
 #include <marlin/ProcessorApi.h>
@@ -15,6 +17,23 @@
 #include <IMPL/LCRunHeaderImpl.h>
 
 #include <ROOT/RHist.hxx>
+
+std::size_t getTotalVirtualMemoryUsed() {
+	std::ifstream file("/proc/self/status");
+	std::size_t res = 1;
+	std::string str;
+	while(std::getline(file, str)) {
+		if(strncmp(str.c_str(), "VmSize:", 7) == 0) {
+			std::cout << "HIT\n";
+			const char* c = str.c_str() + 7;	
+			while(*(++c) == ' ');
+			res = atoll(c);
+			break;
+		}
+	}
+	return res;
+}
+
 
 using namespace marlin;
 
@@ -54,6 +73,7 @@ private:
 
 
 void MarlinHistFillingFromDST::init() {
+	std::size_t memStart = getTotalVirtualMemoryUsed();
 	_nHists = powl(10, _nHists10);
 	if( _useMutex ) {
 		if ( not _rHistograms.empty() ) return;
@@ -75,6 +95,9 @@ void MarlinHistFillingFromDST::init() {
 						axisMin(i,0), axisMax(0,1)}));
 		}
 	}	
+	std::size_t memEnd = getTotalVirtualMemoryUsed();
+	streamlog_out(MESSAGE) << "mem usage raised from: " << memStart << " to "
+		<< memEnd << "\td=" << (memEnd - memStart) << '\n';
 }
 
 
@@ -177,6 +200,8 @@ double axisMax(std::size_t i, int a) {
 	return 1;
 }
 
-void MarlinHistFillingFromDST::end() { }
+void MarlinHistFillingFromDST::end() {
+	streamlog_out(MESSAGE) << "MemAtEnd: " << getTotalVirtualMemoryUsed() << '\n';
+}
 
 MARLIN_DECLARE_PROCESSOR( MarlinHistFillingFromDST);

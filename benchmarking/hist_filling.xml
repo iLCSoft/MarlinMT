@@ -15,7 +15,7 @@
   <global>
     <parameter name="Verbosity"> MESSAGE </parameter>
     <parameter name="ColoredConsole"> 0 </parameter>
-    <parameter name="Concurrency">3</parameter>
+    <parameter name="Concurrency">4</parameter>
   </global>
 
   <bookstore>
@@ -39,9 +39,9 @@
   <processor name="HistFilling" type="MarlinHistFillingFromDST" clone="false">
     <parameter name="NBins">1000</parameter>
     <!-- NHists = 10 ^ NHists10-->
-    <parameter name="NHists10">2</parameter>
+    <parameter name="NHists10">3</parameter>
     <!-- fills per histogram -->
-    <parameter name="NFills">10</parameter>
+    <parameter name="NFills">40</parameter>
     <!-- 0-Rotating 1-Continues -->
     <parameter name="AccessType" options="0 1">0</parameter>
     <parameter name="UseMutex">false</parameter>
