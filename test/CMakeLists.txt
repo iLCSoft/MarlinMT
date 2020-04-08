@@ -35,6 +35,12 @@ marlin_add_test (
   REGEX_FAIL "TEST_FAILED"
 )
 
+marlin_add_test (
+  test-validator
+  BUILD_EXEC
+  REGEX_FAIL "TEST_FAILED"
+)
+
 if("${MARLIN_BOOK_IMPL}" STREQUAL "root7")
 	marlin_add_test (
 		test-mem-layout
