@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <any>
 #include <functional>
 
 // -- marlin headers
@@ -36,6 +37,11 @@ namespace marlin {
    */
   class ParameterImpl {
   public:
+    template <typename T>
+    using ValidatorFunctionT = std::function<bool(const T &)> ;
+    using ValidatorFunction = std::any ;
+    
+  public:
     ParameterImpl() = delete ;
     ~ParameterImpl() = default ;
     
@@ -57,7 +63,8 @@ namespace marlin {
       _name(na),
       _description(desc),
       _typeIndex(typeid(T)),
-      _value(addr) {
+      _value(addr),
+      _validator(createValidator<T>(nullptr)) {
       construct<T>() ;
     }
     
@@ -82,7 +89,8 @@ namespace marlin {
       _description(desc),
       _typeIndex(typeid(T)),
       _value(addr),
-      _defaultValue(std::make_shared<T>(std::move(defVal))) {
+      _defaultValue(std::make_shared<T>(std::move(defVal))),
+      _validator(createValidator<T>(nullptr)) {
       construct<T>() ;
     }
     
@@ -155,6 +163,17 @@ namespace marlin {
     }
     
     /**
+     *  @brief  Set the parameter validator function
+     * 
+     *  @param  validator the user validator function
+     */
+    template <typename T>
+    void setValidator( ValidatorFunctionT<T> validator ) {
+      checkType<T>() ;
+      _validator = createValidator( validator ) ;
+    }
+    
+    /**
      *  @brief  Set the parameter value.
      *  Throw if the type is not matching the one on creation
      *  
@@ -163,6 +182,12 @@ namespace marlin {
     template <typename T>
     inline void set( const T &val ) {
       checkType<T>() ;
+      if( _validator.has_value() ) {
+        auto validatorT = std::any_cast<ValidatorFunctionT<T>>( _validator ) ;
+        if (not validatorT( val ) ) {
+          MARLIN_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
+        }
+      }
       *std::static_pointer_cast<T>( _value ).get() = val ;
       _isSet = true ;
     }
@@ -230,8 +255,25 @@ namespace marlin {
       _resetFunction = [this] { *std::static_pointer_cast<T>( _value ).get() = T() ; };
       _strFunction = [this]( ValueType ptr ) { return details::convert<T>::to_string( *std::static_pointer_cast<T>( ptr ).get() ) ; };
       _fromStrFunction = [this] ( ValueType ptr, const std::string &value ) { 
-        *std::static_pointer_cast<T>( ptr ).get() = details::convert<T>::from_string( value ) ; 
+        T valueT = details::convert<T>::from_string( value ) ;
+        if( _validator.has_value() ) {
+          auto validatorT = std::any_cast<ValidatorFunctionT<T>>( _validator ) ;
+          if( not validatorT( valueT ) ) {
+            MARLIN_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
+          }
+        }
+        *std::static_pointer_cast<T>( ptr ).get() = valueT ;
       };
+    }
+    
+    /// Construct the validator function 
+    template <typename T>
+    inline ValidatorFunction createValidator( ValidatorFunctionT<T> validatorT ) const {
+      std::any validator {} ;
+      if( nullptr != validatorT ) {
+        validator = validatorT ;
+      }
+      return validator ;
     }
     
   private:
@@ -257,6 +299,8 @@ namespace marlin {
     ValueType                                    _value {nullptr} ;
     /// The address to the parameter default value
     ValueType                                    _defaultValue {nullptr} ;
+    /// The parameter validator function
+    ValidatorFunction                            _validator {} ; 
   };
   
   //--------------------------------------------------------------------------
@@ -519,12 +563,30 @@ namespace marlin {
     inline T get( const T &fallback ) const {
       return _impl->get<T>( fallback ) ;
     }
+    
+    /**
+     *  @brief  Set the parameter value
+     *  
+     *  @param  value the new parameter value
+     */
+    inline void set( const T &value ) {
+      _impl->set( value ) ;
+    }
 
     /**
      *  @brief  Reset the parameter value (only)
      */
     inline void reset() {
       _impl->reset() ;
+    }
+    
+    /**
+     *  @brief  Set the validator function
+     * 
+     *  @param  validator the validator
+     */
+    inline void setValidator( ParameterImpl::ValidatorFunctionT<T> validator ) {
+      _impl->setValidator( validator ) ;
     }
     
   protected:
