@@ -1,16 +1,16 @@
-#include <marlin/SimpleScheduler.h>
+#include <marlinmt/SimpleScheduler.h>
 
-// -- marlin headers
-#include <marlin/Application.h>
-#include <marlin/Utils.h>
-#include <marlin/Sequence.h>
-#include <marlin/Processor.h>
+// -- marlinmt headers
+#include <marlinmt/Application.h>
+#include <marlinmt/Utils.h>
+#include <marlinmt/Sequence.h>
+#include <marlinmt/Processor.h>
 
 // -- std headers
 #include <algorithm>
 #include <set>
 
-namespace marlin {
+namespace marlinmt {
   
   SimpleScheduler::SimpleScheduler() :
     IScheduler() {
@@ -31,7 +31,7 @@ namespace marlin {
     _superSequence = std::make_shared<SuperSequence>(1) ;
     log<DEBUG5>() << "Creating processors ..." << std::endl ;
     if ( activeProcessors.empty() ) {
-      MARLIN_THROW( "Active processor list is empty !" ) ;
+      MARLINMT_THROW( "Active processor list is empty !" ) ;
     }
     // populate processor sequences
     for ( size_t i=0 ; i<activeProcessors.size() ; ++i ) {

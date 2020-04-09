@@ -1,10 +1,10 @@
-#include "marlin/GeometryManager.h"
+#include "marlinmt/GeometryManager.h"
 
-// -- marlin headers
-#include "marlin/PluginManager.h"
-#include "marlin/Application.h"
+// -- marlinmt headers
+#include "marlinmt/PluginManager.h"
+#include "marlinmt/Application.h"
 
-namespace marlin {
+namespace marlinmt {
 
   GeometryManager::GeometryManager() :
     Component( "GeometryManager" ) {
@@ -24,7 +24,7 @@ namespace marlin {
     auto &mgr = PluginManager::instance() ;
     _plugin = mgr.create<GeometryPlugin>( geomType ) ;
     if ( nullptr == _plugin ) {
-      MARLIN_THROW( "Couldn't find geometry plugin '" + geomType + "'" ) ;
+      MARLINMT_THROW( "Couldn't find geometry plugin '" + geomType + "'" ) ;
     }
     if( config.hasSection("geometry") ) {
       const auto &section = config.section("geometry") ;
@@ -38,7 +38,7 @@ namespace marlin {
 
   std::type_index GeometryManager::typeIndex() const {
     if ( nullptr == _plugin ) {
-      MARLIN_THROW( "Geometry not initialized !" ) ;
+      MARLINMT_THROW( "Geometry not initialized !" ) ;
     }
     return _plugin->typeIndex() ;
   }
@@ -52,4 +52,4 @@ namespace marlin {
     }
   }
 
-} // namespace marlin
+} // namespace marlinmt

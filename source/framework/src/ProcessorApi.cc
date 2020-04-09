@@ -1,13 +1,13 @@
-#include <marlin/ProcessorApi.h>
+#include <marlinmt/ProcessorApi.h>
 
 // -- std headers
 #include <utility>
 
-// -- marlin headers
-#include <marlin/Exceptions.h>
-#include <marlin/EventExtensions.h>
+// -- marlinmt headers
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/EventExtensions.h>
 
-namespace marlin {
+namespace marlinmt {
   
   /**
    *  @brief construct absolute path from relative path and processor. 
@@ -323,7 +323,7 @@ namespace marlin {
   unsigned int ProcessorApi::getRandomSeed( const Processor *const proc, EventStore *event ) {
     auto randomSeeds = event->extensions().get<extensions::RandomSeed, RandomSeedExtension>();
     if( nullptr == randomSeeds ) {
-      MARLIN_THROW( "No random seed extension in event" ) ;
+      MARLINMT_THROW( "No random seed extension in event" ) ;
     }
     return randomSeeds->randomSeed( proc ) ;
   }
@@ -333,7 +333,7 @@ namespace marlin {
   void ProcessorApi::setReturnValue( const Processor *const proc, EventStore *event, bool value ) {
     auto procConds = event->extensions().get<extensions::ProcessorConditions, ProcessorConditionsExtension>() ;
     if( nullptr == procConds ) {
-      MARLIN_THROW( "No processor conditions extension in event" ) ;
+      MARLINMT_THROW( "No processor conditions extension in event" ) ;
     }
     return procConds->set( proc, value ) ;
   }
@@ -343,7 +343,7 @@ namespace marlin {
   void ProcessorApi::setReturnValue( const Processor *const proc, EventStore *event, const std::string &name, bool value ) {
     auto procConds = event->extensions().get<extensions::ProcessorConditions, ProcessorConditionsExtension>() ;
     if( nullptr == procConds ) {
-      MARLIN_THROW( "No processor conditions extension in event" ) ;
+      MARLINMT_THROW( "No processor conditions extension in event" ) ;
     }
     return procConds->set( proc, name, value ) ;
   }
@@ -358,14 +358,14 @@ namespace marlin {
 
   void ProcessorApi::skipCurrentEvent( const Processor *const proc ) {
     proc->log<WARNING>() << "Skipping current event !" << std::endl ;
-    MARLIN_SKIP_EVENT( proc ) ;
+    MARLINMT_SKIP_EVENT( proc ) ;
   }
 
   //--------------------------------------------------------------------------
 
   void ProcessorApi::abort( const Processor *const proc, const std::string &reason ) {
     proc->log<WARNING>() << "Stopping application: " << reason << std::endl ;
-    MARLIN_STOP_PROCESSING( proc ) ;
+    MARLINMT_STOP_PROCESSING( proc ) ;
   }
 
 }

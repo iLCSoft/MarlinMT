@@ -1,4 +1,4 @@
-#include "marlin/PluginManager.h"
+#include "marlinmt/PluginManager.h"
 
 // -- std headers
 #include <dlfcn.h>
@@ -7,10 +7,10 @@
 #include <algorithm>
 #include <set>
 
-// -- marlin headers
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Utils.h>
 
-namespace marlin {
+namespace marlinmt {
 
   PluginManager::PluginManager() {
     _logger = Logging::createLogger( "PluginManager" ) ;
@@ -24,7 +24,7 @@ namespace marlin {
     auto factoryIter = _pluginFactories.find( name ) ;
     if ( _pluginFactories.end() != factoryIter ) {
       if ( not ignoreDuplicate ) {
-        MARLIN_THROW( "Plugin '" + name + "' already registered" ) ;
+        MARLINMT_THROW( "Plugin '" + name + "' already registered" ) ;
       }
       _logger->log<DEBUG2>() << "Plugin '" << name << "' already registered. Skipping ..." << std::endl ;
     }
@@ -80,7 +80,7 @@ namespace marlin {
     lock_type lock( _mutex ) ;
     std::map<std::string, std::vector<std::string>> pluginMap ;
     _logger->log<MESSAGE>() << "------------------------------------" << std::endl ;
-    _logger->log<MESSAGE>() << " ** Marlin plugin manager dump ** " << std::endl ;
+    _logger->log<MESSAGE>() << " ** MarlinMT plugin manager dump ** " << std::endl ;
     if( _pluginFactories.empty() ) {
       _logger->log<MESSAGE>() << " No plugin entry !" << std::endl ;
     }
@@ -113,15 +113,15 @@ namespace marlin {
     auto libraryStr = libraryPath.string() ;
     _logger->log<MESSAGE>() << "Loading shared library : " << libraryStr << std::endl ;
     if( _libraries.end() != libIter ) {
-      MARLIN_THROW( "ERROR loading shared library '" + libraryStr + "': duplicated library" ) ;
+      MARLINMT_THROW( "ERROR loading shared library '" + libraryStr + "': duplicated library" ) ;
     }
     _currentLibrary = libraryStr ;
     void* libPointer = ::dlopen( _currentLibrary.c_str() , RTLD_LAZY | RTLD_GLOBAL) ;
     _currentLibrary.clear() ;
     if( nullptr == libPointer ) {
-      MARLIN_THROW( "ERROR loading shared library '" + libraryStr + "': " + std::string(dlerror()) ) ;
+      MARLINMT_THROW( "ERROR loading shared library '" + libraryStr + "': " + std::string(dlerror()) ) ;
     }
     _libraries.insert( {libraryStr, libPointer} ) ;
   }
 
-} // namespace marlin
+} // namespace marlinmt

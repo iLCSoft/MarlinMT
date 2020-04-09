@@ -1,16 +1,16 @@
-#ifndef MARLIN_DATASOURCEPLUGIN_h
-#define MARLIN_DATASOURCEPLUGIN_h 1
+#ifndef MARLINMT_DATASOURCEPLUGIN_h
+#define MARLINMT_DATASOURCEPLUGIN_h 1
 
-// -- marlin headers
-#include <marlin/Component.h>
-#include <marlin/Logging.h>
+// -- marlinmt headers
+#include <marlinmt/Component.h>
+#include <marlinmt/Logging.h>
 
 // -- std headers
 #include <functional>
 #include <memory>
 #include <string>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
   class EventStore ;

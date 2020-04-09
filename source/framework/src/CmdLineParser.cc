@@ -1,16 +1,16 @@
 
-// -- marlin headers
-#include <marlin/CmdLineParser.h>
-#include <marlin/MarlinConfig.h>
-#include <marlin/Exceptions.h>
-#include <marlin/Logging.h>
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/CmdLineParser.h>
+#include <marlinmt/MarlinMTConfig.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/Utils.h>
 
 // -- TCLAP headers
 #include <tclap/CmdLine.h>
 #include <tclap/ValueArg.h>
 
-namespace marlin {
+namespace marlinmt {
   
   class Output : public TCLAP::StdOutput {
   	public:
@@ -29,7 +29,7 @@ namespace marlin {
       	else {
       		usage(c) ;
         }
-        MARLIN_RETHROW( e, "Command line parsing failed" ) ;
+        MARLINMT_RETHROW( e, "Command line parsing failed" ) ;
   		}
 
   		void usage(TCLAP::CmdLineInterface& c) override {
@@ -91,7 +91,7 @@ namespace marlin {
     ParseResult parseResult {} ;
     parseResult._arguments.reserve(argc) ;
     // Create command line object
-    TCLAP::CmdLine cmdLine( "MarlinMT", ' ', MARLIN_RELEASE , true ) ;
+    TCLAP::CmdLine cmdLine( "MarlinMT", ' ', MARLINMT_RELEASE , true ) ;
     Output output ;
     cmdLine.setOutput( &output ) ;
     // Config argument
@@ -125,11 +125,11 @@ namespace marlin {
         // Parse the additional argument
         auto tokens = details::split_string<std::string>( argName, "=" ) ;
         if( 2 != tokens.size() ) {
-          MARLIN_THROW( "Additional argument '" + arg + "' with wrong syntax. Expected '--name=value' format" ) ;
+          MARLINMT_THROW( "Additional argument '" + arg + "' with wrong syntax. Expected '--name=value' format" ) ;
         }
         auto res = parseResult._additionalArgs.insert( { tokens[0], tokens[1] } ) ;
         if( not res.second ) {
-          MARLIN_THROW( "Additional argument '" + arg + "' set twice on command line" ) ;
+          MARLINMT_THROW( "Additional argument '" + arg + "' set twice on command line" ) ;
         }
       }
       else {

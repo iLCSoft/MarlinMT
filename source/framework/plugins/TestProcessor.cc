@@ -1,18 +1,18 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Exceptions.h>
-#include <marlin/Logging.h>
-#include <marlin/EventExtensions.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/EventExtensions.h>
 
 // -- std headers
 #include <iostream>
 #include <sstream>
 #include <atomic>
 
-namespace marlin {
+namespace marlinmt {
 
   /** Simple processor for testing.
    *  Writes something to stdout for every callbackmethod.
@@ -63,7 +63,7 @@ namespace marlin {
 
   TestProcessor::TestProcessor() :
     Processor("TestProcessor") {
-    setDescription( "Simple processor to test the marlin application."
+    setDescription( "Simple processor to test the marlinmt application."
       " Prints run and event number." ) ;
   }
 
@@ -134,5 +134,5 @@ namespace marlin {
   }
 
   // processor declaration
-  MARLIN_DECLARE_PROCESSOR( TestProcessor )
+  MARLINMT_DECLARE_PROCESSOR( TestProcessor )
 }

@@ -1,16 +1,16 @@
-#ifndef MARLIN_CONCURRENCY_PEPSCHEDULER_h
-#define MARLIN_CONCURRENCY_PEPSCHEDULER_h 1
+#ifndef MARLINMT_CONCURRENCY_PEPSCHEDULER_h
+#define MARLINMT_CONCURRENCY_PEPSCHEDULER_h 1
 
-// -- marlin headers
-#include <marlin/IScheduler.h>
-#include <marlin/Logging.h>
-#include <marlin/Utils.h>
-#include <marlin/concurrency/ThreadPool.h>
+// -- marlinmt headers
+#include <marlinmt/IScheduler.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/Utils.h>
+#include <marlinmt/concurrency/ThreadPool.h>
 
 // -- std headers
 #include <unordered_set>
 
-namespace marlin {
+namespace marlinmt {
 
   class SuperSequence ;
   class Sequence ;
@@ -94,6 +94,6 @@ namespace marlin {
 
   }
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

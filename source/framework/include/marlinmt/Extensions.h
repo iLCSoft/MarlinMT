@@ -5,10 +5,10 @@
 #include <map>
 #include <typeindex>
 
-// -- marlin headers
-#include <marlin/Exceptions.h>
+// -- marlinmt headers
+#include <marlinmt/Exceptions.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class Extension {
   public:
@@ -90,7 +90,7 @@ namespace marlin {
       std::type_index typeidx( typeid(K) ) ;
       auto iter = _extensions.find( typeidx.hash_code() ) ;
       if( iter != _extensions.end() ) {
-        MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
+        MARLINMT_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
       }
       auto ext = std::make_shared<Extension>( ptr, isOwned ) ;
       _extensions.insert( { typeidx.hash_code(), ext } ) ;
@@ -101,7 +101,7 @@ namespace marlin {
       std::type_index typeidx( typeid(K) ) ;
       auto iter = _extensions.find( typeidx.hash_code() ) ;
       if( iter != _extensions.end() ) {
-        MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
+        MARLINMT_THROW( "Extension of type " + std::string(typeidx.name()) + " already present" ) ;
       }
       auto ext = std::make_shared<Extension>( new T( args... ), isOwned ) ;
       _extensions.insert( { typeidx.hash_code(), ext } ) ;
@@ -113,7 +113,7 @@ namespace marlin {
       std::type_index typeidx( typeid(K) ) ;
       auto iter = _extensions.find( typeidx.hash_code() ) ;
       if( iter == _extensions.end() ) {
-        MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
+        MARLINMT_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
       }
       return iter->second->object<T>() ;
     }
@@ -123,7 +123,7 @@ namespace marlin {
       std::type_index typeidx( typeid(K) ) ;
       auto iter = _extensions.find( typeidx.hash_code() ) ;
       if( iter == _extensions.end() ) {
-        MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
+        MARLINMT_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
       }
       return iter->second->object<T>() ;
     }
@@ -133,7 +133,7 @@ namespace marlin {
       std::type_index typeidx( typeid(K) ) ;
       auto iter = _extensions.find( typeidx.hash_code() ) ;
       if( iter == _extensions.end() ) {
-        MARLIN_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
+        MARLINMT_THROW( "Extension of type " + std::string(typeidx.name()) + " doesn't exists" ) ;
       }
       _extensions.erase( iter ) ;
     }

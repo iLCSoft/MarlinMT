@@ -1,11 +1,11 @@
-#include <marlin/DataSourcePlugin.h>
+#include <marlinmt/DataSourcePlugin.h>
 
-// -- marlin headers
-#include <marlin/Application.h>
-#include <marlin/EventStore.h>
-#include <marlin/RunHeader.h>
+// -- marlinmt headers
+#include <marlinmt/Application.h>
+#include <marlinmt/EventStore.h>
+#include <marlinmt/RunHeader.h>
 
-namespace marlin {
+namespace marlinmt {
 
   DataSourcePlugin::DataSourcePlugin( const std::string &dstype ) :
     Component(dstype) {

@@ -1,9 +1,9 @@
-#include <marlin/Component.h>
-#include <marlin/Exceptions.h>
-#include <marlin/Application.h>
-#include <marlin/Utils.h>
+#include <marlinmt/Component.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Application.h>
+#include <marlinmt/Utils.h>
 
-namespace marlin {
+namespace marlinmt {
   
   Component::Component( const std::string &type ) :
     _type(type),
@@ -82,7 +82,7 @@ namespace marlin {
   
   const Application &Component::application() const {
     if( nullptr == _application ) {
-      MARLIN_THROW( "Application not set" ) ;
+      MARLINMT_THROW( "Application not set" ) ;
     }
     return *_application ;
   }
@@ -91,7 +91,7 @@ namespace marlin {
   
   Application &Component::application() {
     if( nullptr == _application ) {
-      MARLIN_THROW( "Application not set" ) ;
+      MARLINMT_THROW( "Application not set" ) ;
     }
     return *_application ;
   }
@@ -129,7 +129,7 @@ namespace marlin {
         iter->second->str( section.parameter<std::string>( n ) ) ;
       }
       else if( throwIfNotFound ) {
-        MARLIN_THROW( "Input parameter '" + n + "' from section '" + section.name() + "' can't be set (not found)" ) ;
+        MARLINMT_THROW( "Input parameter '" + n + "' from section '" + section.name() + "' can't be set (not found)" ) ;
       }
     }
   }

@@ -1,6 +1,6 @@
-#include "marlin/Logging.h"
+#include "marlinmt/Logging.h"
 
-namespace marlin {
+namespace marlinmt {
 
   Logging::Logger Logging::createLogger( const std::string &name ) {
     return streamlog::logstream::createLogger<Logging::mutex_type>( name ) ;

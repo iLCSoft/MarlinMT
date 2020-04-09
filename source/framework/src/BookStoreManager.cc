@@ -1,12 +1,12 @@
 
-// -- marlin headers
-#include <marlin/BookStoreManager.h>
-#include <marlin/Application.h>
-#include <marlin/Exceptions.h>
-#include <marlin/Processor.h>
+// -- marlinmt headers
+#include <marlinmt/BookStoreManager.h>
+#include <marlinmt/Application.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Processor.h>
 
-// -- MarlinBook headers
-#include <marlin/book/StoreWriter.h>  
+// -- MarlinMTBook headers
+#include <marlinmt/book/StoreWriter.h>  
 
 // -- std headers
 #include <string>
@@ -15,7 +15,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace marlin {
+namespace marlinmt {
 
 #define INSTANCIATIONS_HIST(type) \
   template book::Handle<book::Entry<type>> BookStoreManager::getObject<type>(\
@@ -78,7 +78,7 @@ namespace marlin {
     else {
       auto iter = flags.find( memLayoutStr ) ;
       if( flags.end() == iter ) {
-        MARLIN_THROW( "Unknown memory layout flag '" + _defaultMemLayout.get() + "'" ) ;
+        MARLINMT_THROW( "Unknown memory layout flag '" + _defaultMemLayout.get() + "'" ) ;
       }
       memoryLayout = iter->second ;
     }
@@ -116,7 +116,7 @@ namespace marlin {
     const book::EntryKey& key = res.key();
     if (   key.flags != flagsToPass
         || key.type !=  std::type_index(typeid(HistT))) {
-      MARLIN_THROW("try to book to the same spot again");
+      MARLINMT_THROW("try to book to the same spot again");
     } 
     return res;
     } catch (const BookStoreManager::ObjectNotFound& ) {}
@@ -135,13 +135,13 @@ namespace marlin {
       if ( nthreads != 1) {
         _logger->log<ERROR>() << "Single Memory layout can't be used"
           " with concurrency! \n"
-          "\tuse Marlin for workflows without concurrency";
-        MARLIN_THROW("single only supported without concurrency!!");
+          "\tuse MarlinMT for workflows without concurrency";
+        MARLINMT_THROW("single only supported without concurrency!!");
       }
       entry =  _bookStore.book( path, name, data.single() ) ;
     } 
     else {
-      MARLIN_THROW("Try to book without MemoryLayout Flag");
+      MARLINMT_THROW("Try to book without MemoryLayout Flag");
     }
 
     if (store) {

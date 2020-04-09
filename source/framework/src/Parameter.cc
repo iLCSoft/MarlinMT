@@ -1,8 +1,8 @@
-// -- marlin headers
-#include <marlin/Parameter.h>
-#include <marlin/Configuration.h>
+// -- marlinmt headers
+#include <marlinmt/Parameter.h>
+#include <marlinmt/Configuration.h>
 
-namespace marlin {
+namespace marlinmt {
   
   EParameterType ParameterImpl::type() const {
     return _type ;
@@ -76,7 +76,7 @@ namespace marlin {
   
   void Configurable::checkParameter( const std::string &name ) const {
     if( exists( name ) ) {
-      MARLIN_THROW( "Parameter '" + name +  "' already present" ) ;
+      MARLINMT_THROW( "Parameter '" + name +  "' already present" ) ;
     }
   }
   

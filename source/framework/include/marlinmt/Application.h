@@ -1,16 +1,16 @@
 #pragma once
 
-// -- marlin headers
-#include <marlin/Exceptions.h>
-#include <marlin/Logging.h>
-#include <marlin/GeometryManager.h>
-#include <marlin/LoggerManager.h>
-#include <marlin/RandomSeedManager.h>
-#include <marlin/BookStoreManager.h>
-#include <marlin/Configuration.h>
-#include <marlin/CmdLineParser.h>
+// -- marlinmtmt headers
+#include <marlinmtmt/Exceptions.h>
+#include <marlinmtmt/Logging.h>
+#include <marlinmtmt/GeometryManager.h>
+#include <marlinmtmt/LoggerManager.h>
+#include <marlinmtmt/RandomSeedManager.h>
+#include <marlinmtmt/BookStoreManager.h>
+#include <marlinmtmt/Configuration.h>
+#include <marlinmtmt/CmdLineParser.h>
 
-namespace marlin {
+namespace marlinmtmt {
 
   class IScheduler ;
   class DataSourcePlugin ;
@@ -168,4 +168,4 @@ namespace marlin {
     ConditionsMap              _conditions {} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmtmt

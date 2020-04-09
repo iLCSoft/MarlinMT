@@ -1,14 +1,14 @@
-#ifndef MARLIN_LOGGING_h
-#define MARLIN_LOGGING_h
+#ifndef MARLINMT_LOGGING_h
+#define MARLINMT_LOGGING_h
 
 // -- streamlog headers
 #include <streamlog/streamlog.h>
 
-namespace marlin {
+namespace marlinmt {
   
   namespace loglevel {
     
-    // import the log level classes into the marlin namespace 
+    // import the log level classes into the marlinmt namespace 
     using  streamlog::DEBUG ;
     using  streamlog::DEBUG0 ;
     using  streamlog::DEBUG1 ;
@@ -65,7 +65,7 @@ namespace marlin {
    */
   class Logging {
   public:
-#ifdef MARLIN_LOGGER_TS
+#ifdef MARLINMT_LOGGER_TS
     using mutex_type = streamlog::mt ;
 #else
     using mutex_type = streamlog::st ;

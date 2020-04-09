@@ -1,17 +1,17 @@
-#include <marlin/Sequence.h>
+#include <marlinmt/Sequence.h>
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/Exceptions.h>
-#include <marlin/EventExtensions.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Configuration.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/EventExtensions.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Configuration.h>
 
 // -- std headers
 #include <algorithm>
 #include <iomanip>
 
-namespace marlin {
+namespace marlinmt {
 
   SequenceItem::SequenceItem( std::shared_ptr<Processor> proc ) :
     _processor(proc),

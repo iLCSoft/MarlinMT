@@ -6,7 +6,7 @@
 #include <cmath>
 #include <functional>
 
-namespace marlin {
+namespace marlinmtmt {
   
   template <typename T>
   using ValidatorFunctionT = std::function<bool(const T &)> ;
@@ -185,4 +185,4 @@ namespace marlin {
 
   }
   
-} // end namespace marlin
+} // end namespace marlinmtmt

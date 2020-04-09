@@ -1,8 +1,8 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Logging.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Logging.h>
 
 // -- std headers
 #include <string>
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <atomic>
 
-namespace marlin {
+namespace marlinmt {
 
     /** Simple processor for writing out a status message every n-th event.
      *
@@ -96,5 +96,5 @@ namespace marlin {
   }
 
   // processor declaration
-  MARLIN_DECLARE_PROCESSOR( Statusmonitor )
+  MARLINMT_DECLARE_PROCESSOR( Statusmonitor )
 }

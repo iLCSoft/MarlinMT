@@ -5,32 +5,32 @@
 #include <string>
 
 // -- high level exception macros
-#define MARLIN_THROW( message ) throw marlin::Exception( __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
-#define MARLIN_THROW_T( ExceptionType, message ) throw ExceptionType( __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
-#define MARLIN_RETHROW( orig, message ) throw marlin::Exception( orig, __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
-#define MARLIN_RETHROW_T( ExceptionType, orig, message ) throw ExceptionType( orig, __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
+#define MARLINMT_THROW( message ) throw marlinmt::Exception( __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
+#define MARLINMT_THROW_T( ExceptionType, message ) throw ExceptionType( __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
+#define MARLINMT_RETHROW( orig, message ) throw marlinmt::Exception( orig, __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
+#define MARLINMT_RETHROW_T( ExceptionType, orig, message ) throw ExceptionType( orig, __LINE__, __PRETTY_FUNCTION__, __FILE__, message )
 
-// -- specific marlin exception
-#define MARLIN_SKIP_EVENT( proc ) MARLIN_THROW_T( marlin::SkipEventException, proc->name() )
-#define MARLIN_STOP_PROCESSING( proc ) MARLIN_THROW_T( marlin::StopProcessingException, proc->name() )
+// -- specific marlinmt exception
+#define MARLINMT_SKIP_EVENT( proc ) MARLINMT_THROW_T( marlinmt::SkipEventException, proc->name() )
+#define MARLINMT_STOP_PROCESSING( proc ) MARLINMT_THROW_T( marlinmt::StopProcessingException, proc->name() )
 
 // -- custom exception class definition macro
-#define MARLIN_DEFINE_EXCEPTION( ClassName ) \
-  class ClassName : public marlin::Exception { \
+#define MARLINMT_DEFINE_EXCEPTION( ClassName ) \
+  class ClassName : public marlinmt::Exception { \
   public: \
     ClassName() = delete ; \
     ClassName( const ClassName & ) = default ; \
     ~ClassName() = default ; \
     inline ClassName( const std::string &message ) : \
-      marlin::Exception( std::string( #ClassName ) + " - " + message ) {} \
+      marlinmt::Exception( std::string( #ClassName ) + " - " + message ) {} \
     inline ClassName( unsigned int line, const std::string &func, const std::string &fname, const std::string &message ) : \
-      marlin::Exception( line, func, fname, std::string( #ClassName ) + " - " + message ) {} \
+      marlinmt::Exception( line, func, fname, std::string( #ClassName ) + " - " + message ) {} \
     template <typename T> \
     inline ClassName( const T &rhs, unsigned int line, const std::string &func, const std::string &fname, const std::string &message ) : \
-      marlin::Exception( rhs, line, func, fname, std::string( #ClassName ) + " - " + message ) {} \
+      marlinmt::Exception( rhs, line, func, fname, std::string( #ClassName ) + " - " + message ) {} \
   }
 
-namespace marlin {
+namespace marlinmt {
   
   /**
    *  @brief  Exception class.
@@ -43,15 +43,15 @@ namespace marlin {
    *  with any other previously thrown exception.
    *  Use the pre-processor macro to throw an exception:
    *  @code{cpp}
-   *  MARLIN_THROW( "A problem occured" );
+   *  MARLINMT_THROW( "A problem occured" );
    *  @endcode
    *  An exception can rethrown:
    *  @code{cpp}
    *  try {
    *    // ... some code
    *  }
-   *  catch ( const marlin::Exception &e ) {
-   *    MARLIN_RETHROW( e, "A problem occured" );
+   *  catch ( const marlinmt::Exception &e ) {
+   *    MARLINMT_RETHROW( e, "A problem occured" );
    *  }
    *  @endcode
    *  In this case, the message will appended to the previous exception message
@@ -134,9 +134,9 @@ namespace marlin {
   }
   
   /// Definition of Marlin exceptions
-  MARLIN_DEFINE_EXCEPTION( SkipEventException ) ;
-  MARLIN_DEFINE_EXCEPTION( StopProcessingException ) ;
-  MARLIN_DEFINE_EXCEPTION( ParseException ) ;
-  MARLIN_DEFINE_EXCEPTION( BookStoreException );
+  MARLINMT_DEFINE_EXCEPTION( SkipEventException ) ;
+  MARLINMT_DEFINE_EXCEPTION( StopProcessingException ) ;
+  MARLINMT_DEFINE_EXCEPTION( ParseException ) ;
+  MARLINMT_DEFINE_EXCEPTION( BookStoreException );
 
 } // end namespace

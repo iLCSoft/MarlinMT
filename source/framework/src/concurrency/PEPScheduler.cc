@@ -1,13 +1,13 @@
-#include <marlin/concurrency/PEPScheduler.h>
+#include <marlinmt/concurrency/PEPScheduler.h>
 
-// -- marlin headers
-#include <marlin/Application.h>
-#include <marlin/Utils.h>
-#include <marlin/Sequence.h>
-#include <marlin/Processor.h>
-#include <marlin/PluginManager.h>
-#include <marlin/EventStore.h>
-#include <marlin/RunHeader.h>
+// -- marlinmt headers
+#include <marlinmt/Application.h>
+#include <marlinmt/Utils.h>
+#include <marlinmt/Sequence.h>
+#include <marlinmt/Processor.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/EventStore.h>
+#include <marlinmt/RunHeader.h>
 
 // -- std headers
 #include <exception>
@@ -15,7 +15,7 @@
 #include <iomanip>
 #include <set>
 
-namespace marlin {
+namespace marlinmt {
 
   namespace concurrency {
 
@@ -149,7 +149,7 @@ namespace marlin {
       auto activeProcessors = execSection.parameterNames() ;
       // auto activeProcessors = app->activeProcessors() ;
       if ( activeProcessors.empty() ) {
-        MARLIN_THROW( "Active processor list is empty !" ) ;
+        MARLINMT_THROW( "Active processor list is empty !" ) ;
       }
       // populate processor sequences
       for ( size_t i=0 ; i<activeProcessors.size() ; ++i ) {
@@ -246,4 +246,4 @@ namespace marlin {
 
   }
 
-} // namespace marlin
+} // namespace marlinmt

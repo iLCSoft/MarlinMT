@@ -1,5 +1,5 @@
-#ifndef MARLIN_PARAMETER_h
-#define MARLIN_PARAMETER_h 1
+#ifndef MARLINMT_PARAMETER_h
+#define MARLINMT_PARAMETER_h 1
 
 // -- std headers
 #include <iostream>
@@ -12,11 +12,11 @@
 #include <any>
 #include <functional>
 
-// -- marlin headers
-#include <marlin/Utils.h>
-#include <marlin/Validator.h>
+// -- marlinmt headers
+#include <marlinmt/Utils.h>
+#include <marlinmt/Validator.h>
 
-namespace marlin {
+namespace marlinmt {
   
   class ConfigSection ;
   
@@ -157,7 +157,7 @@ namespace marlin {
     template <typename T>
     inline void checkType() const {
       if( not isType<T>() ) {
-        MARLIN_THROW( "checkType failure. Given: " + std::string(details::type_info<T>::type) + ", stored: " + typeStr() ) ;
+        MARLINMT_THROW( "checkType failure. Given: " + std::string(details::type_info<T>::type) + ", stored: " + typeStr() ) ;
       }
     }
     
@@ -184,7 +184,7 @@ namespace marlin {
       if( _validator.has_value() ) {
         auto validatorT = std::any_cast<ValidatorFunctionT<T>>( _validator ) ;
         if (not validatorT( val ) ) {
-          MARLIN_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
+          MARLINMT_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
         }
       }
       *std::static_pointer_cast<T>( _value ).get() = val ;
@@ -200,7 +200,7 @@ namespace marlin {
       checkType<T>() ;
       if( not isSet() ) {
         if( not hasDefault() ) {
-          MARLIN_THROW( "Parameter '" + name() +  "' not set" ) ;          
+          MARLINMT_THROW( "Parameter '" + name() +  "' not set" ) ;          
         }
         return *std::static_pointer_cast<T>( _defaultValue ).get() ;
       }
@@ -230,7 +230,7 @@ namespace marlin {
     template <typename T>
     inline T getDefault() const {
       if( not hasDefault() ) {
-        MARLIN_THROW( "Parameter '" + name() + "' has no default value" ) ;
+        MARLINMT_THROW( "Parameter '" + name() + "' has no default value" ) ;
       }
       return *std::static_pointer_cast<T>( _defaultValue ).get() ;
     }
@@ -258,7 +258,7 @@ namespace marlin {
         if( _validator.has_value() ) {
           auto validatorT = std::any_cast<ValidatorFunctionT<T>>( _validator ) ;
           if( not validatorT( valueT ) ) {
-            MARLIN_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
+            MARLINMT_THROW( "Parameter '" + name() + "': invalid parameter value" ) ;
           }
         }
         *std::static_pointer_cast<T>( ptr ).get() = valueT ;
@@ -822,5 +822,5 @@ namespace marlin {
   using BoolVectorParameter = VectorParameter<bool> ;
   using StringVectorParameter = VectorParameter<std::string> ;
 
-} // end namespace marlin
+} // end namespace marlinmt
 #endif

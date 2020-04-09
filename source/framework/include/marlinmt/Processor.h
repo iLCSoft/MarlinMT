@@ -1,11 +1,11 @@
-#ifndef MARLIN_PROCESSOR_h
-#define MARLIN_PROCESSOR_h 1
+#ifndef MARLINMT_PROCESSOR_h
+#define MARLINMT_PROCESSOR_h 1
 
-// -- marlin headers
-#include <marlin/Component.h>
-#include <marlin/EventStore.h>
-#include <marlin/RunHeader.h>
-#include <marlin/MarlinConfig.h>  // for Marlin version macros
+// -- marlinmt headers
+#include <marlinmt/Component.h>
+#include <marlinmt/EventStore.h>
+#include <marlinmt/RunHeader.h>
+#include <marlinmt/MarlinConfig.h>  // for Marlin version macros
 
 // -- std headers
 #include <map>
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
   class ProcessorApi ;
@@ -142,6 +142,6 @@ namespace marlin {
     RuntimeOptions                     _forcedRuntimeOptions {} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

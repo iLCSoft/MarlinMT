@@ -1,5 +1,5 @@
-#ifndef MARLIN_PROCESSORAPI_h
-#define MARLIN_PROCESSORAPI_h 1
+#ifndef MARLINMT_PROCESSORAPI_h
+#define MARLINMT_PROCESSORAPI_h 1
 
 // -- std headers
 #include <array>
@@ -7,15 +7,15 @@
 #include <optional>
 #include <string>
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/Application.h>
-#include <marlin/GeometryManager.h>
-#include <marlin/BookStoreManager.h>
-#include <marlin/MarlinConfig.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/Application.h>
+#include <marlinmt/GeometryManager.h>
+#include <marlinmt/BookStoreManager.h>
+#include <marlinmt/MarlinConfig.h>
 
 
-namespace marlin {
+namespace marlinmt {
 
   class Processor ;
 

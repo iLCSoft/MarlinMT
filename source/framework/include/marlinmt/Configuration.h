@@ -5,11 +5,11 @@
 #include <map>
 #include <vector>
 
-// -- marlin headers
-#include <marlin/Utils.h>
-#include <marlin/Exceptions.h>
+// -- marlinmt headers
+#include <marlinmt/Utils.h>
+#include <marlinmt/Exceptions.h>
 
-namespace marlin {
+namespace marlinmt {
   
   class Configurable ;
   
@@ -109,7 +109,7 @@ namespace marlin {
     inline T parameter( const std::string &n ) const {
       auto iter = _parameters.find( n ) ;
       if( _parameters.end() == iter  ) {
-        MARLIN_THROW( "No parameter '" + n + "' in section '" + name() + "'" ) ;
+        MARLINMT_THROW( "No parameter '" + n + "' in section '" + name() + "'" ) ;
       }
       return details::convert<T>::from_string( iter->second ) ;
     }
@@ -210,7 +210,7 @@ namespace marlin {
     T constantAs( const std::string &cn ) const {
       auto iter = _constants.find( cn ) ;
       if( iter == _constants.end() ) {
-        MARLIN_THROW( "No constant '" + cn +  "' in configuration" ) ;
+        MARLINMT_THROW( "No constant '" + cn +  "' in configuration" ) ;
       }
       return details::convert<T>::from_string( iter->second ) ;
     }
@@ -242,7 +242,7 @@ namespace marlin {
     Configuration &addConstant( const std::string &cn, const T &val ) {
       auto iter = _constants.find( cn ) ;
       if( iter != _constants.end() ) {
-        MARLIN_THROW( "Constant '" + cn +  "' already present in configuration" ) ;
+        MARLINMT_THROW( "Constant '" + cn +  "' already present in configuration" ) ;
       }
       _constants.emplace( cn, details::convert<T>::to_string( val ) ) ;
       return *this ;

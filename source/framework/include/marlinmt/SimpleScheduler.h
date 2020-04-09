@@ -1,11 +1,11 @@
-#ifndef MARLIN_SIMPLESCHEDULER_h
-#define MARLIN_SIMPLESCHEDULER_h 1
+#ifndef MARLINMT_SIMPLESCHEDULER_h
+#define MARLINMT_SIMPLESCHEDULER_h 1
 
-// -- marlin headers
-#include <marlin/IScheduler.h>
-#include <marlin/Logging.h>
+// -- marlinmt headers
+#include <marlinmt/IScheduler.h>
+#include <marlinmt/Logging.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class SuperSequence ;
   class Sequence ;
@@ -35,6 +35,6 @@ namespace marlin {
     std::shared_ptr<EventStore>      _currentEvent {nullptr} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

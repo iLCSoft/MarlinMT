@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/Application.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/Application.h>
 
-namespace marlin {
+namespace marlinmt {
 
   Processor::Processor( const std::string& typeName ) :
     Component( typeName ) {
@@ -38,4 +38,4 @@ namespace marlin {
     _forcedRuntimeOptions[option] = value ;
   }
 
-} // namespace marlin
+} // namespace marlinmt

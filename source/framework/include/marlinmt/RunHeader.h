@@ -4,11 +4,11 @@
 #include <string>
 #include <map>
 
-// -- marlin headers
-#include <marlin/Extensions.h>
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Extensions.h>
+#include <marlinmt/Utils.h>
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  RunHeader class.

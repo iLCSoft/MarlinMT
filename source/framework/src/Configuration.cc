@@ -1,13 +1,13 @@
-// -- marlin headers
-#include <marlin/Configuration.h>
-#include <marlin/Parameter.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Configuration.h>
+#include <marlinmt/Parameter.h>
+#include <marlinmt/PluginManager.h>
 
 // -- std headers
 #include <algorithm>
 #include <filesystem>
 
-namespace marlin {
+namespace marlinmt {
   
   ConfigSection::ConfigSection( const std::string &name ) : 
     _name(name) {
@@ -31,7 +31,7 @@ namespace marlin {
   ConfigSection &ConfigSection::section( const std::string &n ) {
     auto iter = _subsections.find( n ) ;
     if( _subsections.end() == iter ) {
-      MARLIN_THROW( "No sub-section '" + n + "' in section '" + name() + "'" ) ;
+      MARLINMT_THROW( "No sub-section '" + n + "' in section '" + name() + "'" ) ;
     }
     return iter->second ;
   }
@@ -41,7 +41,7 @@ namespace marlin {
   const ConfigSection &ConfigSection::section( const std::string &n ) const {
     auto iter = _subsections.find( n ) ;
     if( _subsections.end() == iter ) {
-      MARLIN_THROW( "No sub-section '" + n + "' in section '" + name() + "'" ) ;
+      MARLINMT_THROW( "No sub-section '" + n + "' in section '" + name() + "'" ) ;
     }
     return iter->second ;
   }
@@ -51,7 +51,7 @@ namespace marlin {
   ConfigSection &ConfigSection::addSection( const std::string &n ) {
     auto iter = _subsections.find( n ) ;
     if( _subsections.end() != iter ) {
-      MARLIN_THROW( "Sub-section '" + n + "' already present in section '" + name() + "'" ) ;
+      MARLINMT_THROW( "Sub-section '" + n + "' already present in section '" + name() + "'" ) ;
     }
     return _subsections.emplace( n, ConfigSection{n} ).first->second ;
   }
@@ -120,7 +120,7 @@ namespace marlin {
   ConfigSection &Configuration::createSection( const std::string &sn ) {
     auto iter = _sections.find( sn ) ;
     if( _sections.end() != iter ) {
-      MARLIN_THROW( "Section '" + sn + "' already exists" ) ;
+      MARLINMT_THROW( "Section '" + sn + "' already exists" ) ;
     }
     return _sections.emplace( sn, ConfigSection{sn} ).first->second ;
   }
@@ -130,7 +130,7 @@ namespace marlin {
   ConfigSection &Configuration::section( const std::string &sn ) {
     auto iter = _sections.find( sn ) ;
     if( _sections.end() == iter ) {
-      MARLIN_THROW( "Section '" + sn + "' doesn't exists" ) ;
+      MARLINMT_THROW( "Section '" + sn + "' doesn't exists" ) ;
     }
     return iter->second ;
   }
@@ -140,7 +140,7 @@ namespace marlin {
   const ConfigSection &Configuration::section( const std::string &sn ) const {
     auto iter = _sections.find( sn ) ;
     if( _sections.end() == iter ) {
-      MARLIN_THROW( "Section '" + sn + "' doesn't exists" ) ;
+      MARLINMT_THROW( "Section '" + sn + "' doesn't exists" ) ;
     }
     return iter->second ;
   }
@@ -164,13 +164,13 @@ namespace marlin {
     while( pos != std::string::npos ) {
       size_t pos2 = str.find_first_of( "}", pos+2 ) ;
       if( pos2 == std::string::npos ) {
-        MARLIN_THROW_T( ParseException, "Couldn't parse constant value in string '" + str + "'. It seems you have an open bracket '${' but it is not closed" ) ;
+        MARLINMT_THROW_T( ParseException, "Couldn't parse constant value in string '" + str + "'. It seems you have an open bracket '${' but it is not closed" ) ;
       }
       const std::string key( str.substr( pos+2 , pos2-pos-2 )) ;
       auto iter = _constants.find( key ) ;
       const std::string replacementValue( iter != _constants.end() ? iter->second : "" ) ;
       if( replacementValue.empty() ) {
-        MARLIN_THROW_T( ParseException, "Constant '" + key + "' doesn't exists !" ) ;
+        MARLINMT_THROW_T( ParseException, "Constant '" + key + "' doesn't exists !" ) ;
       }
       str.replace( pos , (pos2+1-pos) , replacementValue ) ;
       pos2 = pos + replacementValue.size() ; // new end position after replace
@@ -228,11 +228,11 @@ namespace marlin {
       }
     }
     if( pluginInput.first.empty() ) {
-      MARLIN_THROW( "No config reader plugin found in config string. Please specify your config as 'plugin_name:input'" ) ;
+      MARLINMT_THROW( "No config reader plugin found in config string. Please specify your config as 'plugin_name:input'" ) ;
     }
     auto reader = PluginManager::instance().create<ConfigReader>( pluginInput.first ) ;
     if( nullptr == reader ) {
-      MARLIN_THROW( "No ConfigReader plugin found for type '" + pluginInput.first + "'" ) ;
+      MARLINMT_THROW( "No ConfigReader plugin found for type '" + pluginInput.first + "'" ) ;
     }
     reader->init( pluginInput.second ) ;
     reader->read( cfg ) ;
@@ -250,11 +250,11 @@ namespace marlin {
       }
     }
     if( pluginInput.first.empty() ) {
-      MARLIN_THROW( "No config writer plugin found in config string. Please specify your config as 'plugin_name:input'" ) ;
+      MARLINMT_THROW( "No config writer plugin found in config string. Please specify your config as 'plugin_name:input'" ) ;
     }
     auto writer = PluginManager::instance().create<ConfigWriter>( pluginInput.first ) ;
     if( nullptr == writer ) {
-      MARLIN_THROW( "No ConfigWriter plugin found for type '" + pluginInput.first + "'" ) ;
+      MARLINMT_THROW( "No ConfigWriter plugin found for type '" + pluginInput.first + "'" ) ;
     }
     writer->init( pluginInput.second ) ;
     writer->write( cfg ) ;

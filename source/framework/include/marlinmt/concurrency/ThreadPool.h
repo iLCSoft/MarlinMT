@@ -1,5 +1,5 @@
-#ifndef MARLIN_CONCURRENCY_THREADPOOL_h
-#define MARLIN_CONCURRENCY_THREADPOOL_h 1
+#ifndef MARLINMT_CONCURRENCY_THREADPOOL_h
+#define MARLINMT_CONCURRENCY_THREADPOOL_h 1
 
 // -- std headers
 #include <functional>
@@ -12,12 +12,12 @@
 #include <future>
 #include <condition_variable>
 
-// -- marlin headers
-#include "marlin/Exceptions.h"
-#include "marlin/concurrency/Queue.h"
-#include "marlin/concurrency/QueueElement.h"
+// -- marlinmt headers
+#include "marlinmt/Exceptions.h"
+#include "marlinmt/concurrency/Queue.h"
+#include "marlinmt/concurrency/QueueElement.h"
 
-namespace marlin {
+namespace marlinmt {
 
   namespace concurrency {
 
@@ -174,9 +174,9 @@ namespace marlin {
 }
 
 // template implementation
-#include <marlin/concurrency/Worker.h>
+#include <marlinmt/concurrency/Worker.h>
 
-namespace marlin {
+namespace marlinmt {
 
   namespace concurrency {
 
@@ -365,6 +365,6 @@ namespace marlin {
 
   } // end namespace concurrency
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

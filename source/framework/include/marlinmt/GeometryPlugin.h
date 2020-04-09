@@ -1,15 +1,15 @@
-#ifndef MARLIN_GEOMETRYPLUGIN_h
-#define MARLIN_GEOMETRYPLUGIN_h 1
+#ifndef MARLINMT_GEOMETRYPLUGIN_h
+#define MARLINMT_GEOMETRYPLUGIN_h 1
 
 // -- std headers
 #include <string>
 #include <typeindex>
 
-// -- marlin headers
-#include "marlin/Exceptions.h"
-#include "marlin/Component.h"
+// -- marlinmt headers
+#include "marlinmt/Exceptions.h"
+#include "marlinmt/Component.h"
 
-namespace marlin {
+namespace marlinmt {
 
   class GeometryManager ;
   class Application ;
@@ -77,6 +77,6 @@ namespace marlin {
     BoolParameter       _dumpGeometry {*this, "DumpGeometry", "Whether to dump the geometry on creation", false} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

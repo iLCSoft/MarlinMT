@@ -5,10 +5,10 @@
 #include <memory>
 #include <typeindex>
 
-// -- marlin headers
-#include <marlin/Extensions.h>
+// -- marlinmt headers
+#include <marlinmt/Extensions.h>
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  EventStore class.

@@ -1,5 +1,5 @@
-#ifndef MARLIN_PLUGINMANAGER_h
-#define MARLIN_PLUGINMANAGER_h 1
+#ifndef MARLINMT_PLUGINMANAGER_h
+#define MARLINMT_PLUGINMANAGER_h 1
 
 // -- std headers
 #include <map>
@@ -11,48 +11,48 @@
 #include <functional>
 #include <filesystem>
 
-// -- marlin headers
-#include "marlin/Exceptions.h"
-#include "marlin/Logging.h"
+// -- marlinmt headers
+#include "marlinmt/Exceptions.h"
+#include "marlinmt/Logging.h"
 
 // Helper macros to declare plugins
 // R. Ete: Impossible to make a function outside of main.
 // The workaround is to create a structure on-the-fly that make the function call in the constructor
-#define MARLIN_DECLARE_PLUGIN( Base, Class ) MARLIN_DECLARE_PLUGIN_NAME( Base, Class, #Class )
+#define MARLINMT_DECLARE_PLUGIN( Base, Class ) MARLINMT_DECLARE_PLUGIN_NAME( Base, Class, #Class )
 
-#define MARLIN_DECLARE_PLUGIN_NAME( Base, Class, NameStr ) \
-  namespace marlin_plugins { \
+#define MARLINMT_DECLARE_PLUGIN_NAME( Base, Class, NameStr ) \
+  namespace marlinmt_plugins { \
     struct PluginDeclaration_##Class { \
       PluginDeclaration_##Class() { \
-        marlin::PluginManager::instance().registerPlugin<Base, Class>( NameStr, false ) ; \
+        marlinmt::PluginManager::instance().registerPlugin<Base, Class>( NameStr, false ) ; \
       } \
     }; \
     static PluginDeclaration_##Class __instance_##Class ; \
   }
 
 // processor plugin declaration
-#define MARLIN_DECLARE_PROCESSOR( Class ) namespace { \
+#define MARLINMT_DECLARE_PROCESSOR( Class ) namespace { \
   static const auto __processortype__ = Class().type() ; \
-  MARLIN_DECLARE_PLUGIN_NAME( marlin::Processor, Class, __processortype__ ) \
+  MARLINMT_DECLARE_PLUGIN_NAME( marlinmt::Processor, Class, __processortype__ ) \
 }
 
 // geometry plugin declaration
-#define MARLIN_DECLARE_GEOMETRY( Class ) MARLIN_DECLARE_PLUGIN( marlin::GeometryPlugin, Class )
-#define MARLIN_DECLARE_GEOMETRY_NAME( Class, NameStr ) MARLIN_DECLARE_PLUGIN_NAME( marlin::GeometryPlugin, Class, NameStr )
+#define MARLINMT_DECLARE_GEOMETRY( Class ) MARLINMT_DECLARE_PLUGIN( marlinmt::GeometryPlugin, Class )
+#define MARLINMT_DECLARE_GEOMETRY_NAME( Class, NameStr ) MARLINMT_DECLARE_PLUGIN_NAME( marlinmt::GeometryPlugin, Class, NameStr )
 
 // data source plugin declaration
-#define MARLIN_DECLARE_DATASOURCE( Class ) MARLIN_DECLARE_PLUGIN( marlin::DataSourcePlugin, Class )
-#define MARLIN_DECLARE_DATASOURCE_NAME( Class, NameStr ) MARLIN_DECLARE_PLUGIN_NAME( marlin::DataSourcePlugin, Class, NameStr )
+#define MARLINMT_DECLARE_DATASOURCE( Class ) MARLINMT_DECLARE_PLUGIN( marlinmt::DataSourcePlugin, Class )
+#define MARLINMT_DECLARE_DATASOURCE_NAME( Class, NameStr ) MARLINMT_DECLARE_PLUGIN_NAME( marlinmt::DataSourcePlugin, Class, NameStr )
 
 // config reader plugin declaration
-#define MARLIN_DECLARE_CONFIG_READER( Class ) MARLIN_DECLARE_PLUGIN( marlin::ConfigReader, Class )
-#define MARLIN_DECLARE_CONFIG_READER_NAME( Class, NameStr ) MARLIN_DECLARE_PLUGIN_NAME( marlin::ConfigReader, Class, NameStr )
+#define MARLINMT_DECLARE_CONFIG_READER( Class ) MARLINMT_DECLARE_PLUGIN( marlinmt::ConfigReader, Class )
+#define MARLINMT_DECLARE_CONFIG_READER_NAME( Class, NameStr ) MARLINMT_DECLARE_PLUGIN_NAME( marlinmt::ConfigReader, Class, NameStr )
 
 // config writer plugin declaration
-#define MARLIN_DECLARE_CONFIG_WRITER( Class ) MARLIN_DECLARE_PLUGIN( marlin::ConfigWriter, Class )
-#define MARLIN_DECLARE_CONFIG_WRITER_NAME( Class, NameStr ) MARLIN_DECLARE_PLUGIN_NAME( marlin::ConfigWriter, Class, NameStr )
+#define MARLINMT_DECLARE_CONFIG_WRITER( Class ) MARLINMT_DECLARE_PLUGIN( marlinmt::ConfigWriter, Class )
+#define MARLINMT_DECLARE_CONFIG_WRITER_NAME( Class, NameStr ) MARLINMT_DECLARE_PLUGIN_NAME( marlinmt::ConfigWriter, Class, NameStr )
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  PluginManager singleton class
@@ -243,6 +243,6 @@ namespace marlin {
     }
   }
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

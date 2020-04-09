@@ -1,12 +1,12 @@
-#ifndef MARLIN_CONCURRENCY_QUEUE_h
-#define MARLIN_CONCURRENCY_QUEUE_h 1
+#ifndef MARLINMT_CONCURRENCY_QUEUE_h
+#define MARLINMT_CONCURRENCY_QUEUE_h 1
 
 // -- std headers
 #include <mutex>
 #include <utility>
 #include <queue>
 
-namespace marlin {
+namespace marlinmt {
 
   namespace concurrency {
 
@@ -133,6 +133,6 @@ namespace marlin {
 
   } // end namespace concurrency
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

@@ -1,5 +1,5 @@
 #################################
-# cmake file for building Marlin Core
+# cmake file for building MarlinMT Core
 # @author Remi Ete, DESY
 #################################
 
@@ -8,43 +8,43 @@ find_package( ILCUTIL COMPONENTS streamlog REQUIRED )
 find_package( TinyXML REQUIRED )
 find_package( Threads REQUIRED )
 
-#--- Generate MarlinConfig.h
-string( TIMESTAMP Marlin_RELEASE_DATE "%b %d %Y" )
-string( TIMESTAMP Marlin_RELEASE_TIME "%H:%M:%S" )
+#--- Generate MarlinMTConfig.h
+string( TIMESTAMP MarlinMT_RELEASE_DATE "%b %d %Y" )
+string( TIMESTAMP MarlinMT_RELEASE_TIME "%H:%M:%S" )
 configure_file(
-  ${PROJECT_SOURCE_DIR}/cmake/MarlinConfig.h.cmake.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/marlin/MarlinConfig.h
+  ${PROJECT_SOURCE_DIR}/cmake/MarlinMTConfig.h.cmake.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/marlinmt/MarlinMTConfig.h
   @ONLY
 )
 
-#--- Generate MarlinBookConfig.h
-# Map the options available in MARLIN_BOOK_IMPL variable
-set( MARLIN_BOOK_HEADER_dummy Dummy.h )
-set( MARLIN_BOOK_HEADER_root6 Dummy.h ) # No ROOT 6 implementation for the moment
-set( MARLIN_BOOK_HEADER_root7 ROOTv7.h )
+#--- Generate MarlinMTBookConfig.h
+# Map the options available in MARLINMT_BOOK_IMPL variable
+set( MARLINMT_BOOK_HEADER_dummy Dummy.h )
+set( MARLINMT_BOOK_HEADER_root6 Dummy.h ) # No ROOT 6 implementation for the moment
+set( MARLINMT_BOOK_HEADER_root7 ROOTv7.h )
 # Select the implementation config
-set( MARLIN_BOOK_IMPL_HEADER ${MARLIN_BOOK_HEADER_${MARLIN_BOOK_IMPL}} )
+set( MARLINMT_BOOK_IMPL_HEADER ${MARLINMT_BOOK_HEADER_${MARLINMT_BOOK_IMPL}} )
 configure_file(
-  ${PROJECT_SOURCE_DIR}/cmake/MarlinBookConfig.h.cmake.in
-  ${CMAKE_CURRENT_SOURCE_DIR}/include/marlin/MarlinBookConfig.h
+  ${PROJECT_SOURCE_DIR}/cmake/MarlinMTBookConfig.h.cmake.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/marlinmt/MarlinMTBookConfig.h
   @ONLY
 )
 
-# MarlinCore library
-aux_source_directory( src MarlinCore_sources )
-aux_source_directory( src/concurrency MarlinCore_sources )
-marlin_add_doxygen_sources( GLOB_RECURSE DIRECTORY include MATCHING_PATTERN *.h )
-marlin_add_doxygen_sources( GLOB_RECURSE DIRECTORY src MATCHING_PATTERN *.cc )
+# MarlinMTCore library
+aux_source_directory( src MarlinMTCore_sources )
+aux_source_directory( src/concurrency MarlinMTCore_sources )
+marlinmt_add_doxygen_sources( GLOB_RECURSE DIRECTORY include MATCHING_PATTERN *.h )
+marlinmt_add_doxygen_sources( GLOB_RECURSE DIRECTORY src MATCHING_PATTERN *.cc )
 
-add_library( Core SHARED ${MarlinCore_sources} )
-add_library( Marlin::Core ALIAS Core )
-set_target_properties( Core PROPERTIES OUTPUT_NAME MarlinCore )
-install( TARGETS Core EXPORT Marlin LIBRARY )
+add_library( Core SHARED ${MarlinMTCore_sources} )
+add_library( MarlinMT::Core ALIAS Core )
+set_target_properties( Core PROPERTIES OUTPUT_NAME MarlinMTCore )
+install( TARGETS Core EXPORT MarlinMT LIBRARY )
 # Dependencies include dirs as system one to avoid unnecessary warnings
 target_include_directories( 
   Core SYSTEM PUBLIC 
   $<BUILD_INTERFACE:${streamlog_INCLUDE_DIRS}> 
-  $<BUILD_INTERFACE:${MARLIN_3RDPARTY}/tclap/include>  # 3rd party tclap includes
+  $<BUILD_INTERFACE:${MARLINMT_3RDPARTY}/tclap/include>  # 3rd party tclap includes
 )
 target_include_directories( 
   Core BEFORE PUBLIC 
@@ -54,56 +54,56 @@ target_include_directories(
 target_link_libraries( 
   Core PUBLIC
   Threads::Threads
-  Marlin::Book
+  MarlinMT::Book
   ${streamlog_LIBRARIES} 
   ${CMAKE_DL_LIBS} 
 )
 set_target_properties( 
   Core
   PROPERTIES 
-    COMPILE_FLAGS ${MARLIN_COMPILE_OPTIONS}
+    COMPILE_FLAGS ${MARLINMT_COMPILE_OPTIONS}
     VERSION ${${PROJECT_NAME}_VERSION}
-    CXX_STANDARD ${MARLIN_CXX_STANDARD}
+    CXX_STANDARD ${MARLINMT_CXX_STANDARD}
 )
-install( DIRECTORY include/marlin TYPE INCLUDE )
+install( DIRECTORY include/marlinmt TYPE INCLUDE )
 
 
-# MarlinCorePlugins module
-aux_source_directory( plugins MarlinCorePlugins_sources )
-marlin_add_doxygen_sources( GLOB_RECURSE DIRECTORY plugins MATCHING_PATTERN *.cc )
+# MarlinMTCorePlugins module
+aux_source_directory( plugins MarlinMTCorePlugins_sources )
+marlinmt_add_doxygen_sources( GLOB_RECURSE DIRECTORY plugins MATCHING_PATTERN *.cc )
 
-add_library( CorePlugins MODULE ${MarlinCorePlugins_sources} )
-add_library( Marlin::CorePlugins ALIAS CorePlugins )
-set_target_properties( CorePlugins PROPERTIES OUTPUT_NAME MarlinCorePlugins )
+add_library( CorePlugins MODULE ${MarlinMTCorePlugins_sources} )
+add_library( MarlinMT::CorePlugins ALIAS CorePlugins )
+set_target_properties( CorePlugins PROPERTIES OUTPUT_NAME MarlinMTCorePlugins )
 install( TARGETS CorePlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 
 set_target_properties( 
   CorePlugins
   PROPERTIES 
-    COMPILE_FLAGS ${MARLIN_COMPILE_OPTIONS}
+    COMPILE_FLAGS ${MARLINMT_COMPILE_OPTIONS}
     VERSION ${${PROJECT_NAME}_VERSION}
-    CXX_STANDARD ${MARLIN_CXX_STANDARD}
+    CXX_STANDARD ${MARLINMT_CXX_STANDARD}
 )
 target_include_directories(
   CorePlugins SYSTEM PUBLIC 
   $<BUILD_INTERFACE:${TinyXML_INCLUDE_DIR}>
 )
 target_link_libraries( 
-  CorePlugins PUBLIC Marlin::Core ${TinyXML_LIBRARY}
+  CorePlugins PUBLIC MarlinMT::Core ${TinyXML_LIBRARY}
 )
 
-# Add MarlinCorePlugins library to list of MARLIN_DLL libraries
-marlin_add_plugin_library( TARGETS CorePlugins )
+# Add MarlinMTCorePlugins library to list of MARLINMT_DLL libraries
+marlinmt_add_plugin_library( TARGETS CorePlugins )
 
 # Create all executables out of the main directory
-set( MarlinMT_BINARIES MarlinShellCompletion MarlinDumpPlugins MarlinMT )
+set( MarlinMT_BINARIES MarlinMTShellCompletion MarlinMTDumpPlugins MarlinMTMT )
 foreach( binary ${MarlinMT_BINARIES} )
   add_executable( bin_${binary} main/${binary}.cc )
-  target_link_libraries( bin_${binary} Marlin::Core )
+  target_link_libraries( bin_${binary} MarlinMT::Core )
   set_target_properties( bin_${binary} PROPERTIES OUTPUT_NAME ${binary} )
   install( TARGETS bin_${binary} RUNTIME )
 endforeach()
 
-install( FILES scripts/marlin-completion.bash TYPE BIN )
-install( FILES scripts/marlin-shell-functions.bash TYPE BIN )
+install( FILES scripts/marlinmt-completion.bash TYPE BIN )
+install( FILES scripts/marlinmt-shell-functions.bash TYPE BIN )
 

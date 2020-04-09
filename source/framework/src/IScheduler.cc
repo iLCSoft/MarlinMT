@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include <marlin/IScheduler.h>
-#include <marlin/Application.h>
+// -- marlinmt headers
+#include <marlinmt/IScheduler.h>
+#include <marlinmt/Application.h>
 
-namespace marlin {
+namespace marlinmt {
   
   IScheduler::IScheduler() : 
     Component("Scheduler") {

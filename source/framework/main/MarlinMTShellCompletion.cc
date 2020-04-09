@@ -1,10 +1,10 @@
 
-// -- marlin headers
-#include <marlin/Configuration.h>
-#include <marlin/CmdLineParser.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Logging.h>
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Configuration.h>
+#include <marlinmt/CmdLineParser.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/Utils.h>
 
 // -- std headers
 #include <iostream>
@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 
-using namespace marlin ;
+using namespace marlinmt ;
 
 void globParameters( const ConfigSection &section, std::vector<std::string> &parameters, const std::set<std::string> &skip ) ;
 

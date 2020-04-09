@@ -1,17 +1,17 @@
-#ifndef MARLIN_EVENTEXTENSIONS_h
-#define MARLIN_EVENTEXTENSIONS_h 1
+#ifndef MARLINMT_EVENTEXTENSIONS_h
+#define MARLINMT_EVENTEXTENSIONS_h 1
 
-// -- marlin headers
-#include <marlin/RandomSeedManager.h>
-#include <marlin/LogicalExpressions.h>
-#include <marlin/Extensions.h>
+// -- marlinmt headers
+#include <marlinmt/RandomSeedManager.h>
+#include <marlinmt/LogicalExpressions.h>
+#include <marlinmt/Extensions.h>
 
 // -- std headers
 #include <memory>
 #include <thread>
 #include <string>
 
-namespace marlin {
+namespace marlinmt {
 
   class Processor ;
 

@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include <marlin/Configuration.h>
-#include <marlin/Exceptions.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Configuration.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Utils.h>
 
 // -- std headers
 #include <algorithm>
@@ -17,7 +17,7 @@
 // -- tinyxml headers
 #include <tinyxml.h>
 
-namespace marlin {
+namespace marlinmt {
   
   /**
    *  @brief  XMLConfigReader plugin
@@ -53,7 +53,7 @@ namespace marlin {
      *  @brief  Resolve the <group> sections. 
      *  Add common group parameter to every processor in the group
      *  
-     *  @param  rootElement the XML parent element (the <marlin> root element)
+     *  @param  rootElement the XML parent element (the <marlinmt> root element)
      */
     void resolveGroupSections( TiXmlElement *rootElement ) const ;
     
@@ -201,11 +201,11 @@ namespace marlin {
           << ", row: " << document->ErrorRow() << ", col: " << document->ErrorCol() << "] : "
           << document->ErrorDesc() ;
       
-      MARLIN_THROW_T( ParseException, str.str() ) ;
+      MARLINMT_THROW_T( ParseException, str.str() ) ;
     }
     auto rootElement = document->RootElement() ;
-    if( nullptr == rootElement || rootElement->ValueStr() != "marlin" ) {
-      MARLIN_THROW_T( ParseException, "No root tag <marlin>...</marlin> found in " + _fname ) ;
+    if( nullptr == rootElement || rootElement->ValueStr() != "marlinmt" ) {
+      MARLINMT_THROW_T( ParseException, "No root tag <marlinmt>...</marlinmt> found in " + _fname ) ;
     }
     // parse constants
     parseConstants( document.get(), cfg ) ;
@@ -230,7 +230,7 @@ namespace marlin {
     parseExecuteSection( rootElement, cfg ) ;
     // resolve groups sections in the root XML element
     // simply copy all group parameters to the processors
-    // and then copy the processors to the root node <marlin>
+    // and then copy the processors to the root node <marlinmt>
     // 'section' comes from above as first execute child, get the next section so we
     // do not cleanup the execute section in loop body below, only the groups
     resolveGroupSections( rootElement ) ;
@@ -245,7 +245,7 @@ namespace marlin {
     auto sectionElement = parentElement->FirstChildElement( name ) ;
     if( nullptr == sectionElement ) {
       if( throwIfNotFound ) {
-        MARLIN_THROW_T( ParseException, "Missing <" + name + "> section in " + _fname ) ;
+        MARLINMT_THROW_T( ParseException, "Missing <" + name + "> section in " + _fname ) ;
       }
     }
     else {
@@ -261,7 +261,7 @@ namespace marlin {
       // parse execute section
       auto executeElement = parentElement->FirstChildElement("execute") ;
       if( nullptr == executeElement ) {
-        MARLIN_THROW_T( ParseException, "Missing <execute> section in " + _fname ) ;
+        MARLINMT_THROW_T( ParseException, "Missing <execute> section in " + _fname ) ;
       }
       replaceGroups( parentElement, executeElement ) ;
       processConditions( executeElement, "" ) ;
@@ -275,7 +275,7 @@ namespace marlin {
         cfg.replaceConstants( processorName ) ;
         auto inserted = processorDuplicates.insert( processorName ) ;
         if( 1 != inserted.second ) {
-          MARLIN_THROW_T( ParseException, "Processor " + processorName + " defined more than once in <execute> section" ) ;
+          MARLINMT_THROW_T( ParseException, "Processor " + processorName + " defined more than once in <execute> section" ) ;
         }
         processorNames.push_back( processorName ) ;
         std::string condition ;
@@ -297,7 +297,7 @@ namespace marlin {
       }      
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't parse execute section" ) ;
+      MARLINMT_RETHROW( e, "Couldn't parse execute section" ) ;
     }
   }
   
@@ -344,12 +344,12 @@ namespace marlin {
         parametersFromXMLElement( section->ToElement(), cfg, procSection, true, name ) ;
         availableProcs.push_back( name ) ;
       }
-      catch( marlin::Exception &e ) {
-        MARLIN_RETHROW_T( ParseException, e, "Duplicated processor section: " + name ) ;
+      catch( marlinmt::Exception &e ) {
+        MARLINMT_RETHROW_T( ParseException, e, "Duplicated processor section: " + name ) ;
       }
     }
     if( availableProcs.empty() ) {
-      MARLIN_THROW_T( ParseException, "No <processor> section found in root section <marlin>" ) ;
+      MARLINMT_THROW_T( ParseException, "No <processor> section found in root section <marlinmt>" ) ;
     }
   }
   
@@ -358,7 +358,7 @@ namespace marlin {
   std::string XMLConfigReader::getAttribute( const TiXmlElement* element , const std::string& name ) const {
     const char* attr = element->Attribute( name.c_str() )  ;
     if( nullptr == attr ) {
-      MARLIN_THROW_T( ParseException, "Missing attribute '" + name + "' in element <" + element->ValueStr() + "> in file " + _fname ) ;
+      MARLINMT_THROW_T( ParseException, "Missing attribute '" + name + "' in element <" + element->ValueStr() + "> in file " + _fname ) ;
     }
     return attr ;
   }
@@ -432,7 +432,7 @@ namespace marlin {
       cfg.addConstant( name , value ) ;      
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't parse constant XML element" ) ;
+      MARLINMT_RETHROW( e, "Couldn't parse constant XML element" ) ;
     }
   }
   
@@ -479,7 +479,7 @@ namespace marlin {
       cfg.replaceConstants( ref ) ;
       std::filesystem::path filepath = ref ;
       if( not filepath.has_stem() || filepath.extension() != ".xml" ) {
-        MARLIN_THROW_T( ParseException, "Invalid ref file name '" + ref + "' in element <" + element->ValueStr() + "/> in file " + _fname ) ;
+        MARLINMT_THROW_T( ParseException, "Invalid ref file name '" + ref + "' in element <" + element->ValueStr() + "/> in file " + _fname ) ;
       }
       // if the include ref is not absolute, then
       // it is relative to the input file name
@@ -494,12 +494,12 @@ namespace marlin {
         str << "Couldn't load include document. Error in file [" << filepath
             << ", row: " << document.ErrorRow() << ", col: " << document.ErrorCol() << "] : "
             << document.ErrorDesc() ;
-        MARLIN_THROW_T( ParseException, str.str() ) ;
+        MARLINMT_THROW_T( ParseException, str.str() ) ;
       }
       checkForNestedIncludes( &document ) ;
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't process include element" ) ;
+      MARLINMT_RETHROW( e, "Couldn't process include element" ) ;
     }
   }
     
@@ -510,7 +510,7 @@ namespace marlin {
       if( child->ValueStr() == "include" ) {
         std::stringstream ss;
         ss << "Nested includes are not allowed [in file: " << node->GetDocument()->ValueStr() << ", line: " << child->Row() << "] !" ;
-        MARLIN_THROW_T( ParseException, ss.str() ) ;
+        MARLINMT_THROW_T( ParseException, ss.str() ) ;
       }
       checkForNestedIncludes( child ) ;
     }
@@ -558,7 +558,7 @@ namespace marlin {
       }      
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't parse parameters from XML section" ) ;
+      MARLINMT_RETHROW( e, "Couldn't parse parameters from XML section" ) ;
     }
   }
   
@@ -605,7 +605,7 @@ namespace marlin {
       }      
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't process conditions in execute section" ) ;
+      MARLINMT_RETHROW( e, "Couldn't process conditions in execute section" ) ;
     }
   }
   
@@ -622,7 +622,7 @@ namespace marlin {
           auto groupName = getAttribute( child->ToElement(), "name") ;
           TiXmlNode* group = findElement( processorsParent, "group", "name" , groupName ) ;
           if( nullptr == group ) {
-            MARLIN_THROW_T( ParseException, "Group not found : " +  groupName ) ;
+            MARLINMT_THROW_T( ParseException, "Group not found : " +  groupName ) ;
           }
           TiXmlNode* sub = 0 ;
           while( ( sub = group->IterateChildren( "processor" , sub ) )  != 0  ){
@@ -639,7 +639,7 @@ namespace marlin {
       }      
     }
     catch(Exception &e) {
-      MARLIN_RETHROW( e, "Couldn't replace groups in XML file" ) ;
+      MARLINMT_RETHROW( e, "Couldn't replace groups in XML file" ) ;
     }
   }
   
@@ -671,6 +671,6 @@ namespace marlin {
   }
   
   // plugin registration
-  MARLIN_DECLARE_CONFIG_READER( XMLConfigReader )
+  MARLINMT_DECLARE_CONFIG_READER( XMLConfigReader )
 
-}  // namespace marlin
+}  // namespace marlinmt

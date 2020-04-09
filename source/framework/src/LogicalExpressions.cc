@@ -1,13 +1,13 @@
-#include "marlin/LogicalExpressions.h"
-#include "marlin/Exceptions.h"
-#include "marlin/Logging.h"
+#include "marlinmt/LogicalExpressions.h"
+#include "marlinmt/Exceptions.h"
+#include "marlinmt/Logging.h"
 
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 
 
-namespace marlin{
+namespace marlinmt{
 
   std::ostream& operator<< (  std::ostream& s,  Expression& e ) {
     if( e.Operation == Expression::AND ) s << " && "  ;
@@ -95,7 +95,7 @@ namespace marlin{
       for( auto iter = _resultMap.begin() ; iter != _resultMap.end() ; ++iter ){
         streamlog_out( DEBUG ) << " key : " << iter->first << " val: " << iter->second << std::endl ;
       }
-      throw marlin::ParseException( error.str() );
+      throw marlinmt::ParseException( error.str() );
     }
     return it->second;
   }

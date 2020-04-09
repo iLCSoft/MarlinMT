@@ -1,17 +1,17 @@
 
-// -- marlin headers
-#include <marlin/Application.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Utils.h>
-#include <marlin/DataSourcePlugin.h>
-#include <marlin/Processor.h>
-#include <marlin/MarlinConfig.h>
-#include <marlin/EventExtensions.h>
-#include <marlin/IScheduler.h>
-#include <marlin/SimpleScheduler.h>
-#include <marlin/concurrency/PEPScheduler.h>
-#include <marlin/EventStore.h>
-#include <marlin/RunHeader.h>
+// -- marlinmt headers
+#include <marlinmt/Application.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Utils.h>
+#include <marlinmt/DataSourcePlugin.h>
+#include <marlinmt/Processor.h>
+#include <marlinmt/MarlinMTConfig.h>
+#include <marlinmt/EventExtensions.h>
+#include <marlinmt/IScheduler.h>
+#include <marlinmt/SimpleScheduler.h>
+#include <marlinmt/concurrency/PEPScheduler.h>
+#include <marlinmt/EventStore.h>
+#include <marlinmt/RunHeader.h>
 
 // -- std headers
 #include <cstring>
@@ -19,7 +19,7 @@
 
 using namespace std::placeholders ;
 
-namespace marlin {
+namespace marlinmt {
   
   int Application::main( int argc, char**argv ) {
     // configure and run application
@@ -29,8 +29,8 @@ namespace marlin {
       application.init( argc, argv ) ;
       application.run() ;
     }
-    catch ( marlin::Exception &e ) {
-      logger->log<ERROR>() << "MarlinMT main, caught Marlin exception " << e.what() << std::endl ;
+    catch ( marlinmt::Exception &e ) {
+      logger->log<ERROR>() << "MarlinMT main, caught MarlinMT exception " << e.what() << std::endl ;
       logger->log<ERROR>() << "Exiting with status 1" << std::endl ;
       return 1 ;
     }
@@ -77,7 +77,7 @@ namespace marlin {
     // load plugins
     auto &pluginMgr = PluginManager::instance() ;
     pluginMgr.logger()->setLevel<MESSAGE>() ;
-    auto libraries = details::split_string<std::string>( details::getenv<std::string>( "MARLIN_DLL", "" ), ":" ) ;
+    auto libraries = details::split_string<std::string>( details::getenv<std::string>( "MARLINMT_DLL", "" ), ":" ) ;
     pluginMgr.loadLibraries( libraries ) ;
     
     if( _parseResult._dumpExample ) {
@@ -102,7 +102,7 @@ namespace marlin {
     
     // setup scheduler
     if( 0 == _parseResult._nthreads ) {
-      MARLIN_THROW( "Number of threads can't be 0 !" ) ;
+      MARLINMT_THROW( "Number of threads can't be 0 !" ) ;
     }
     if( 1 == _parseResult._nthreads ) {
       logger()->log<MESSAGE>() << "Running in single-thread mode" << std::endl ;
@@ -118,7 +118,7 @@ namespace marlin {
     auto dstype = configuration().section("datasource").parameter<std::string>( "DatasourceType" ) ;
     _dataSource = pluginMgr.create<DataSourcePlugin>( dstype ) ;
     if( nullptr == _dataSource ) {
-      MARLIN_THROW( "Data source of type '" + dstype + "' not found in plugins" ) ;
+      MARLINMT_THROW( "Data source of type '" + dstype + "' not found in plugins" ) ;
     }
     _dataSource->setup( this ) ;
     _dataSource->onEventRead( std::bind( &Application::onEventRead, this, _1 ) ) ;
@@ -328,4 +328,4 @@ namespace marlin {
     ConfigHelper::writeConfig( _parseResult._config.value(), config ) ;
   }
 
-} // namespace marlin
+} // namespace marlinmt

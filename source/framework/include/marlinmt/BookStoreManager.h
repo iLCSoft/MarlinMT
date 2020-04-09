@@ -1,15 +1,15 @@
 #pragma once
 
-// -- marlin headers
-#include <marlin/MarlinBookConfig.h>
-#include <marlin/Component.h>
-#include <marlin/Logging.h>
+// -- marlinmtmt headers
+#include <marlinmtmt/MarlinBookConfig.h>
+#include <marlinmtmt/Component.h>
+#include <marlinmtmt/Logging.h>
 
 // -- std includes
 #include <unistd.h>
 #include <set>
 
-namespace marlin {
+namespace marlinmtmt {
   
   // forward declaration
   class Application ;

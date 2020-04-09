@@ -1,16 +1,16 @@
-#ifndef MARLIN_GEOMETRYMANAGER_h
-#define MARLIN_GEOMETRYMANAGER_h 1
+#ifndef MARLINMT_GEOMETRYMANAGER_h
+#define MARLINMT_GEOMETRYMANAGER_h 1
 
 // -- std headers
 #include <typeindex>
 
-// -- marlin headers
-#include <marlin/Logging.h>
-#include <marlin/Exceptions.h>
-#include <marlin/Component.h>
-#include <marlin/GeometryPlugin.h>
+// -- marlinmt headers
+#include <marlinmt/Logging.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Component.h>
+#include <marlinmt/GeometryPlugin.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
 
@@ -84,6 +84,6 @@ namespace marlin {
     return castHandle ;
   }
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

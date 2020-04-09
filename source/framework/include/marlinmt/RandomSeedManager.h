@@ -1,5 +1,5 @@
-#ifndef MARLIN_RANDOMSEEDMANAGER_h
-#define MARLIN_RANDOMSEEDMANAGER_h 1
+#ifndef MARLINMT_RANDOMSEEDMANAGER_h
+#define MARLINMT_RANDOMSEEDMANAGER_h 1
 
 // -- std headers
 #include <map>
@@ -8,7 +8,7 @@
 #include <functional>
 #include <unordered_set>
 
-namespace marlin {
+namespace marlinmt {
 
   class EventStore ;
 
@@ -83,6 +83,6 @@ namespace marlin {
     RandomDistribution      _rdmDistribution {MinSeed, MaxSeed} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

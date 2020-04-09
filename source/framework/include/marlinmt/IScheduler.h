@@ -1,14 +1,14 @@
-#ifndef MARLIN_ISCHEDULER_h
-#define MARLIN_ISCHEDULER_h 1
+#ifndef MARLINMT_ISCHEDULER_h
+#define MARLINMT_ISCHEDULER_h 1
 
 // -- std headers
 #include <memory>
 #include <vector>
 
-// -- marlin headers
-#include <marlin/Component.h>
+// -- marlinmt headers
+#include <marlinmt/Component.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
   class EventStore ;
@@ -66,6 +66,6 @@ namespace marlin {
     virtual std::size_t freeSlots() const = 0 ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

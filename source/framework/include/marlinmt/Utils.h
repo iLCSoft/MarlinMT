@@ -1,5 +1,5 @@
-#ifndef MARLIN_UTILS_h
-#define MARLIN_UTILS_h 1
+#ifndef MARLINMT_UTILS_h
+#define MARLINMT_UTILS_h 1
 
 // -- std headers
 #include <map>
@@ -13,11 +13,11 @@
 #include <unordered_map>
 #include <thread>
 
-// -- marlin headers
-#include <marlin/Exceptions.h>
-#include <marlin/MarlinConfig.h>
+// -- marlinmt headers
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/MarlinConfig.h>
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  clock class
@@ -370,7 +370,7 @@ namespace marlin {
       static inline std::string to_string( const T &value ) {
         std::ostringstream oss ;
         if ((oss << value).fail()) {
-          MARLIN_THROW( "to_string failure: " + std::string(details::type_info<T>::type) ) ;
+          MARLINMT_THROW( "to_string failure: " + std::string(details::type_info<T>::type) ) ;
         }
         return oss.str() ;
       }
@@ -379,7 +379,7 @@ namespace marlin {
         T t ;
         std::istringstream iss(str) ;
         if ((iss >> t).fail()) {
-          MARLIN_THROW( "from_string failure: " + std::string(details::type_info<T>::type) ) ;
+          MARLINMT_THROW( "from_string failure: " + std::string(details::type_info<T>::type) ) ;
         }
         return t ;
       }
@@ -419,7 +419,7 @@ namespace marlin {
         if( std::find( std::begin(false_list), std::end(false_list), strcp ) != std::end(false_list) ) {
           return false ;
         }
-        MARLIN_THROW( "from_string failure: bool" ) ;
+        MARLINMT_THROW( "from_string failure: bool" ) ;
       }
     };
     
@@ -486,7 +486,7 @@ namespace marlin {
     template <typename T>
     inline std::vector<T> split_string(const std::string &str, const std::string &delimiter, size_t maxTokens = std::numeric_limits<std::size_t>::max()) {
       if( 0 == maxTokens ) {
-        MARLIN_THROW( "maxTokens can't be 0" ) ;
+        MARLINMT_THROW( "maxTokens can't be 0" ) ;
       }
       std::string::size_type lastPos = str.find_first_not_of(delimiter, 0) ;
       std::string::size_type pos = str.find_first_of(delimiter, lastPos) ;
@@ -512,7 +512,7 @@ namespace marlin {
     template <>
     inline std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t maxTokens) {
       if( 0 == maxTokens ) {
-        MARLIN_THROW( "maxTokens can't be 0" ) ;
+        MARLINMT_THROW( "maxTokens can't be 0" ) ;
       }
       std::string::size_type lastPos = str.find_first_not_of(delimiter, 0) ;
       std::string::size_type pos = str.find_first_of(delimiter, lastPos) ;
@@ -584,7 +584,7 @@ namespace marlin {
       if( str == "auto" ) {
         return std::thread::hardware_concurrency() ;
       }
-      MARLIN_THROW( "Invalid conversion to n threads" ) ;
+      MARLINMT_THROW( "Invalid conversion to n threads" ) ;
     }
     
     //--------------------------------------------------------------------------
@@ -599,7 +599,7 @@ namespace marlin {
     inline T getenv( const std::string &var ) {
       auto env = ::getenv( var.c_str() ) ;
       if( nullptr == env ) {
-        MARLIN_THROW( var + " env variable is not set" ) ;
+        MARLINMT_THROW( var + " env variable is not set" ) ;
       }
       return details::convert<T>::from_string( env ) ;
     }
@@ -626,7 +626,7 @@ namespace marlin {
       out << "   | |  | | (_| | |  | | | | | | |  | |  | |   " << std::endl ;
       out << "   |_|  |_|\\__,_|_|  |_|_|_| |_|_|  |_|  |_|   " << std::endl ;    
       out << std::endl ;
-      out << "                Version: " << MARLIN_RELEASE << std::endl ;
+      out << "                Version: " << MARLINMT_RELEASE << std::endl ;
       out << std::endl ;
       out << "                LICENCE: GPLv3 " << std::endl ;
       out << "     Copyright (C), Marlin/MarlinMT Authors" << std::endl ;
@@ -635,6 +635,6 @@ namespace marlin {
     
   }
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

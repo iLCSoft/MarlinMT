@@ -1,5 +1,5 @@
-#ifndef MARLIN_SEQUENCE_h
-#define MARLIN_SEQUENCE_h 1
+#ifndef MARLINMT_SEQUENCE_h
+#define MARLINMT_SEQUENCE_h 1
 
 // -- std headers
 #include <vector>
@@ -10,11 +10,11 @@
 #include <utility> // pair
 #include <ctime>
 
-// -- marlin headers
-#include <marlin/Logging.h>
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Logging.h>
+#include <marlinmt/Utils.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
   class SequenceItem ;
@@ -299,6 +299,6 @@ namespace marlin {
     SequenceItemList           _uniqueItems {} ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

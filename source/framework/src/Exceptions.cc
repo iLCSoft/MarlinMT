@@ -1,6 +1,6 @@
-#include <marlin/Exceptions.h>
+#include <marlinmt/Exceptions.h>
 
-namespace marlin {
+namespace marlinmt {
   
   Exception::Exception( const std::string &message ) : 
     _message(message) {

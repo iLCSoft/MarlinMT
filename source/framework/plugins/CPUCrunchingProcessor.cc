@@ -1,16 +1,16 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/Logging.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/PluginManager.h>
 
 // -- std headers
 #include <cmath>
 #include <ctime>
 #include <random>
 
-namespace marlin {
+namespace marlinmt {
 
   /** Simple processor crunching CPU time for n milliseconds.
    *
@@ -71,5 +71,5 @@ namespace marlin {
   }
 
   // processor declaration
-  MARLIN_DECLARE_PROCESSOR( CPUCrunchingProcessor )
+  MARLINMT_DECLARE_PROCESSOR( CPUCrunchingProcessor )
 }

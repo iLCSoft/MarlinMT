@@ -1,10 +1,10 @@
-#include "marlin/GeometryPlugin.h"
+#include "marlinmt/GeometryPlugin.h"
 
-// -- marlin headers
-#include "marlin/PluginManager.h"
-#include "marlin/Application.h"
+// -- marlinmt headers
+#include "marlinmt/PluginManager.h"
+#include "marlinmt/Application.h"
 
-namespace marlin {
+namespace marlinmt {
 
   GeometryPlugin::GeometryPlugin( const std::string &gtype ) :
     Component("Geometry") {
@@ -39,4 +39,4 @@ namespace marlin {
     }
   }
 
-} // namespace marlin
+} // namespace marlinmt

@@ -1,15 +1,15 @@
-#ifndef MARLIN_LOGGERMANAGER_h
-#define MARLIN_LOGGERMANAGER_h 1
+#ifndef MARLINMT_LOGGERMANAGER_h
+#define MARLINMT_LOGGERMANAGER_h 1
 
 // -- std headers
 #include <string>
 
-// -- marlin headers
-#include <marlin/Exceptions.h>
-#include <marlin/Logging.h>
-#include <marlin/Component.h>
+// -- marlinmt headers
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/Component.h>
 
-namespace marlin {
+namespace marlinmt {
 
   class Application ;
 
@@ -57,6 +57,6 @@ namespace marlin {
     BoolParameter           _coloredConsole {*this, "ColoredConsole", "Whether to use a colored console printout", false } ;
   };
 
-} // end namespace marlin
+} // end namespace marlinmt
 
 #endif

@@ -11,7 +11,7 @@ typedef std::map< const std::string, std::string > ConditionsMap ;
 typedef std::map< const std::string, bool > ResultMap ;
 
 
-namespace marlin{
+namespace marlinmt{
 
 
   /** Helper struct for LogicalExpression.

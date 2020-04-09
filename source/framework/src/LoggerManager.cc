@@ -1,9 +1,9 @@
-#include <marlin/LoggerManager.h>
+#include <marlinmt/LoggerManager.h>
 
-// -- marlin headers
-#include <marlin/Application.h>
+// -- marlinmt headers
+#include <marlinmt/Application.h>
 
-namespace marlin {
+namespace marlinmt {
 
   LoggerManager::LoggerManager() : 
     Component("LoggerManager") {
@@ -51,4 +51,4 @@ namespace marlin {
     return logger ;
   }
 
-} // namespace marlin
+} // namespace marlinmt

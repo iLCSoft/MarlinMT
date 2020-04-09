@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include "marlin/GeometryPlugin.h"
-#include "marlin/PluginManager.h"
+// -- marlinmt headers
+#include "marlinmt/GeometryPlugin.h"
+#include "marlinmt/PluginManager.h"
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  EmptyGeometry class
@@ -25,6 +25,6 @@ namespace marlin {
     void dumpGeometry() const override { /* nop */ }
   };
 
-  MARLIN_DECLARE_GEOMETRY( EmptyGeometry )
+  MARLINMT_DECLARE_GEOMETRY( EmptyGeometry )
   
 }

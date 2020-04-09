@@ -1,12 +1,12 @@
-#include <marlin/RandomSeedManager.h>
+#include <marlinmt/RandomSeedManager.h>
 
-// -- marlin headers
+// -- marlinmt headers
 #include <jenkinsHash.h>
-#include <marlin/Exceptions.h>
-#include <marlin/EventStore.h>
+#include <marlinmt/Exceptions.h>
+#include <marlinmt/EventStore.h>
 
 
-namespace marlin {
+namespace marlinmt {
 
   RandomSeedManager::RandomSeedManager( SeedType globalSeed ) :
     _globalSeed( globalSeed ),

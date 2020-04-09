@@ -1,7 +1,7 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/PluginManager.h>
 
 // -- std headers
 #include <stdlib.h>
@@ -15,7 +15,7 @@
 #include <sys/sysinfo.h>
 #endif
 
-namespace marlin {
+namespace marlinmt {
 
   /** MemoryMonitorProcessor is a memory monitoring application for Marlin
    *  <h4>Input - Prerequisites</h4>
@@ -99,5 +99,5 @@ namespace marlin {
   }
 
   // plugin declaration
-  MARLIN_DECLARE_PROCESSOR( MemoryMonitorProcessor )
+  MARLINMT_DECLARE_PROCESSOR( MemoryMonitorProcessor )
 }

@@ -1,9 +1,9 @@
-#include <marlin/EventExtensions.h>
+#include <marlinmt/EventExtensions.h>
 
-// -- marlin headers
-#include <marlin/Processor.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
 
-namespace marlin {
+namespace marlinmt {
 
   RandomSeedExtension::RandomSeedExtension( RandomSeedMap seeds ) :
     _randomSeeds(std::move(seeds)) {
