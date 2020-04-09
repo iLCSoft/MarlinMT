@@ -1,10 +1,10 @@
-site_name: Marlin
+site_name: MarlinMT
 nav:
     - Home: 'index.md'
     - About:
       - License: 'about/license.md'
       - Contribute: 'about/contribute.md'
-      - Citing Marlin: 'about/citing.md'
+      - Citing MarlinMT: 'about/citing.md'
     - User manual:
       - Introduction: 'user-manual/introduction.md'
       - Installation: 'user-manual/installation.md'
