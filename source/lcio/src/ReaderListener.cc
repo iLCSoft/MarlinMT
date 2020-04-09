@@ -1,15 +1,15 @@
-#include <marlin/lcio/ReaderListener.h>
+#include <marlinmt/lcio/ReaderListener.h>
 
-// -- marlin headers
-#include <marlin/RunHeader.h>
-#include <marlin/EventStore.h>
+// -- marlinmt headers
+#include <marlinmt/RunHeader.h>
+#include <marlinmt/EventStore.h>
 #include <jenkinsHash.h>
 
 // -- lcio headers
 #include <EVENT/LCEvent.h>
 #include <EVENT/LCRunHeader.h>
 
-namespace marlin {
+namespace marlinmt {
 
   void ReaderListener::onEventRead( EventFunction func ) {
     _onEventRead = func ;

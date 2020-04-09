@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/Logging.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/PluginManager.h>
 
 // -- lcio headers
 #include <lcio.h>
@@ -13,7 +13,7 @@
 #include <ctime>
 #include <random>
 
-namespace marlin {
+namespace marlinmt {
 
   /** Simple processor that triggers the LCEvent data unpacking.
    *
@@ -54,5 +54,5 @@ namespace marlin {
   }
 
   // processor declaration
-  MARLIN_DECLARE_PROCESSOR( LCIOEventUnpackingProcessor )
+  MARLINMT_DECLARE_PROCESSOR( LCIOEventUnpackingProcessor )
 }

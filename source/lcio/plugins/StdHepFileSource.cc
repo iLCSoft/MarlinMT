@@ -1,11 +1,11 @@
 
-// -- marlin headers
-#include <marlin/lcio/ReaderListener.h>
-#include <marlin/DataSourcePlugin.h>
-#include <marlin/PluginManager.h>
-#include <marlin/Logging.h>
-#include <marlin/EventStore.h>
-#include <marlin/RunHeader.h>
+// -- marlinmt headers
+#include <marlinmt/lcio/ReaderListener.h>
+#include <marlinmt/DataSourcePlugin.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/Logging.h>
+#include <marlinmt/EventStore.h>
+#include <marlinmt/RunHeader.h>
 #include <jenkinsHash.h>
 
 // -- lcio headers
@@ -19,7 +19,7 @@
 
 using namespace std::placeholders ;
 
-namespace marlin {
+namespace marlinmt {
 
   /**
    *  @brief  StdHepFileSource class
@@ -109,6 +109,6 @@ namespace marlin {
     return true ;
   }
 
-  MARLIN_DECLARE_DATASOURCE_NAME( StdHepFileSource, "StdHepReader" )
+  MARLINMT_DECLARE_DATASOURCE_NAME( StdHepFileSource, "StdHepReader" )
 
 }

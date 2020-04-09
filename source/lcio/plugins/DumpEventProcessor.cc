@@ -1,12 +1,12 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/PluginManager.h>
 
 // -- lcio headers
 #include <UTIL/LCTOOLS.h>
 
-namespace marlin {
+namespace marlinmt {
 
   /** DumpEventProcessor simply dumps an event in the console
    *  <h4>Input - Prerequisites</h4>
@@ -67,5 +67,5 @@ namespace marlin {
   }
 
   // plugin declaration
-  MARLIN_DECLARE_PROCESSOR( DumpEventProcessor )
+  MARLINMT_DECLARE_PROCESSOR( DumpEventProcessor )
 }

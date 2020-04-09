@@ -1,8 +1,8 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/PluginManager.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/PluginManager.h>
 
 // -- lcio headers
 #include <lcio.h>
@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <bitset>
 
-namespace marlin {
+namespace marlinmt {
 
   /** Default output processor. If active every event is writen to the
    *  specified LCIO file.
@@ -224,5 +224,5 @@ namespace marlin {
     _writer = nullptr ;
   }
 
-  MARLIN_DECLARE_PROCESSOR( LCIOOutputProcessor )
+  MARLINMT_DECLARE_PROCESSOR( LCIOOutputProcessor )
 }

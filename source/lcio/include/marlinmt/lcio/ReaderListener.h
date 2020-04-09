@@ -1,5 +1,4 @@
-#ifndef MARLIN_READERLISTENER_h
-#define MARLIN_READERLISTENER_h 1
+#pragma once
 
 // -- std headers
 #include <functional>
@@ -13,7 +12,7 @@ namespace EVENT {
   class LCRunHeader ;
 }
 
-namespace marlin {
+namespace marlinmt {
 
   class EventStore ;
   class RunHeader ;
@@ -79,4 +78,3 @@ namespace marlin {
 
 }
 
-#endif

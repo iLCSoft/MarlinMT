@@ -1,9 +1,9 @@
 
-// -- marlin headers
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/PluginManager.h>
-#include <marlin/EventExtensions.h>
+// -- marlinmt headers
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/PluginManager.h>
+#include <marlinmt/EventExtensions.h>
 
 // -- lcio headers
 #include <lcio.h>
@@ -12,7 +12,7 @@
 #include <set>
 #include <map>
 
-namespace marlin {
+namespace marlinmt {
 
   /** Simple event selector processor. Returns true if the given event
    *  was specified in the EvenList parameter.
@@ -79,7 +79,7 @@ namespace marlin {
     }
     auto iter = _evtSet.find( std::make_pair( lcevent->getEventNumber() , lcevent->getRunNumber() ) ) ;
     const bool isInList = (iter != _evtSet.end() ) ;
-    //-- note: this will not be printed if compiled w/o MARLINDEBUG=1 !
+    //-- note: this will not be printed if compiled w/o MARLINMTDEBUG=1 !
     log<DEBUG>() << "   processing event: " << lcevent->getEventNumber()
   		       << "   in run:  " << lcevent->getRunNumber()
   		       << " - in event list : " << isInList
@@ -88,5 +88,5 @@ namespace marlin {
   }
 
   // plugin declaration
-  MARLIN_DECLARE_PROCESSOR( EventSelectorProcessor )
+  MARLINMT_DECLARE_PROCESSOR( EventSelectorProcessor )
 }
