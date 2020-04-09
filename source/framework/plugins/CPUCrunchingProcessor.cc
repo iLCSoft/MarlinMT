@@ -44,6 +44,9 @@ namespace marlin {
     Processor("CPUCrunching") {
     // modify processor description
     setDescription( "CPUCrunchingProcessor crunch CPU time for n milliseconds" ) ;
+    // parameters validation
+    _crunchTime.setValidator( validator::greaterEqual<int>(0) ) ;
+    _crunchSigma.setValidator( validator::greaterEqual<float>(0) ) ;
   }
 
   //--------------------------------------------------------------------------
