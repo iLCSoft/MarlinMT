@@ -1,12 +1,12 @@
-#ifndef MARLIN_BOOK_CONFIG
-#define MARLIN_BOOK_CONFIG
+#ifndef MARLINMT_BOOK_CONFIG
+#define MARLINMT_BOOK_CONFIG
 #else
 #error No mutiple binding of MarlinConfig. 
 #endif
 
 #include "marlinmt/book/configs/Base.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     namespace types {
       

@@ -12,7 +12,7 @@
 
 namespace marlinmt {
   namespace book {
-    /// Alias for Types used by MarlinBook
+    /// Alias for Types used by MarlinMTBook
     namespace types {
   
       // TODO: check for minimal amount of copies 
