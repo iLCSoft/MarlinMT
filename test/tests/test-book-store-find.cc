@@ -1,20 +1,20 @@
 #include <UnitTesting.h>
 
-#include "marlin/book/configs/ROOTv7.h"
-#include "marlin/book/BookStore.h"
-#include "marlin/book/Handle.h"
-#include "marlin/book/Hist.h"
+#include "marlinmt/book/configs/ROOTv7.h"
+#include "marlinmt/book/BookStore.h"
+#include "marlinmt/book/Handle.h"
+#include "marlinmt/book/Hist.h"
 
 std::string unicStr() {
   static std::size_t num = 0 ;
   return std::to_string( ++num ) ;
 }
 
-using namespace marlin::book ;
-using namespace marlin::book::types ;
+using namespace marlinmt::book ;
+using namespace marlinmt::book::types ;
 
 int main( int /*argc*/, char * /*argv*/[] ) {
-  marlin::test::UnitTest test( " BookStore: find " ) ;
+  marlinmt::test::UnitTest test( " BookStore: find " ) ;
   constexpr std::size_t  bins         = 3 ;
   constexpr float        min          = -1.F ;
   constexpr float        max          = 5.F ;

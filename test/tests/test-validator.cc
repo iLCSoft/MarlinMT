@@ -1,9 +1,9 @@
-// -- marlin headers
-#include <marlin/Parameter.h>
+// -- marlinmt headers
+#include <marlinmt/Parameter.h>
 #include <UnitTesting.h>
 
-using namespace marlin::test ;
-using namespace marlin ;
+using namespace marlinmt::test ;
+using namespace marlinmt ;
 
 #define PASS_VALIDATOR( testname, param, value, mustPass ) \
   { \

@@ -1,14 +1,14 @@
 
-// --  marlin headers
-#include "marlin/Processor.h"
-#include "marlin/Logging.h"
-#include "marlin/PluginManager.h"
+// --  marlinmt headers
+#include "marlinmt/Processor.h"
+#include "marlinmt/Logging.h"
+#include "marlinmt/PluginManager.h"
 
 // -- lcio headers
 #include "IMPL/LCEventImpl.h"
 #include "IMPL/LCRunHeaderImpl.h"
 
-using namespace marlin ;
+using namespace marlinmt ;
 using namespace EVENT ;
 using namespace IMPL ;
 
@@ -82,4 +82,4 @@ void TestEventModifier::end() {
         << std::endl ;
 }
 
-MARLIN_DECLARE_PROCESSOR( TestEventModifier )
+MARLINMT_DECLARE_PROCESSOR( TestEventModifier )

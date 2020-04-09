@@ -1,12 +1,11 @@
-#ifndef MARLIN_UNITTESTING_H
-#define MARLIN_UNITTESTING_H
+#pragma once
 
 // -- std headers
 #include <iostream>
 #include <string>
 #include <sstream>
 
-namespace marlin {
+namespace marlinmt {
 
   namespace test {
 
@@ -88,5 +87,3 @@ namespace marlin {
   }
   
 }
-
-#endif //  MARLIN_UNITTESTING_H

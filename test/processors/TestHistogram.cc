@@ -1,10 +1,10 @@
 #include <utility>
 #include <array>
 
-// -- marlin headers
-#include "marlin/Processor.h"
-#include "marlin/ProcessorApi.h"
-#include "marlin/PluginManager.h"
+// -- marlinmt headers
+#include "marlinmt/Processor.h"
+#include "marlinmt/ProcessorApi.h"
+#include "marlinmt/PluginManager.h"
 
 #include <EVENT/LCCollection.h>
 #include <EVENT/MCParticle.h>
@@ -13,7 +13,7 @@
 #include "IMPL/LCEventImpl.h"
 #include "IMPL/LCRunHeaderImpl.h"
 
-using namespace marlin ;
+using namespace marlinmt ;
 
 class TestHistogram : public Processor {
 public:
@@ -75,4 +75,4 @@ void TestHistogram::end() {
   streamlog_out(MESSAGE) << "success\n";  
 }
 
-MARLIN_DECLARE_PROCESSOR( TestHistogram )
+MARLINMT_DECLARE_PROCESSOR( TestHistogram )

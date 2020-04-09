@@ -5,12 +5,12 @@
 #include <cmath>
 
 #include <UnitTesting.h>
-#include "marlin/book/configs/ROOTv7.h"
-#include "marlin/book/Types.h"
-#include "marlin/book/MemLayout.h"
+#include "marlinmt/book/configs/ROOTv7.h"
+#include "marlinmt/book/Types.h"
+#include "marlinmt/book/MemLayout.h"
 
-using namespace marlin::book;
-using namespace marlin::book::types;
+using namespace marlinmt::book;
+using namespace marlinmt::book::types;
 
 struct Type1 {
   std::array<int, 5> bins;
@@ -26,7 +26,7 @@ void MergeType1(const std::shared_ptr<Type1>& p1, const std::shared_ptr<Type1>& 
 
 int main (int, char**) {
   std::srand(static_cast<unsigned int>(std::time(nullptr)));
-  marlin::test::UnitTest test(" MemLayout Test ");
+  marlinmt::test::UnitTest test(" MemLayout Test ");
   SharedMemLayout<Type1, MergeType1, int, int, int, int, int> sMem(3, 1, 0, 0, 0, 0);
   auto ptr1 = sMem.at<Type1>(0);
   auto ptr2 = sMem.at<Type1>(1);

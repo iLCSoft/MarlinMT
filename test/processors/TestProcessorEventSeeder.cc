@@ -1,14 +1,14 @@
 
-// -- marlin headers
-#include "marlin/Processor.h"
-#include "marlin/Logging.h"
-#include "marlin/ProcessorApi.h"
-#include "marlin/PluginManager.h"
+// -- marlinmt headers
+#include "marlinmt/Processor.h"
+#include "marlinmt/Logging.h"
+#include "marlinmt/ProcessorApi.h"
+#include "marlinmt/PluginManager.h"
 
-using namespace marlin ;
+using namespace marlinmt ;
 
 
-/**  test processor for testing the uniquie event seeding functionality of the ProcessorEventSeeder service in Marlin.
+/**  test processor for testing the uniquie event seeding functionality of the ProcessorEventSeeder service in MarlinMT.
  *
  *
  * @author S. J. Aplin, DESY
@@ -48,7 +48,7 @@ protected:
 TestProcessorEventSeeder::TestProcessorEventSeeder() : Processor("TestProcessorEventSeeder") {
 
   // modify processor description
-  _description = "TestProcessorEventSeeder test the uniquie event seeding functionality of the ProcessorEventSeeder service in Marlin" ;
+  _description = "TestProcessorEventSeeder test the uniquie event seeding functionality of the ProcessorEventSeeder service in MarlinMT" ;
 
   _nRun = -1 ;
   _nEvt = -1 ;
@@ -85,7 +85,7 @@ void TestProcessorEventSeeder::processEvent( EventStore * evt ) {
   try {
     ProcessorApi::registerForRandomSeeds( this ) ;
   }
-  catch( marlin::Exception& ) {
+  catch( marlinmt::Exception& ) {
     log<ERROR>() << name() << " failed to register processor to event seed generator (TEST is OK)" << std::endl ;
   }
 
@@ -132,4 +132,4 @@ void TestProcessorEventSeeder::end(){
 
 }
 
-MARLIN_DECLARE_PROCESSOR( TestProcessorEventSeeder )
+MARLINMT_DECLARE_PROCESSOR( TestProcessorEventSeeder )

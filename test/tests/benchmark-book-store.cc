@@ -8,11 +8,11 @@
 
 #include <UnitTesting.h>
 
-#include "marlin/book/configs/ROOTv7.h"
+#include "marlinmt/book/configs/ROOTv7.h"
 
-#include "marlin/book/Handle.h"
-#include "marlin/book/BookStore.h"
-#include "marlin/book/Hist.h"
+#include "marlinmt/book/Handle.h"
+#include "marlinmt/book/BookStore.h"
+#include "marlinmt/book/Hist.h"
 
 constexpr unsigned int NumThreads = 3;
 
@@ -24,11 +24,11 @@ int main(int /*argc*/, char * /*argv*/[])
 
   const std::thread::id& tid = std::this_thread::get_id();
 
-  marlin::test::UnitTest test(" Performance Test Filling: ");
+  marlinmt::test::UnitTest test(" Performance Test Filling: ");
 
-  marlin::book::BookStore store;
-  marlin::book::Handle entry = store.book("/", "hist", marlin::book::EntryData<marlin::book::types::H1F>("title", {"a", 250, range.first, range.second}).single());
-  marlin::book::Handle hist = entry.handle(tid);
+  marlinmt::book::BookStore store;
+  marlinmt::book::Handle entry = store.book("/", "hist", marlinmt::book::EntryData<marlinmt::book::types::H1F>("title", {"a", 250, range.first, range.second}).single());
+  marlinmt::book::Handle hist = entry.handle(tid);
   ROOT::Experimental::RH1F rhist("title", {"a", 250, range.first, range.second});
 
   std::array<float, nWrites> numbers;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 
-<marlin>
+<marlinmt>
   
   <constants>
     <constant name="constantFile" value="constants-eventmodifier.xml"/>
@@ -24,4 +24,4 @@
   
   <include ref="${includefile}"/>
   
-</marlin>
+</marlinmt>

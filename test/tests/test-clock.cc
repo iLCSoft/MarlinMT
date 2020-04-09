@@ -1,5 +1,5 @@
-// -- marlin headers
-#include <marlin/Utils.h>
+// -- marlinmt headers
+#include <marlinmt/Utils.h>
 #include <UnitTesting.h>
 
 #include <future>
@@ -8,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 
-using namespace marlin::test ;
+using namespace marlinmt::test ;
 
 
 int main( int /*argc*/, char ** /*argv*/ ) {
@@ -16,19 +16,19 @@ int main( int /*argc*/, char ** /*argv*/ ) {
   UnitTest test( "Clock" ) ;
   test.test( "obvious", true ) ;
 
-  std::vector<std::future<marlin::clock::duration_rep>> futures ;
-  std::atomic<marlin::clock::duration_rep> timediff {0.f} ;
-  auto start = marlin::clock::now() ;
-  const marlin::clock::duration_rep crunchTime = 1 ; 
+  std::vector<std::future<marlinmt::clock::duration_rep>> futures ;
+  std::atomic<marlinmt::clock::duration_rep> timediff {0.f} ;
+  auto start = marlinmt::clock::now() ;
+  const marlinmt::clock::duration_rep crunchTime = 1 ; 
   
   for( auto i=0u ; i<std::thread::hardware_concurrency() ; ++i ) {
     futures.push_back( std::async( std::launch::async, [&](){
-      auto localStart = marlin::clock::now() ;
-      marlin::clock::crunchFor<marlin::clock::seconds>(crunchTime) ;
-      auto localEnd = marlin::clock::now() ;
-      auto localDiff = marlin::clock::time_difference<marlin::clock::milliseconds>( localStart, localEnd ) ;
+      auto localStart = marlinmt::clock::now() ;
+      marlinmt::clock::crunchFor<marlinmt::clock::seconds>(crunchTime) ;
+      auto localEnd = marlinmt::clock::now() ;
+      auto localDiff = marlinmt::clock::time_difference<marlinmt::clock::milliseconds>( localStart, localEnd ) ;
       // the last task to exit set the total time diff
-      timediff = marlin::clock::elapsed_since<marlin::clock::milliseconds>( start ) ;
+      timediff = marlinmt::clock::elapsed_since<marlinmt::clock::milliseconds>( start ) ;
       return localDiff ;
     })) ;
   }

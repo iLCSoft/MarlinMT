@@ -1,4 +1,4 @@
-## Marlin testing
+## MarlinMT testing
 
 To run unit tests, make sure the CMake switch is on:
 

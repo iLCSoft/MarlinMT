@@ -1,10 +1,10 @@
-// -- marlin headers
-#include <marlin/concurrency/ThreadPool.h>
+// -- marlinmt headers
+#include <marlinmt/concurrency/ThreadPool.h>
 #include <UnitTesting.h>
 
-using namespace marlin ;
-using namespace marlin::test ;
-using namespace marlin::concurrency ;
+using namespace marlinmt ;
+using namespace marlinmt::test ;
+using namespace marlinmt::concurrency ;
 
 using Function = std::function<void()> ;
 using Pool = ThreadPool<Function,void> ;

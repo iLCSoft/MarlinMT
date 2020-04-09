@@ -9,14 +9,14 @@
 #include <filesystem>
 #include <type_traits>
 
-#include "marlin/book/configs/ROOTv7.h"
-#include "marlin/book/BookStore.h"
-#include "marlin/book/Handle.h"
-#include "marlin/book/Hist.h"
-#include "marlin/book/StoreWriter.h"
+#include "marlinmt/book/configs/ROOTv7.h"
+#include "marlinmt/book/BookStore.h"
+#include "marlinmt/book/Handle.h"
+#include "marlinmt/book/Hist.h"
+#include "marlinmt/book/StoreWriter.h"
 
-using namespace marlin::book ;
-using namespace marlin::book::types ;
+using namespace marlinmt::book ;
+using namespace marlinmt::book::types ;
 
 std::string expected = "expected: " ;
 
@@ -79,7 +79,7 @@ struct Bin {
 
 template <int N, typename T >
 class HistTest {
-  using Type                        = marlin::book::types::HistT<HistConfig<double, T, N>>;
+  using Type                        = marlinmt::book::types::HistT<HistConfig<double, T, N>>;
   using RootT                       = typename HDetails< Type >::RootT ;
   static constexpr const char *Name = HDetails< Type >::Name ;
 
@@ -232,7 +232,7 @@ private:
 } ;
 
 int main( int /*argc*/, char * /*argv*/[] ) {
-  marlin::test::UnitTest test( " BookStore: write to file " ) ;
+  marlinmt::test::UnitTest test( " BookStore: write to file " ) ;
 
   AxisConfig<double> axis = {"x", 2, -2.f, 5.f} ;
 
@@ -247,7 +247,7 @@ int main( int /*argc*/, char * /*argv*/[] ) {
     BookStore store{} ;
     try {
       bluePrint.Create( store ) ;
-    } catch ( const marlin::book::exceptions::BookStoreException &expc ) {
+    } catch ( const marlinmt::book::exceptions::BookStoreException &expc ) {
       test.test( std::string( "unexpected error: '" ) + expc.what() + "'",
                  false ) ;
     }
