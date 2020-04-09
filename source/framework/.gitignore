@@ -1,2 +1,2 @@
-include/marlin/MarlinMTConfig.h
-include/marlin/MarlinMTBookConfig.h
+include/marlinmt/MarlinMTConfig.h
+include/marlinmt/MarlinMTBookConfig.h
