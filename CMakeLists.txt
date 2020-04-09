@@ -37,7 +37,7 @@ add_subdirectory( doc )
 marlinmt_generate_thismarlinmt()
 
 #--- Display summary and write variables to cache
-marlin_cmake_summary()
+marlinmt_cmake_summary()
 
 #--- Generate configuration files
 # See: https://cmake.org/cmake/help/v3.14/module/CMakePackageConfigHelpers.html
