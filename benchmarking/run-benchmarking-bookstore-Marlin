@@ -10,15 +10,15 @@ function printUsage() {
 	echo ""
 }
 
-if [ -z "$MARLIN_DIR" ]; then
-	echo "MARLIN_DIR not set. Please setup your env!"
+if [ -z "$MARLINMT_DIR" ]; then
+	echo "MARLINMT_DIR not set. Please setup your env!"
 	exit 1;
 fi
 
 OPTS=`getopt -o h -1 inputfile: -n 'parse-options' -- "$@"`
 eval --set "$OPTS"
 
-steeringfile="${MARLIN_DIR}benchmarking/Marlin/hist_filling.xml"
+steeringfile="${MARLINMT_DIR}benchmarking/Marlin/hist_filling.xml"
 nhists=(1 2 3)
 nfills=(30)
 nbins=(1000)

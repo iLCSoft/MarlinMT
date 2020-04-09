@@ -6,9 +6,9 @@
 #include <fstream>
 #include <cstdlib>
 
-#include <marlin/Processor.h>
-#include <marlin/ProcessorApi.h>
-#include <marlin/PluginManager.h>
+#include <marlinmt/Processor.h>
+#include <marlinmt/ProcessorApi.h>
+#include <marlinmt/PluginManager.h>
 
 #include <EVENT/LCCollection.h>
 #include <EVENT/MCParticle.h>
@@ -35,7 +35,7 @@ std::size_t getTotalVirtualMemoryUsed() {
 }
 
 
-using namespace marlin;
+using namespace marlinmt;
 
 double getValue(EVENT::MCParticle* mcp, int hist); 
 
@@ -43,23 +43,24 @@ std::string histName(std::size_t i);
 double axisMin(std::size_t i, int a) ;
 double axisMax(std::size_t i, int a) ; 
 
-class MarlinHistFillingFromDST : public Processor {
+class MarlinMTHistFillingFromDST : public Processor {
 public:
-  MarlinHistFillingFromDST() : Processor("MarlinHistFillingFromDST") {} 
+  MarlinMTHistFillingFromDST() : Processor("MarlinMTHistFillingFromDST") {} 
   void init() final override;
   void processEvent( EventStore * evt ) final override;
   void end() final override;
 private:
-  Property<std::size_t> _nBins 
-    {this, "NBins", "number of bins per Histogram.", 1000};
-  Property<std::size_t> _nHists10
-    {this, "NHists10", "number of Histograms = 10 ^ NHists10", 2};
-  Property<std::size_t> _nFills
-    {this, "NFills", "number of Fills per Histogram per event", 10};
-  Property<std::size_t> _at 
-    {this, "AccessType", "type of accessing the histograms for filling.", 0};
-  Property<bool>        _useMutex 
-    {this, "UseMutex", "use a shared instance of Histogram and lock it with a mutex"};
+  using SizeTParameter = Parameter<std::size_t> ;
+  SizeTParameter _nBins 
+    {*this, "NBins", "number of bins per Histogram.", 1000};
+  SizeTParameter _nHists10
+    {*this, "NHists10", "number of Histograms = 10 ^ NHists10", 2};
+  SizeTParameter _nFills
+    {*this, "NFills", "number of Fills per Histogram per event", 10};
+  SizeTParameter _at 
+    {*this, "AccessType", "type of accessing the histograms for filling.", 0};
+  BoolParameter        _useMutex 
+    {*this, "UseMutex", "use a shared instance of Histogram and lock it with a mutex"};
   std::vector<std::unique_ptr<std::mutex>> _mutex{};
   std::vector<H1FEntry> _histograms{};
   std::vector<ROOT::Experimental::RH1F> _rHistograms{};
@@ -72,7 +73,7 @@ private:
 };
 
 
-void MarlinHistFillingFromDST::init() {
+void MarlinMTHistFillingFromDST::init() {
   std::size_t memStart = getTotalVirtualMemoryUsed();
   _nHists = powl(10, _nHists10);
   if( _useMutex ) {
@@ -102,7 +103,7 @@ void MarlinHistFillingFromDST::init() {
 
 
 
-void MarlinHistFillingFromDST::processEvent(EventStore * e) {
+void MarlinMTHistFillingFromDST::processEvent(EventStore * e) {
   IMPL::LCEventImpl* evt = dynamic_cast<IMPL::LCEventImpl*>(
       e->event<EVENT::LCEvent>().get() );
   try {
@@ -129,7 +130,7 @@ void MarlinHistFillingFromDST::processEvent(EventStore * e) {
   }
 }
 
-void MarlinHistFillingFromDST::continuesFill(
+void MarlinMTHistFillingFromDST::continuesFill(
     EVENT::LCCollection* mcp, 
     std::vector<H1FHandle>& handles) {
   for (std::size_t i = 0; i < _nHists; ++i) {
@@ -153,7 +154,7 @@ void MarlinHistFillingFromDST::continuesFill(
   } 
 }
 
-void MarlinHistFillingFromDST::rotatingFill(
+void MarlinMTHistFillingFromDST::rotatingFill(
     EVENT::LCCollection* mcp, 
     std::vector<H1FHandle>& handles) {
   for( std::size_t j = 0; j < _nFills; ++j) {
@@ -200,8 +201,8 @@ double axisMax(std::size_t i, int a) {
   return 1;
 }
 
-void MarlinHistFillingFromDST::end() {
+void MarlinMTHistFillingFromDST::end() {
   streamlog_out(MESSAGE) << "MemAtEnd: " << getTotalVirtualMemoryUsed() << '\n';
 }
 
-MARLIN_DECLARE_PROCESSOR( MarlinHistFillingFromDST);
+MARLINMT_DECLARE_PROCESSOR( MarlinMTHistFillingFromDST);

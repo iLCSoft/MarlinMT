@@ -30,9 +30,9 @@ function printUsage() {
 }
 
 
-if [ -z "$MARLIN_DIR" ]
+if [ -z "$MARLINMT_DIR" ]
 then
-  echo "MARLIN_DIR not set. Please setup your environment!"
+  echo "MARLINMT_DIR not set. Please setup your environment!"
   exit 1
 fi
 
@@ -54,7 +54,7 @@ sigmapercent=0
 lazyUnpack="false"
 triggerUnpacking="false"
 inputfile=""
-steeringfile=${MARLIN_DIR}/benchmarking/cpu_crunching.xml
+steeringfile=${MARLINMT_DIR}/benchmarking/cpu_crunching.xml
 
 while true; do
   case "$1" in
@@ -134,14 +134,14 @@ do
     echo "-- Lazy unpacking:     ${lazyUnpack}"
     echo "-- Trigger unpacking:  ${triggerUnpacking}"
     MarlinMT \
-    ${steeringfile} \
+    -c ${steeringfile} \
     --constant.TriggerUnpacking="${triggerUnpacking}" \
     --datasource.LCIOInputFiles="${inputfile}" \
     --datasource.LazyUnpack="${lazyUnpack}" \
     --CPUCrunch.CrunchTime=${cr} \
     --CPUCrunch.CrunchSigma=${crunchSigma} \
-    --global.Verbosity=MESSAGE \
-    --global.Concurrency=${c} > scaling_temp_$$.log 
+    --logging.Verbosity=MESSAGE \
+    -j ${c} > scaling_temp_$$.log 
     serial=$( cat scaling_temp_$$.log | grep serial | awk '{print $7}' )
     parallel=$( cat scaling_temp_$$.log |  grep serial | awk '{print $9}' )
     scaling=$( cat scaling_temp_$$.log | grep serial| awk '{print $11}' )

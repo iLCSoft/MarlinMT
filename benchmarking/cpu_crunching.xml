@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 
-<marlin>
+<marlinmt>
   <constants>
     <constant name="TriggerUnpacking" value="false"/>
   </constants>
@@ -12,11 +12,10 @@
     <processor name="CPUCrunch"/>
   </execute>
 
-  <global>
+  <logging>
     <parameter name="Verbosity"> MESSAGE </parameter>
-    <parameter name="Concurrency"> 10 </parameter>
     <parameter name="ColoredConsole"> 0 </parameter>
-  </global>
+  </logging>
 
   <datasource type="LCIO">
     <parameter name="LCIOInputFiles">  </parameter>
@@ -35,4 +34,4 @@
     <parameter name="CrunchSigma"> 100 </parameter>
   </processor>
 
-</marlin>
+</marlinmt>

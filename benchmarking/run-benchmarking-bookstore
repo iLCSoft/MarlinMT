@@ -12,9 +12,9 @@ function printUsage() {
 }
 
 
-if [ -z "$MARLIN_DIR" ]
+if [ -z "$MARLINMT_DIR" ]
 then
-  echo "MARLIN_DIR not set. Please setup your environment!"
+  echo "MARLINMT_DIR not set. Please setup your environment!"
   exit 1
 fi
 
@@ -29,7 +29,7 @@ OPTS=`getopt -o h -l inputfile: -n 'parse-options' -- "$@"`
 eval set -- "$OPTS"
 
 # general configuration
-steeringfile="${MARLIN_DIR}benchmarking/hist_filling.xml"
+steeringfile="${MARLINMT_DIR}benchmarking/hist_filling.xml"
 cores=(4) # (1 4 8 12)
 nhists=(0) # (1 2 3)
 nfills=(30)
@@ -113,9 +113,9 @@ for c in ${cores[@]}; do
 	echo "  general"
 	echo "  -- N cores: ${c}"
 	totalTime=(`time ( MarlinMT \
-		${steeringfile} \
+		-c ${steeringfile} \
 		--datasource.LCIOInputFiles="$inputfile" \
-		--global.Concurrency=${c} \
+		-j ${c} \
 		--constant.FillingActive="false" > scaling_temp_.log ) 2>&1 1>/dev/null `)
 	read_results
 	echo "$c,0,null,null,null,0,0,$serial,$parallel,$scaling,$real,$unpackTime,0,$nEvents,false" >> $output
@@ -142,7 +142,7 @@ for c in ${cores[@]}; do
 						echo "  -- number bins:        ${nb}"
 						echo "  -- number fills:       ${nf}"
 						totalTime=(`time ( MarlinMT \
-							${steeringfile} \
+							-c ${steeringfile} \
 							--HistFilling.NBins="$nb" \
 							--HistFilling.NHists10="$nh" \
 							--HistFilling.NFills="$nf" \
@@ -150,7 +150,7 @@ for c in ${cores[@]}; do
 							--HistFilling.UseMutex="$mutex" \
 							--datasource.LCIOInputFiles="$inputfile" \
 							--bookstore.DefaultMemoryLayout=${ml} \
-							--global.Concurrency=${c} > scaling_temp_.log ) 2>&1 1>/dev/null `)
+							-j ${c} > scaling_temp_.log ) 2>&1 1>/dev/null `)
 						if [ $? -ne 0 ]; then
 							>&2 echo "MarlinMT failed!, stop benchmarks!"
 							exit 1

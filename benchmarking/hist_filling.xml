@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="us-ascii"?>
 
-<marlin>
+<marlinmt>
   <constants>
     <constant name="FillingActive" value="true" />
   </constants>
@@ -12,11 +12,10 @@
     </if>
   </execute>
 
-  <global>
+  <logging>
     <parameter name="Verbosity"> MESSAGE </parameter>
     <parameter name="ColoredConsole"> 0 </parameter>
-    <parameter name="Concurrency">4</parameter>
-  </global>
+  </logging>
 
   <bookstore>
     <parameter name="OutputFile">HistFill.root</parameter>
@@ -36,7 +35,7 @@
   <processor name="EventUnpacking" type="LCIOEventUnpacking" clone="false" />
 
 
-  <processor name="HistFilling" type="MarlinHistFillingFromDST" clone="false">
+  <processor name="HistFilling" type="MarlinMTHistFillingFromDST" clone="false">
     <parameter name="NBins">1000</parameter>
     <!-- NHists = 10 ^ NHists10-->
     <parameter name="NHists10">3</parameter>
@@ -47,4 +46,4 @@
     <parameter name="UseMutex">false</parameter>
   </processor >
 
-</marlin>
+</marlinmt>
