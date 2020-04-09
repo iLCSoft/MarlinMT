@@ -5,12 +5,12 @@
 
 find_package( GEAR REQUIRED )
 
-marlin_add_doxygen_sources( GLOB_RECURSE DIRECTORY plugins MATCHING_PATTERN *.cc )
+marlinmt_add_doxygen_sources( GLOB_RECURSE DIRECTORY plugins MATCHING_PATTERN *.cc )
 
 # create library
-aux_source_directory( plugins MarlinGear_sources )
-add_library( GearPlugins MODULE ${MarlinGear_sources} )
-add_library( Marlin::GearPlugins ALIAS GearPlugins )
+aux_source_directory( plugins MarlinMTGear_sources )
+add_library( GearPlugins MODULE ${MarlinMTGear_sources} )
+add_library( MarlinMT::GearPlugins ALIAS GearPlugins )
 install( TARGETS GearPlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 # For any stupid reason, Gear has two different include directories 
 # exported: ${GEAR_DIR}/include and ${GEAR_DIR}/include/gear
@@ -21,7 +21,7 @@ foreach( dir ${GEAR_INCLUDE_DIRS} )
     $<BUILD_INTERFACE:${dir}>
   )
 endforeach()
-target_link_libraries( GearPlugins PUBLIC Marlin::Core ${GEAR_LIBRARIES} )
+target_link_libraries( GearPlugins PUBLIC MarlinMT::Core ${GEAR_LIBRARIES} )
 
-# Add MarlinGear library to list of MARLIN_DLL libraries
-marlin_add_plugin_library( TARGETS GearPlugins )
+# Add MarlinMTGear library to list of MARLINMT_DLL libraries
+marlinmt_add_plugin_library( TARGETS GearPlugins )

@@ -1,18 +1,18 @@
 
-// -- marlin headers
-#include "marlin/GeometryPlugin.h"
-#include "marlin/PluginManager.h"
+// -- marlinmt headers
+#include "marlinmt/GeometryPlugin.h"
+#include "marlinmt/PluginManager.h"
 
 // -- gear headers
 #include "gear/GearMgr.h"
 #include "gearimpl/Util.h"
 #include "gearxml/GearXML.h"
 
-namespace marlin {
+namespace marlinmt {
   
   /**
    *  @brief  GearGeometry class
-   *  Responsible for loading Gear geometry in Marlin 
+   *  Responsible for loading Gear geometry in MarlinMT 
    */
   class GearGeometry : public GeometryPlugin {
   public:
@@ -75,7 +75,7 @@ namespace marlin {
     _logger->log<MESSAGE>() << *_gearMgr << std::endl ;
   }
 
-  MARLIN_DECLARE_GEOMETRY( GearGeometry )
+  MARLINMT_DECLARE_GEOMETRY( GearGeometry )
   
-} // namespace marlin
+} // namespace marlinmt
 
