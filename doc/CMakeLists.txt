@@ -1,12 +1,12 @@
 ########################################################
-# cmake file for building Marlin documentation
+# cmake file for building MarlinMT documentation
 # @author Remi Ete, Desy
 ########################################################
 
 set( INSTALL_DOXYGEN_DIR ${CMAKE_INSTALL_DOCDIR}/${PROJECT_VERSION}/Doxygen )
 
 # build documentation out-of-source
-marlin_get_doxygen_inputs( 
+marlinmt_get_doxygen_inputs( 
   VAR DOX_INPUT_FILE_LIST
 )
 
@@ -25,14 +25,14 @@ configure_file(
   @ONLY
 )
 
-if( MARLIN_DOXYGEN )
+if( MARLINMT_DOXYGEN )
   find_package( Doxygen REQUIRED )
 
   # custom command to build documentation
   add_custom_command(
       OUTPUT  "${DOX_OUTPUT_DIRECTORY}/html/index.html" #"${DOC_BIN_DIR}/latex/index.tex"
       COMMAND ${DOXYGEN_EXECUTABLE}
-      COMMAND cp ${PROJECT_SOURCE_DIR}/doc/marlin_overview.gif ${PROJECT_SOURCE_DIR}/doc/ReleaseNotes.md ${DOX_OUTPUT_DIRECTORY}/html
+      COMMAND cp ${PROJECT_SOURCE_DIR}/doc/marlinmt_overview.gif ${PROJECT_SOURCE_DIR}/doc/ReleaseNotes.md ${DOX_OUTPUT_DIRECTORY}/html
       WORKING_DIRECTORY ${DOX_DOXYFILE_DIR}
       COMMENT "Building Doxygen documentation..."
       DEPENDS ${DOX_DOXYFILE} CMakeLists.txt ${PROJECT_SOURCE_DIR}/doc/overview.txt ${DOX_INPUT_FILE_LIST}
@@ -47,7 +47,7 @@ endif()
 
 #----------------------------------------------------------------------------
 
-if( MARLIN_MKDOCS )
+if( MARLINMT_MKDOCS )
   find_package( MkDocs REQUIRED )
 
   # build documentation out-of-source
@@ -59,7 +59,7 @@ if( MARLIN_MKDOCS )
   add_custom_command(
       OUTPUT  "${MKDOCS_SITE_DIR}/index.html"
       COMMAND ${MKDOCS_EXECUTABLE} build -c -f ${MKDOCS_CONFIG_FILE} -d ${MKDOCS_SITE_DIR}
-      COMMAND cp ${PROJECT_SOURCE_DIR}/doc/marlin_overview.gif ${PROJECT_SOURCE_DIR}/doc/ReleaseNotes.md ${MKDOCS_SITE_DIR}/doxygen
+      COMMAND cp ${PROJECT_SOURCE_DIR}/doc/marlinmt_overview.gif ${PROJECT_SOURCE_DIR}/doc/ReleaseNotes.md ${MKDOCS_SITE_DIR}/doxygen
       COMMENT "Building Mkdocs documentation..."
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       DEPENDS ${MKDOCS_CONFIG_FILE} CMakeLists.txt ${MKDOCS_SOURCES}
@@ -68,16 +68,5 @@ if( MARLIN_MKDOCS )
   install( CODE "EXECUTE_PROCESS( COMMAND ${CMAKE_BUILD_TOOL} mkdocs)" )
   set( INSTALL_MKDOCS_DIR ${CMAKE_INSTALL_DOCDIR}/${PROJECT_VERSION}/MkDocs )
   install( DIRECTORY ${MKDOCS_SITE_DIR} DESTINATION ${INSTALL_MKDOCS_DIR} )
-  # if( MARLIN_DOXYGEN )
-  #   install( CODE "
-  #     if( NOT EXISTS ${MKDOCS_SITE_DIR}/doxygen )
-  #       EXECUTE_PROCESS(
-  #       COMMAND ${CMAKE_COMMAND} -E
-  #       create_symlink
-  #         ${CMAKE_INSTALL_PREFIX}/${INSTALL_DOXYGEN_DIR}/html
-  #         ${MKDOCS_SITE_DIR}/doxygen)
-  #     endif()"
-  #   )
-  # endif()
 
 endif()

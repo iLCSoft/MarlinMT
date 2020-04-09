@@ -1,19 +1,19 @@
 ##############################################################################
-# cmake configuration file for Marlin
+# cmake configuration file for MarlinMT
 #
 # returns following variables:
 #
-#   Marlin_FOUND      : set to TRUE if Marlin found
+#   MarlinMT_FOUND      : set to TRUE if MarlinMT found
 #       if FIND_PACKAGE called with REQUIRED and COMPONENTS arguments
-#       Marlin_FOUND is only set to TRUE if ALL components are also found
+#       MarlinMT_FOUND is only set to TRUE if ALL components are also found
 #       if REQUIRED is NOT set components may or may not be available
 #
-#   Marlin_ROOT                     : path to this Marlin installation
-#   Marlin_VERSION                  : package version
-#   Marlin_BUILD_CXX_STANDARD       : CXX standard with which Marlin was built
-#   Marlin::Core                    : the Marlin core imported library target
-#   Marlin::${COMPONENT}            : the Marlin component imported library target
-#   Marlin_${COMPONENT}_FOUND       : set to TRUE or FALSE for each library
+#   MarlinMT_ROOT                     : path to this MarlinMT installation
+#   MarlinMT_VERSION                  : package version
+#   MarlinMT_BUILD_CXX_STANDARD       : CXX standard with which MarlinMT was built
+#   MarlinMT::Core                    : the MarlinMT core imported library target
+#   MarlinMT::${COMPONENT}            : the MarlinMT component imported library target
+#   MarlinMT_${COMPONENT}_FOUND       : set to TRUE or FALSE for each library
 #
 # @author Remi Ete, DESY
 ##############################################################################
@@ -21,53 +21,53 @@
 
 @PACKAGE_INIT@
 
-set( Marlin_FOUND TRUE )
+set( MarlinMT_FOUND TRUE )
 
-set( Marlin_ROOT                     @CMAKE_INSTALL_PREFIX@ )
-set( Marlin_VERSION                  @Marlin_VERSION@ )
-set( Marlin_BUILD_CXX_STANDARD       @CMAKE_CXX_STANDARD@ )
-set_and_check( Marlin_INCLUDE_DIRS   @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@ )
-set_and_check( Marlin_LIBRARY_DIR    @PACKAGE_CMAKE_INSTALL_LIBDIR@ )
+set( MarlinMT_ROOT                     @CMAKE_INSTALL_PREFIX@ )
+set( MarlinMT_VERSION                  @MarlinMT_VERSION@ )
+set( MarlinMT_BUILD_CXX_STANDARD       @CMAKE_CXX_STANDARD@ )
+set_and_check( MarlinMT_INCLUDE_DIRS   @PACKAGE_CMAKE_INSTALL_INCLUDEDIR@ )
+set_and_check( MarlinMT_LIBRARY_DIR    @PACKAGE_CMAKE_INSTALL_LIBDIR@ )
 
-# Import Marlin targets in Marlin:: namespace
-include( ${CMAKE_CURRENT_LIST_DIR}/MarlinConfig-targets.cmake )
+# Import MarlinMT targets in MarlinMT:: namespace
+include( ${CMAKE_CURRENT_LIST_DIR}/MarlinMTConfig-targets.cmake )
 
-# Marlin::Core is a mandatory target
-if( NOT TARGET Marlin::Core )
-	message( FATAL_ERROR "Couldn't import Marlin::Core library!" )
+# MarlinMT::Core is a mandatory target
+if( NOT TARGET MarlinMT::Core )
+	message( FATAL_ERROR "Couldn't import MarlinMT::Core library!" )
 endif()
 
-set( Marlin_MISSING_COMPONENTS )
-foreach( comp ${Marlin_FIND_COMPONENTS} )
+set( MarlinMT_MISSING_COMPONENTS )
+foreach( comp ${MarlinMT_FIND_COMPONENTS} )
 	# The component can a normal library target
-	if( NOT TARGET Marlin::${comp} )
-		# In Marlin, plugin libraries (MODULE) are not exported
+	if( NOT TARGET MarlinMT::${comp} )
+		# In MarlinMT, plugin libraries (MODULE) are not exported
 		# to avoid unnecessary linking from user and double counting 
 		# of plugins at runtime.
 		# So here we just check if we have a library up there
 		if( "${comp}" MATCHES ".*Plugins$" )
-			find_library( Marlin_${comp}_MODULE Marlin${comp} PATHS ${Marlin_LIBRARY_DIR} NO_DEFAULT_PATH )
-			if( NOT Marlin_${comp}_MODULE )
-				list( APPEND Marlin_MISSING_COMPONENTS ${comp} )	
+			find_library( MarlinMT_${comp}_MODULE MarlinMT${comp} PATHS ${MarlinMT_LIBRARY_DIR} NO_DEFAULT_PATH )
+			if( NOT MarlinMT_${comp}_MODULE )
+				list( APPEND MarlinMT_MISSING_COMPONENTS ${comp} )	
 			else()
-				set( Marlin_${comp}_FOUND TRUE )
+				set( MarlinMT_${comp}_FOUND TRUE )
 			endif()
 			# In any case, reset the cache variable
-			set( Marlin_${comp}_MODULE )
+			set( MarlinMT_${comp}_MODULE )
 		else()
-			list( APPEND Marlin_MISSING_COMPONENTS ${comp} )			
+			list( APPEND MarlinMT_MISSING_COMPONENTS ${comp} )			
 		endif()
 	else()
-		set( Marlin_${comp}_FOUND TRUE )
+		set( MarlinMT_${comp}_FOUND TRUE )
 	endif()
 endforeach()
 
-check_required_components( Marlin )
+check_required_components( MarlinMT )
 
-if( NOT Marlin_FIND_QUIET AND Marlin_MISSING_COMPONENTS )
-	if( Marlin_FIND_REQUIRED )
-		message( FATAL_ERROR "Marlin not found. Missing components: ${Marlin_MISSING_COMPONENTS}" )
+if( NOT MarlinMT_FIND_QUIET AND MarlinMT_MISSING_COMPONENTS )
+	if( MarlinMT_FIND_REQUIRED )
+		message( FATAL_ERROR "MarlinMT not found. Missing components: ${MarlinMT_MISSING_COMPONENTS}" )
 	else()
-		message( WARNING "Marlin: some components are missing: ${Marlin_MISSING_COMPONENTS}" )
+		message( WARNING "MarlinMT: some components are missing: ${MarlinMT_MISSING_COMPONENTS}" )
 	endif()
 endif()

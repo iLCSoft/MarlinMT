@@ -1,7 +1,7 @@
 #
 # CMake macros and function used during the build process
-# of Marlin. Stuff defined here is private. For public
-# functions, see MarlinMacros.cmake
+# of MarlinMT. Stuff defined here is private. For public
+# functions, see MarlinMTMacros.cmake
 #
 # @author: Remi Ete, DESY
 # @date: Oct 2019
@@ -10,9 +10,9 @@
 
 # Use GNU conventions for install paths
 include( GNUInstallDirs )
-include( MarlinMacros )
+include( MarlinMTMacros )
 
-macro( MARLIN_OPTION )
+macro( MARLINMT_OPTION )
   cmake_parse_arguments(ARG "CACHE" "NAME;VALUE;DOC" "POSSIBLE_VALUES" ${ARGN} )
   if( ARG_CACHE )
     # is cache variable set by command line ?
@@ -26,73 +26,73 @@ macro( MARLIN_OPTION )
   else()
     option( ${ARG_NAME} ${ARG_DOC} ${ARG_VALUE} )
   endif()
-  list( APPEND MARLIN_CMAKE_OPTIONS ${ARG_NAME} )
-  list( REMOVE_DUPLICATES MARLIN_CMAKE_OPTIONS )
+  list( APPEND MARLINMT_CMAKE_OPTIONS ${ARG_NAME} )
+  list( REMOVE_DUPLICATES MARLINMT_CMAKE_OPTIONS )
 endmacro()
 
 # CMake options
-marlin_option( 
-  NAME MARLIN_LCIO
+marlinmt_option( 
+  NAME MARLINMT_LCIO
   VALUE ON
-  DOC "Set to ON to build Marlin with LCIO support"
+  DOC "Set to ON to build MarlinMT with LCIO support"
 )
-marlin_option( 
-  NAME MARLIN_DD4HEP
+marlinmt_option( 
+  NAME MARLINMT_DD4HEP
   VALUE ON
-  DOC "Set to ON to build Marlin with DD4hep"
+  DOC "Set to ON to build MarlinMT with DD4hep"
 )
-marlin_option( 
-  NAME MARLIN_GEAR
+marlinmt_option( 
+  NAME MARLINMT_GEAR
   VALUE OFF                 
-  DOC "Set to ON to build Marlin with Gear"
+  DOC "Set to ON to build MarlinMT with Gear"
 )
-marlin_option( 
-  NAME MARLIN_DOXYGEN
+marlinmt_option( 
+  NAME MARLINMT_DOXYGEN
   VALUE OFF 
   DOC "Set to ON to build/install Doxygen documentation"
 )
-marlin_option( 
-  NAME MARLIN_MKDOCS
+marlinmt_option( 
+  NAME MARLINMT_MKDOCS
   VALUE OFF
   DOC "Set to ON to build/install mkdocs documentation"
 )
-marlin_option(
-	NAME MARLIN_BUILD_BENCHMARKS
+marlinmt_option(
+	NAME MARLINMT_BUILD_BENCHMARKS
 	VALUE OFF
 	DOC "Set to ON to build/install marlin benchmarking Processors"
 )
-marlin_option( 
-  NAME MARLIN_WERROR
+marlinmt_option( 
+  NAME MARLINMT_WERROR
   VALUE OFF
-  DOC "Set to ON to compile Marlin with -Werror"
+  DOC "Set to ON to compile MarlinMT with -Werror"
 )
-marlin_option(
-  NAME MARLIN_BOOK_IMPL
+marlinmt_option(
+  NAME MARLINMT_BOOK_IMPL
   VALUE dummy
-  DOC "The Marlin Book implementation"
+  DOC "The MarlinMT Book implementation"
   CACHE 
   POSSIBLE_VALUES root6 root7 dummy
 )
 
-# List of compiler we want to compile Marlin with.
-# The list is purified using MarlinSupportedCompilerFlags
-list( APPEND MARLIN_CXX_FLAGS
+# List of compiler we want to compile MarlinMT with.
+# The list is purified using MarlinMTSupportedCompilerFlags
+list( APPEND MARLINMT_CXX_FLAGS
   -Wall -Wextra -Wshadow -Weffc++ -pedantic -Wno-long-long -Wuninitialized -O3
   -fexceptions -fstack-clash-protection -Wsuggest-override -Wconversion -Wparentheses
 )
-if( MARLIN_WERROR )
-  list( APPEND MARLIN_CXX_FLAGS -Werror )
+if( MARLINMT_WERROR )
+  list( APPEND MARLINMT_CXX_FLAGS -Werror )
 endif()
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
- list( APPEND MARLIN_CXX_FLAGS -Wl,-no-undefined )
+ list( APPEND MARLINMT_CXX_FLAGS -Wl,-no-undefined )
 endif()
 if( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9 )
-  list( APPEND MARLIN_CXX_FLAGS -fdiagnostics-color=auto )
+  list( APPEND MARLINMT_CXX_FLAGS -fdiagnostics-color=auto )
 endif()
 
-marlin_supported_compiler_flags( MARLIN_SUPPORTED_CXX_FLAGS ${MARLIN_CXX_FLAGS} )
-string( JOIN " " MARLIN_COMPILE_OPTIONS ${MARLIN_SUPPORTED_CXX_FLAGS} )
-set( MARLIN_COMPILE_OPTIONS ${MARLIN_COMPILE_OPTIONS} CACHE STRING "The CXX flags used by Marlin" FORCE )
+marlinmt_supported_compiler_flags( MARLINMT_SUPPORTED_CXX_FLAGS ${MARLINMT_CXX_FLAGS} )
+string( JOIN " " MARLINMT_COMPILE_OPTIONS ${MARLINMT_SUPPORTED_CXX_FLAGS} )
+set( MARLINMT_COMPILE_OPTIONS ${MARLINMT_COMPILE_OPTIONS} CACHE STRING "The CXX flags used by MarlinMT" FORCE )
 
 # RPATH treatment
 if (APPLE)
@@ -115,43 +115,43 @@ else()
 endif()
 
 #
-# function: marlin_set_cxx_standard
+# function: marlinmt_set_cxx_standard
 # Check and set the CXX standard if not set
 #
 # Usage:
-#    marlin_set_cxx_standard()
+#    marlinmt_set_cxx_standard()
 #
-function( MARLIN_SET_CXX_STANDARD )
-  set( MARLIN_UNSUPPORTED_CXX_STANDARDS 98 11 14 )
+function( MARLINMT_SET_CXX_STANDARD )
+  set( MARLINMT_UNSUPPORTED_CXX_STANDARDS 98 11 14 )
   if( NOT DEFINED CMAKE_CXX_STANDARD )
-    set( MARLIN_CXX_STANDARD 17 )
+    set( MARLINMT_CXX_STANDARD 17 )
   else()
-    if( CMAKE_CXX_STANDARD IN_LIST MARLIN_SUPPORTED_COMPILER_FLAGS )
+    if( CMAKE_CXX_STANDARD IN_LIST MARLINMT_SUPPORTED_COMPILER_FLAGS )
       message( FATAL_ERROR "CXX standard ${CMAKE_CXX_STANDARD} not supported. Must be >= 17" )
     endif()
-    set( MARLIN_CXX_STANDARD ${CMAKE_CXX_STANDARD} )
+    set( MARLINMT_CXX_STANDARD ${CMAKE_CXX_STANDARD} )
   endif()
-  set( CMAKE_CXX_STANDARD  ${MARLIN_CXX_STANDARD} CACHE STRING "The CXX standard" FORCE )
-  set( MARLIN_CXX_STANDARD ${MARLIN_CXX_STANDARD} CACHE STRING "The CXX standard" FORCE )
-  message( STATUS "Will use C++ standard ${MARLIN_CXX_STANDARD}" )
+  set( CMAKE_CXX_STANDARD  ${MARLINMT_CXX_STANDARD} CACHE STRING "The CXX standard" FORCE )
+  set( MARLINMT_CXX_STANDARD ${MARLINMT_CXX_STANDARD} CACHE STRING "The CXX standard" FORCE )
+  message( STATUS "Will use C++ standard ${MARLINMT_CXX_STANDARD}" )
 endfunction()
 
 
 #
-# function: marlin_check_root_requirements
+# function: marlinmt_check_root_requirements
 # In case ROOT is used check the ROOT config.
 # For example, we may require experimental components
 # from ROOT for our BOOK interface...
 #
 # Usage:
-#    marlin_check_root_requirements()
+#    marlinmt_check_root_requirements()
 #
-function( MARLIN_CHECK_ROOT_REQUIREMENTS )
+function( MARLINMT_CHECK_ROOT_REQUIREMENTS )
   # check if find_package( ROOT ... ) was processed before
   if( NOT ROOT_FOUND OR NOT ROOT_INCLUDE_DIRS )
     message( FATAL_ERROR "ROOT not found. Couldn't check ROOT7 requirements. Please use find_package( ROOT ... ) before calling this function" )
   endif()
-  if( NOT MARLIN_BOOK )
+  if( NOT MARLINMT_BOOK )
     return()
   endif()
   # Required ROOT options
@@ -159,10 +159,10 @@ function( MARLIN_CHECK_ROOT_REQUIREMENTS )
   foreach( opt ${REQUIRED_OPTIONS} )
     message( STATUS " => Checking for ROOT option ${opt}: ${ROOT_${opt}_FOUND}" )
     if( NOT ROOT_${opt}_FOUND )
-      message( FATAL_ERROR "Marlin ROOT requirements: ROOT was not compiled with the option '${opt}'" )
+      message( FATAL_ERROR "MarlinMT ROOT requirements: ROOT was not compiled with the option '${opt}'" )
     endif()
   endforeach()
-  # Marlin book requires includes from ROOT 7
+  # MarlinMT book requires includes from ROOT 7
   list( APPEND REQUIRED_INCLUDES
     RHist.hxx
     RSpan.hxx
@@ -180,29 +180,29 @@ function( MARLIN_CHECK_ROOT_REQUIREMENTS )
       endif()
     endforeach()
   endforeach()
-  message( STATUS "Marlin ROOT requirements OK ..." )
+  message( STATUS "MarlinMT ROOT requirements OK ..." )
 endfunction()
 
 
 # 
-# function: marlin_generate_thismarlin
-# Generate and install thismarlin.sh
+# function: marlinmt_generate_thismarlinmt
+# Generate and install thismarlinmt.sh
 # 
 # Usage:
-#    marlin_generate_thismarlin()
+#    marlinmt_generate_thismarlinmt()
 #    
-function( MARLIN_GENERATE_THISMARLIN )
-  file( READ ${PROJECT_SOURCE_DIR}/cmake/thismarlin.sh.in FILE_CONTENT )
-  get_property( marlin_dll_exports GLOBAL PROPERTY MARLIN_DLL_EXPORTS )
-  set( MARLIN_DLLS )
-  foreach( dll ${marlin_dll_exports} )
-    list( APPEND MARLIN_DLLS "$MARLIN_DIR/@CMAKE_INSTALL_LIBDIR@/$<TARGET_FILE_NAME:${dll}>" )
+function( MARLINMT_GENERATE_THISMARLINMT )
+  file( READ ${PROJECT_SOURCE_DIR}/cmake/thismarlinmt.sh.in FILE_CONTENT )
+  get_property( marlinmt_dll_exports GLOBAL PROPERTY MARLINMT_DLL_EXPORTS )
+  set( MARLINMT_DLLS )
+  foreach( dll ${marlinmt_dll_exports} )
+    list( APPEND MARLINMT_DLLS "$MARLINMT_DIR/@CMAKE_INSTALL_LIBDIR@/$<TARGET_FILE_NAME:${dll}>" )
   endforeach()
-  list( JOIN MARLIN_DLLS ":" CMAKE_MARLIN_DLL )
-  message( STATUS "Will export marlin dll for targets: ${marlin_dll_exports}" )
+  list( JOIN MARLINMT_DLLS ":" CMAKE_MARLINMT_DLL )
+  message( STATUS "Will export marlinmt dll for targets: ${marlinmt_dll_exports}" )
   string( CONFIGURE ${FILE_CONTENT} FILE_FINAL @ONLY )
   string( CONFIGURE ${FILE_FINAL} FILE_FINAL @ONLY )
-  set( OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/thismarlin.sh )
+  set( OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/thismarlinmt.sh )
   if( EXISTS ${OUTPUT_FILE} )
     file( REMOVE ${OUTPUT_FILE} )
   endif()

@@ -5,7 +5,7 @@
 /*
  * These macros can be used in the following way:
  *
- *    #if MARLIN_VERSION_CODE >= MARLIN_VERSION(2,23,4)
+ *    #if MARLINMT_VERSION_CODE >= MARLINMT_VERSION(2,23,4)
  *       #include <newheader.h>
  *    #else
  *       #include <oldheader.h>
@@ -13,8 +13,8 @@
  *
 */
 
-#define MARLIN_RELEASE "@Marlin_VERSION_MAJOR@.@Marlin_VERSION_MINOR@.@Marlin_VERSION_PATCH@"
-#define MARLIN_RELEASE_DATE "@Marlin_RELEASE_DATE@"
-#define MARLIN_RELEASE_TIME "@Marlin_RELEASE_TIME@"
-#define MARLIN_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-#define MARLIN_VERSION_CODE MARLIN_VERSION(@Marlin_VERSION_MAJOR@,@Marlin_VERSION_MINOR@,@Marlin_VERSION_PATCH@)
+#define MARLINMT_RELEASE "@MarlinMT_VERSION_MAJOR@.@MarlinMT_VERSION_MINOR@.@MarlinMT_VERSION_PATCH@"
+#define MARLINMT_RELEASE_DATE "@MarlinMT_RELEASE_DATE@"
+#define MARLINMT_RELEASE_TIME "@MarlinMT_RELEASE_TIME@"
+#define MARLINMT_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
+#define MARLINMT_VERSION_CODE MARLINMT_VERSION(@MarlinMT_VERSION_MAJOR@,@MarlinMT_VERSION_MINOR@,@MarlinMT_VERSION_PATCH@)

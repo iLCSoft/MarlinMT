@@ -1,24 +1,24 @@
 #!/bin/bash
 #
-# thismarlin.sh setup environment for this MarlinMT installation
+# thismarlinmt.sh setup environment for this MarlinMT installation
 # Generated from build directory: @CMAKE_BINARY_DIR@
 # Installation directory: @CMAKE_INSTALL_PREFIX@
 #
 # @author: Remi Ete, DESY
 #
 
-export MARLIN_DIR=@CMAKE_INSTALL_PREFIX@
-export LD_LIBRARY_PATH=$MARLIN_DIR/lib:$LD_LIBRARY_PATH
-export PATH=$MARLIN_DIR/bin:$PATH
+export MARLINMT_DIR=@CMAKE_INSTALL_PREFIX@
+export LD_LIBRARY_PATH=$MARLINMT_DIR/lib:$LD_LIBRARY_PATH
+export PATH=$MARLINMT_DIR/bin:$PATH
 
-source $MARLIN_DIR/bin/marlin-completion.bash
-source $MARLIN_DIR/bin/marlin-shell-functions.bash
+source $MARLINMT_DIR/bin/marlinmt-completion.bash
+source $MARLINMT_DIR/bin/marlinmt-shell-functions.bash
 
-FRAMEWORK_MARLIN_DLL=@CMAKE_MARLIN_DLL@
+FRAMEWORK_MARLINMT_DLL=@CMAKE_MARLINMT_DLL@
 
-if [ "${FRAMEWORK_MARLIN_DLL}" != "" ]
+if [ "${FRAMEWORK_MARLINMT_DLL}" != "" ]
 then
-  marlin-add-dll `echo $FRAMEWORK_MARLIN_DLL | tr ':' ' '`
+  marlinmt-add-dll `echo $FRAMEWORK_MARLINMT_DLL | tr ':' ' '`
 fi
 
 #
