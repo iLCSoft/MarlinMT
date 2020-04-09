@@ -13,7 +13,7 @@ cd build
 cmake \
   -C $HOME/CMakeCache.cmake \
   -DCMAKE_INSTALL_PREFIX=$PWD/../install \
-  -DMARLIN_MKDOCS=ON \
+  -DMARLINMT_MKDOCS=ON \
   ..
   
 # Run mkdocs
