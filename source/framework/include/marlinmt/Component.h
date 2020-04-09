@@ -3,11 +3,11 @@
 // -- std headers
 #include <typeindex>
 
-// -- marlinmtmt headers
-#include <marlinmtmt/Logging.h>
-#include <marlinmtmt/Parameter.h>
+// -- marlinmt headers
+#include <marlinmt/Logging.h>
+#include <marlinmt/Parameter.h>
 
-namespace marlinmtmt {
+namespace marlinmt {
   
   class Application ;
   

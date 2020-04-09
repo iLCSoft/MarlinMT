@@ -5,7 +5,7 @@
 #include <marlinmt/Component.h>
 #include <marlinmt/EventStore.h>
 #include <marlinmt/RunHeader.h>
-#include <marlinmt/MarlinConfig.h>  // for Marlin version macros
+#include <marlinmt/MarlinMTConfig.h>  // for Marlin version macros
 
 // -- std headers
 #include <map>

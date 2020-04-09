@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace marlinmtmt {
+namespace marlinmt {
 
   /**
    *  @brief  CmdLineParser class

@@ -15,7 +15,7 @@
 
 // -- marlinmt headers
 #include <marlinmt/Exceptions.h>
-#include <marlinmt/MarlinConfig.h>
+#include <marlinmt/MarlinMTConfig.h>
 
 namespace marlinmt {
 

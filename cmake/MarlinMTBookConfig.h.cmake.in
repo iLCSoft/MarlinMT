@@ -2,7 +2,7 @@
 // MarlinMT book config
 // WARNING: this header has been generated at configure time via CMake.
 // Modification may be lost ...
-#include <marlinmt/book/configs/@MARLIN_BOOK_IMPL_HEADER@>
+#include <marlinmt/book/configs/@MARLINMT_BOOK_IMPL_HEADER@>
 #include <marlinmt/book/BookStore.h>
 #include <marlinmt/book/Handle.h>
 #include <marlinmt/book/Hist.h>

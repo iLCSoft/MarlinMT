@@ -12,7 +12,7 @@
 #include <marlinmt/Application.h>
 #include <marlinmt/GeometryManager.h>
 #include <marlinmt/BookStoreManager.h>
-#include <marlinmt/MarlinConfig.h>
+#include <marlinmt/MarlinMTConfig.h>
 
 
 namespace marlinmt {
