@@ -14,6 +14,7 @@
 
 // -- marlin headers
 #include <marlin/Utils.h>
+#include <marlin/Validator.h>
 
 namespace marlin {
   
@@ -37,8 +38,6 @@ namespace marlin {
    */
   class ParameterImpl {
   public:
-    template <typename T>
-    using ValidatorFunctionT = std::function<bool(const T &)> ;
     using ValidatorFunction = std::any ;
     
   public:
@@ -427,6 +426,8 @@ namespace marlin {
   template <typename T>
   class ParameterBase {
   public:
+    using ValueType = T ;
+    
     /// Default destructor
     virtual ~ParameterBase() = default ;
     
@@ -585,7 +586,7 @@ namespace marlin {
      * 
      *  @param  validator the validator
      */
-    inline void setValidator( ParameterImpl::ValidatorFunctionT<T> validator ) {
+    inline void setValidator( ValidatorFunctionT<T> validator ) {
       _impl->setValidator( validator ) ;
     }
     
