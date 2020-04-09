@@ -1,9 +1,9 @@
-#include "marlin/book/Selection.h"
+#include "marlinmt/book/Selection.h"
 
 // -- MarlinBook includes
-#include "marlin/book/BookStore.h"
+#include "marlinmt/book/BookStore.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     WeakEntry::WeakEntry( const std::shared_ptr< const details::Entry > &entry )
       : _entry{entry}{}
@@ -90,4 +90,4 @@ namespace marlin {
       const Condition &         cond ) ;
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

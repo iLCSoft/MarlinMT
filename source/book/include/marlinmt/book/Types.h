@@ -1,6 +1,6 @@
 #pragma once
 
-# include "marlin/book/configs/Base.h"
+# include "marlinmt/book/configs/Base.h"
 
 // -- std includes
 #include <exception>
@@ -8,10 +8,10 @@
 #include <string_view>
 
 #define MARLIN_BOOK_THROW( message ) \
-  throw marlin::book::exceptions::BookStoreException( \
+  throw marlinmt::book::exceptions::BookStoreException( \
       __LINE__, __FUNCTION__, __FILE__, message );
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     namespace exceptions {
       class BookStoreException : public std::exception {
@@ -43,6 +43,6 @@ namespace marlin {
       }
     } // end namespace exceptions
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 
 

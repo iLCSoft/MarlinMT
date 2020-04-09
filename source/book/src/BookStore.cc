@@ -1,13 +1,13 @@
-#include "marlin/book/BookStore.h"
+#include "marlinmt/book/BookStore.h"
 
 // -- std includes
 #include <filesystem>
 #include <unordered_map>
 
 // -- MarlinBook includes
-#include "marlin/book/Condition.h"
-#include "marlin/book/Selection.h"
-#include "marlin/book/StoreWriter.h"
+#include "marlinmt/book/Condition.h"
+#include "marlinmt/book/Selection.h"
+#include "marlinmt/book/StoreWriter.h"
 
 class PathHash {
 public:
@@ -16,7 +16,7 @@ public:
   }
 };
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     std::shared_ptr< details::Entry >
@@ -100,5 +100,5 @@ namespace marlin {
 
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 

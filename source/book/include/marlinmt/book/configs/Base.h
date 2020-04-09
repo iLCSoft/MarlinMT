@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <vector>
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     /// Alias for Types used by MarlinBook
     namespace types {
@@ -357,4 +357,4 @@ namespace marlin {
     class BaseHandle ;
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

@@ -1,14 +1,14 @@
 #pragma once
 
 // -- MarlinBook includes
-#include "marlin/book/BookStore.h"
-#include "marlin/book/Types.h"
+#include "marlinmt/book/BookStore.h"
+#include "marlinmt/book/Types.h"
 
 // -- Hist includes
-#include "marlin/book/HistEntry.h"
-#include "marlin/book/HistEntryData.h"
+#include "marlinmt/book/HistEntry.h"
+#include "marlinmt/book/HistEntryData.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     //--------------------------------------------------------------------------
@@ -557,4 +557,4 @@ namespace marlin {
     }
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

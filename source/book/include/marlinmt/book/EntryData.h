@@ -7,10 +7,10 @@
 #include  <typeindex>
 
 // -- MarlinBook includes
-#include  "marlin/book/Flags.h"
-#include  "marlin/book/Types.h"
+#include  "marlinmt/book/Flags.h"
+#include  "marlinmt/book/Types.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     // -- MarlinBook forward declaration
     class MemLayout ;
@@ -88,14 +88,14 @@ namespace marlin {
     class EntryBase {} ;
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 
 namespace std {
   template<>
-  struct less<marlin::book::EntryKey> {
+  struct less<marlinmt::book::EntryKey> {
     bool operator()(
-      const marlin::book::EntryKey& lh,
-      const marlin::book::EntryKey& rh) const 
+      const marlinmt::book::EntryKey& lh,
+      const marlinmt::book::EntryKey& rh) const 
     {
       return lh.idx < rh.idx;
     }

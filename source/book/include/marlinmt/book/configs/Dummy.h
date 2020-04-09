@@ -4,7 +4,7 @@
 #error No mutiple binding of MarlinConfig. 
 #endif
 
-#include "marlin/book/configs/Base.h"
+#include "marlinmt/book/configs/Base.h"
 
 namespace marlin {
   namespace book {

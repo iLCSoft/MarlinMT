@@ -25,7 +25,7 @@ namespace ROOT { namespace Experimental {
 
 
 // Evil machinery turning ROOT 7 histograms into ROOT 6 histograms
-namespace marlin 
+namespace marlinmt 
 {
   namespace book {
     // Typing this gets old quickly
@@ -253,7 +253,7 @@ namespace marlin
 
     // TODO: Support THn someday, if someone asks for it
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 
 
 // High-level interface to the above conversion machinery
@@ -263,7 +263,7 @@ namespace marlin
 //
 template <typename Root7Hist>
 auto into_root6_hist(const Root7Hist& src, const char* name) {
-  return marlin::book::HistConverter<Root7Hist>::convert(src, name);
+  return marlinmt::book::HistConverter<Root7Hist>::convert(src, name);
 }
 // ROOT7 -> ROOT6 histogram converter (full header)
 //
@@ -288,7 +288,7 @@ auto into_root6_hist(const Root7Hist& src, const char* name) {
 #include <utility>
 
 
-namespace marlin
+namespace marlinmt
 {
   namespace book {
     // === BUILD A THx, FAILING AT RUNTIME IF NO CONSTRUCTOR EXISTS ===
@@ -631,4 +631,4 @@ namespace marlin
       return dest;
     }
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

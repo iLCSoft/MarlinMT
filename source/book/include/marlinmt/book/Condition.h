@@ -8,9 +8,9 @@
 #include <typeindex>
 
 // -- MarlinBook includes
-#include "marlin/book/EntryData.h"
+#include "marlinmt/book/EntryData.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     // -- MarlinBook forward declaration
     struct EntryKey ;
@@ -156,4 +156,4 @@ namespace marlin {
     } ;
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

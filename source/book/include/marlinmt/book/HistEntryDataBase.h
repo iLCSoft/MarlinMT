@@ -4,10 +4,10 @@
 #include <array>
 
 // -- MarlinBook includes
-#include  "marlin/book/EntryData.h"
-#include  "marlin/book/Types.h"
+#include  "marlinmt/book/EntryData.h"
+#include  "marlinmt/book/Types.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     
     /**
@@ -78,4 +78,4 @@ namespace marlin {
       std::array< std::unique_ptr< typename Type::AxisConfig_t >, D > _axis{} ;
     } ;
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

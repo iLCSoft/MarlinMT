@@ -1,9 +1,9 @@
-#include "marlin/book/StoreWriter.h"
+#include "marlinmt/book/StoreWriter.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     void StoreWriter::writeSelection(
       const Selection &selection
     ) {}
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

@@ -8,15 +8,15 @@
 #include <variant>
 
 // -- Marlin includes
-// #include "marlin/Exceptions.h"
+// #include "marlinmt/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/EntryData.h"
-#include "marlin/book/Flags.h"
-#include "marlin/book/MemLayout.h"
-#include "marlin/book/Types.h"
+#include "marlinmt/book/EntryData.h"
+#include "marlinmt/book/Flags.h"
+#include "marlinmt/book/MemLayout.h"
+#include "marlinmt/book/Types.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     /**
@@ -275,4 +275,4 @@ namespace marlin {
 
     } // end namespace details
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

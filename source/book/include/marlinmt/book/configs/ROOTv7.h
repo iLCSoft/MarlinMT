@@ -4,7 +4,7 @@
 #error No mutiple binding of MarlinConfig. 
 #endif
 
-#include "marlin/book/configs/Base.h"
+#include "marlinmt/book/configs/Base.h"
 
 // -- ROOT includes
 #include "RVersion.h"
@@ -20,7 +20,7 @@
 #include "ROOT/RSpan.hxx"
 
 // -- histogram conversion include 
-#include "marlin/book/RootHistV7ToV6Conversion.h"
+#include "marlinmt/book/RootHistV7ToV6Conversion.h"
 
 namespace marlin {
   namespace book {

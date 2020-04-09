@@ -15,18 +15,18 @@
 #include <unordered_map>
 
 // -- Marlin includes
-// #include "marlin/Exceptions.h"
+// #include "marlinmt/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/Condition.h"
-#include "marlin/book/Entry.h"
-#include "marlin/book/EntryData.h"
-#include "marlin/book/Flags.h"
-#include "marlin/book/MemLayout.h"
-#include "marlin/book/Selection.h"
-#include "marlin/book/Types.h"
+#include "marlinmt/book/Condition.h"
+#include "marlinmt/book/Entry.h"
+#include "marlinmt/book/EntryData.h"
+#include "marlinmt/book/Flags.h"
+#include "marlinmt/book/MemLayout.h"
+#include "marlinmt/book/Selection.h"
+#include "marlinmt/book/Types.h"
 
-namespace marlin {
+namespace marlinmt {
   /// contains classes needed to book and managed booked objects.
   namespace book {
 
@@ -494,4 +494,4 @@ namespace marlin {
 
   } // end namespace book
 
-} // end namespace marlin
+} // end namespace marlinmt

@@ -7,14 +7,14 @@
 #include <vector>
 
 // -- Marlin includes
-// #include  "marlin/Exceptions.h"
+// #include  "marlinmt/Exceptions.h"
 
 // -- MarlinBook includes
-#include "marlin/book/Condition.h"
-#include "marlin/book/Entry.h"
-#include "marlin/book/MemLayout.h"
+#include "marlinmt/book/Condition.h"
+#include "marlinmt/book/Entry.h"
+#include "marlinmt/book/MemLayout.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     // -- MarlinBook forward declaration
@@ -226,4 +226,4 @@ namespace marlin {
 
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

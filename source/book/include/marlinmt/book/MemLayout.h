@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     /**
@@ -148,4 +148,4 @@ namespace marlin {
     } ;
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

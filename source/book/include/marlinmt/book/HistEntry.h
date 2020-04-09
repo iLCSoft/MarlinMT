@@ -8,12 +8,12 @@
 #include <vector>
 
 // -- MarlinBook includes
-#include "marlin/book/Entry.h"
-#include "marlin/book/Flags.h"
-#include "marlin/book/Types.h"
+#include "marlinmt/book/Entry.h"
+#include "marlinmt/book/Flags.h"
+#include "marlinmt/book/Types.h"
 
 
-namespace marlin {
+namespace marlinmt {
   namespace book {  
 
     /// Handle specialisation for Histograms.
@@ -272,4 +272,4 @@ namespace marlin {
       std::mutex _fillersExtend {};
     } ;
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

@@ -4,7 +4,7 @@
 #include <filesystem>
 
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     // -- MarlinBook forward declaration
@@ -28,5 +28,5 @@ namespace marlin {
 
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 

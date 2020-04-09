@@ -1,13 +1,13 @@
-#include "marlin/book/Condition.h"
+#include "marlinmt/book/Condition.h"
 
 // -- std includes
 #include <iostream>
 #include <string>
 
 // -- MarlinBook includes
-#include "marlin/book/EntryData.h"
+#include "marlinmt/book/EntryData.h"
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
     
     bool rgxEvaluation( const std::string_view &match,
@@ -118,4 +118,4 @@ namespace marlin {
     }
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

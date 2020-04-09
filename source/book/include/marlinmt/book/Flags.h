@@ -3,7 +3,7 @@
 // -- std header
 #include <bitset>
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     class Flag_t ;
@@ -11,7 +11,7 @@ namespace marlin {
       constexpr unsigned long long value( const Flag_t &flag ) ;
     } // end namespace Flags
 
-    /** Flag type for flags in marlin::book */
+    /** Flag type for flags in marlinmt::book */
     class Flag_t {
       static constexpr std::size_t AmtFlags = 8 ;
 
@@ -101,7 +101,7 @@ namespace marlin {
     } ;
 
 
-    /// Flags for different purposes in marlin::book
+    /// Flags for different purposes in marlinmt::book
     namespace Flags {
       constexpr unsigned long long value( const Flag_t &flag ) {
         return flag._initValue ;
@@ -141,4 +141,4 @@ namespace marlin {
     } // end namespace Masks
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

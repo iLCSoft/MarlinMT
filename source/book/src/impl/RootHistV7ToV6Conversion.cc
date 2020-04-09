@@ -1,7 +1,7 @@
-#include "marlin/book/RootHistV7ToV6Conversion.h"
+#include "marlinmt/book/RootHistV7ToV6Conversion.h"
 
 
-namespace marlin {
+namespace marlinmt {
   namespace book { 
     std::string convert_hist_title(const std::string& title) {
       // To prevent ROOT 6 from misinterpreting free-form histogram titles
@@ -119,4 +119,4 @@ namespace marlin {
     template TH3F convert_hist(const RExp::RHist<3, Float_t>&, const char*);
     template TH3D convert_hist(const RExp::RHist<3, Double_t>&, const char*);
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt

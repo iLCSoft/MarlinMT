@@ -1,4 +1,4 @@
-#include "marlin/book/StoreWriter.h"
+#include "marlinmt/book/StoreWriter.h"
 
 // -- std includes
 #include <filesystem>
@@ -6,12 +6,12 @@
 #include <vector>
 
 // -- MarlinBook includes
-#include "marlin/book/configs/ROOTv7.h"
-#include "marlin/book/Entry.h"
-#include "marlin/book/Handle.h"
-#include "marlin/book/Hist.h"
-#include "marlin/book/Selection.h"
-#include "marlin/book/Types.h"
+#include "marlinmt/book/configs/ROOTv7.h"
+#include "marlinmt/book/Entry.h"
+#include "marlinmt/book/Handle.h"
+#include "marlinmt/book/Hist.h"
+#include "marlinmt/book/Selection.h"
+#include "marlinmt/book/Types.h"
 
 
 // -- ROOT includes
@@ -30,7 +30,7 @@ using DirectoryMap = std::unordered_map<std::filesystem::path, TDirectory*, Path
 template<typename T>  
 void writeObject( TDirectory* file, const std::string_view& name, const T& obj) {
 
-  auto root6Obj = marlin::book::types::toRoot6(obj, name);
+  auto root6Obj = marlinmt::book::types::toRoot6(obj, name);
 
   if constexpr (!std::is_same_v<decltype(toRoot6(obj,name)), decltype(nullptr)>) {
     file->WriteTObject(
@@ -42,7 +42,7 @@ void writeObject( TDirectory* file, const std::string_view& name, const T& obj) 
 
 
 
-namespace marlin {
+namespace marlinmt {
   namespace book {
 
     void StoreWriter::writeSelection(
@@ -98,5 +98,5 @@ namespace marlin {
     }
 
   } // end namespace book
-} // end namespace marlin
+} // end namespace marlinmt
 
