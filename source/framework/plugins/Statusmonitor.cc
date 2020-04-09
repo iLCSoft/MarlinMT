@@ -44,7 +44,7 @@ namespace marlin {
     void end() override ;
 
   private:
-    IntParameter _howOften {*this, "howOften",
+    UIntParameter _howOften {*this, "howOften",
               "Print event number every N events", 1 } ;
 
     // runtime members

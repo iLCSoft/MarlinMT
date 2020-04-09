@@ -40,7 +40,7 @@ namespace marlin {
   	void processEvent( EventStore * evt ) override ;
 
   protected:
-    IntParameter _howOften {*this, "howOften",
+    UIntParameter _howOften {*this, "howOften",
               "Print event number every N events", 1 } ;
 
     ///< Event counter
