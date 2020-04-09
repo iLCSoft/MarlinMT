@@ -1,6 +1,6 @@
 /.dependencies
-/MarlinConfig.cmake
-/MarlinConfigVersion.cmake
+/MarlinMTConfig.cmake
+/MarlinMTConfigVersion.cmake
 /bin/
 /build/
 /build_env.sh
