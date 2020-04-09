@@ -107,10 +107,10 @@ int main( int /*argc*/, char ** /*argv*/ ) {
   args = {45., 78541.} ;
   PASS_VALIDATOR( "fv_notempty_pass", fvparam, args, true )
   
-  StringParameter svparam( "sparam", "A string parameter" ) ;
+  StringParameter sparam( "sparam", "A string parameter" ) ;
   test.test( "no_default", not sparam.hasDefault() ) ;
   
-  sparam.setValidator( validator::constraints( { "toto", "tata", "tutu" } ) ) ;
+  sparam.setValidator( validator::constraints<std::string>( { "toto", "tata", "tutu" } ) ) ;
   PASS_VALIDATOR( "sp_contraints_pass", sparam, "toto", true )
   PASS_VALIDATOR( "sp_contraints_fail", sparam, "bibou", false )
   
