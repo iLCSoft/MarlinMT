@@ -1,7 +1,7 @@
 
-// -- marlin headers
-#include "marlin/PluginManager.h"
-#include "marlin/GeometryPlugin.h"
+// -- marlinmt headers
+#include "marlinmt/PluginManager.h"
+#include "marlinmt/GeometryPlugin.h"
 
 // -- dd4hep headers
 #include "DD4hep/Detector.h"
@@ -17,11 +17,11 @@ using namespace dd4hep ;
 using namespace dd4hep::detail ;
 using namespace dd4hep::rec ;
 
-namespace marlin {
+namespace marlinmt {
   
   /**
    *  @brief  DD4hepGeometry class
-   *  Responsible for loading DD4hep geometry in Marlin 
+   *  Responsible for loading DD4hep geometry in MarlinMT
    */
   class DD4hepGeometry : public GeometryPlugin {
   public:
@@ -222,6 +222,6 @@ namespace marlin {
     _logger->log<MESSAGE>() << "############################################################################### "  << std::endl  << std::endl  ;
   }
   
-  MARLIN_DECLARE_GEOMETRY( DD4hepGeometry )
+  MARLINMT_DECLARE_GEOMETRY( DD4hepGeometry )
 
-} // namespace marlin
+} // namespace marlinmt
