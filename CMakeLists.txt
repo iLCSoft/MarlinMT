@@ -6,7 +6,7 @@ cmake_minimum_required( VERSION 3.14 FATAL_ERROR )
 
 #--- Project name
 project( MarlinMT
-  VERSION 1.16.0
+  VERSION 0.1.0
   DESCRIPTION "Modular Analysis and Reconstruction for LINear collider (Multi-Threaded)"
   LANGUAGES CXX
 )
