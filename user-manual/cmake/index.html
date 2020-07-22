@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Compiling your project with CMake - MarlinMT</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../..">MarlinMT</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../..">Home</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="../../about/license/">License</a>
+</li>
+                                    
+<li >
+    <a href="../../about/contribute/">Contribute</a>
+</li>
+                                    
+<li >
+    <a href="../../about/citing/">Citing MarlinMT</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">User manual <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="../introduction/">Introduction</a>
+</li>
+                                    
+<li >
+    <a href="../installation/">Installation</a>
+</li>
+                                    
+<li >
+    <a href="../getting-started/">Getting started</a>
+</li>
+                                    
+<li class="active">
+    <a href="./">Compiling your project with CMake</a>
+</li>
+                                    
+<li >
+    <a href="../bookstore/">Use Histograms</a>
+</li>
+                                    
+<li >
+    <a href="../geometry/">Geometry</a>
+</li>
+                                    
+<li >
+    <a href="../data-source/">Data source</a>
+</li>
+                                    
+<li >
+    <a href="../xml-parser/">XML parser</a>
+</li>
+                                    
+<li >
+    <a href="../processor-api/">Processor API</a>
+</li>
+                                    
+<li >
+    <a href="../marlin-mt/">Multi-threading with MarlinMT</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Internal Documentation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="../../internal-documentation/booking-system/">Booking system</a>
+</li>
+                                </ul>
+                            </li>
+                            <li >
+                                <a href="../../doxygen/index.html">Reference manual</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../getting-started/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li >
+                                <a rel="prev" href="../bookstore/">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#finding-the-marlinmt-package">Finding the MarlinMT package</a></li>
+            <li><a href="#pointing-to-a-marlin-installation">Pointing to a Marlin installation</a></li>
+            <li><a href="#use-marlin-cmake-configuration-files">Use Marlin CMake configuration files</a></li>
+        <li class="main "><a href="#examples">Examples</a></li>
+            <li><a href="#general-notes">General notes</a></li>
+            <li><a href="#a-single-processor-library">A single processor library</a></li>
+            <li><a href="#project-requiring-other-components">Project requiring other components</a></li>
+            <li><a href="#project-with-a-toolkit-library-and-a-plugin-library">Project with a toolkit library and a plugin library</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<p>The build system of MarlinMT is CMake. After a successful installation of MarlinMT, a set of CMake configuration files are installed with the software, listed (non-exaustive):</p>
+<ul>
+<li>MarlinConfig.cmake</li>
+<li>MarlinConfigVersion.cmake</li>
+<li>MarlinConfig-targets.cmake</li>
+</ul>
+<p>This page describes how to write CMake files to compile your project against MarlinMT and create the needed libraries to run your MarlinMT processors.
+In the following, we assume that Marlin was installed in <code>/home/$USER/MarlinMT</code>, installation path refereed as <code>$Marlin_DIR</code> later-on. </p>
+<h2 id="finding-the-marlinmt-package">Finding the MarlinMT package</h2>
+<h3 id="pointing-to-a-marlin-installation">Pointing to a Marlin installation</h3>
+<p>To point to a specific Marlin installation, you need to tell CMake where the configuration files are. 
+The CMake documentation <a href="https://cmake.org/cmake/help/v3.14/manual/cmake-packages.7.html">about this</a> may be more complete than the information in this section.
+The common way to point to configuration files is to provide the <code>&lt;PACKAGE&gt;_DIR</code> variable, in our case <code>Marlin_DIR</code>:</p>
+<pre class="codehilite"><code class="language-shell"># from the build directory, assume your
+# CMakeLists.txt file is in .. 
+cmake -DMarlin_DIR=$Marlin_DIR/lib/Marlin-&lt;version&gt; ..</code></pre>
+
+
+<p>If you use version 1.16.0, then use:</p>
+<pre class="codehilite"><code class="language-shell">cmake -DMarlin_DIR=$Marlin_DIR/lib/Marlin-1.16.0 ..</code></pre>
+
+
+<h3 id="use-marlin-cmake-configuration-files">Use Marlin CMake configuration files</h3>
+<p>The command to find a package using CMake is the following:</p>
+<pre class="codehilite"><code class="language-cmake"># Minimal call to find Marlin
+find_package( Marlin CONFIG REQUIRED )</code></pre>
+
+
+<p>This call will look for MarlinConfig.cmake in your system. If CMake couldn't not find it, an error is raised and CMake stops processing.
+On success, a few targets will be imported from configuration files, allowing to access include directories, libraries, etc... to use for compiling and linking in your project. Using the call has shown above, only the target <code>Marlin::Core</code> is imported. This target holds the core framework include directories (normally <code>$Marlin_DIR/include</code>) and the library <code>MarlinCore</code>. </p>
+<p>Your project may require the use of other components. For example, you want to use LCIO in your processors as the main event handle or the DD4hep geometry. </p>
+<p>We first need to differentiate two component cases:</p>
+<ul>
+<li>a <strong>toolkit</strong> library: a shared library which comes with include directories installed along with the library. The user can link against this library and use the includes for its development. For example, the <code>MarlinBook</code> library is such a library.</li>
+<li>a <strong>plugin</strong> library: a shared library that will be loaded at runtime by an application (Marlin in our case). This library has been installed along with other libraries but are not designed to be linked against by users. For example <code>LCIOPlugins</code> is such a library.</li>
+</ul>
+<p>The <code>find_package</code> CMake command can take additional arguments to find additional components:</p>
+<pre class="codehilite"><code class="language-cmake"># Find Marlin core and additional components 
+find_package( Marlin CONFIG COMPONENTS Book LCIOPlugins DD4hepPlugins REQUIRED )</code></pre>
+
+
+<p>This call will add an additional target to the <code>Marlin::</code> namespace, the target <code>Marlin::Book</code>. As a rule of thumb, if the component name contains <code>Plugins</code>, then we are dealing with <code>plugin</code> libraries. In the <code>find_package</code> CMake call for Marlin, no target will be created for <code>plugin</code> libraries. The role of this call with plugin components is to check that the installed version of Marlin is distributed with the components you need. For toolkit libraries, such as <code>MarlinBook</code>, an imported target will be created (in this case <code>Marlin::Book</code>). This target provides include directories, library, etc... (as for <code>Marlin::Core</code>) for linking you project against. If any of these components is missing CMake will raise an error.</p>
+<h2 id="examples">Examples</h2>
+<h3 id="general-notes">General notes</h3>
+<p>In general a project using Marlin can be partitioned in 3 types of files:</p>
+<ul>
+<li>toolkit files: located in your <code>include</code> and <code>src</code> directories they implement all the functionalities you need in your project.</li>
+<li>plugin files: self-contained code not included in any other place of your project. These are plugins that will be compiled in a module library (see <a href="https://cmake.org/cmake/help/v3.14/command/add_library.html?highlight=add_library#id2">module library</a>). For them, you don't need header files as they are self-contained.</li>
+<li>binaries: executables compiled and installed along with your project.</li>
+</ul>
+<p>It is generally a question of taste of how to organize your files in a project. In the case of Marlin, the only recommendation is to make sure the toolkit and the plugins are well separated in the project. In particular, you should not compile a plugin in your toolkit library, as the plugin will be loaded by any project linking against your library. This is generally wanted and is preferable to compile a separate library (or many if you need) for your plugins and add <code>"Plugins"</code> in the library name.  </p>
+<h3 id="a-single-processor-library">A single processor library</h3>
+<p>We assume the following working tree:</p>
+<pre class="codehilite"><code class="language-shell">$ ls -R
+CMakeLists.txt
+source/plugins/MyProcessor.cc</code></pre>
+
+
+<p>with <code>MyProcessor.cc</code> implementing a single processor plugin. </p>
+<p>To compile your project with CMake, use: </p>
+<pre class="codehilite"><code class="language-cmake"># Top-level CMakeLists.txt file
+cmake_minimum_required( VERSION 3.14 FATAL_ERROR )
+project( MyProject )
+
+# Standard CMake file: sets prefix path for libraries, includes, etc ...
+include( GNUInstallDirs )
+
+# Find Marlin. Imports all needed targets
+find_package( Marlin CONFIG REQUIRED )
+
+# MODULE libraries are shared libraries, designed to be loaded 
+# at runtime, not to be linked against
+add_library( MyPlugins MODULE source/plugins/MyProcessor.cc )
+
+# This will link your processor library against the MarlinCore library...
+# but not only
+# It will add the include directories of Marlin::Core to the target 
+# include directories automatically (and definitions, etc ...) 
+target_link_libraries( MyPlugins PUBLIC Marlin::Core )
+
+# Install your library. CMAKE_INSTALL_LIBDIR is defined in GNUInstallDirs
+install( TARGETS MyPlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )</code></pre>
+
+
+<h3 id="project-requiring-other-components">Project requiring other components</h3>
+<p>We assume the same working tree:</p>
+<pre class="codehilite"><code class="language-shell">$ ls -R
+CMakeLists.txt
+source/plugins/MyProcessor.cc</code></pre>
+
+
+<p>with <code>MyProcessor.cc</code> implementing a single processor plugin using LCIO event data model.</p>
+<p>To compile your project with CMake, use: </p>
+<pre class="codehilite"><code class="language-cmake"># Top-level CMakeLists.txt file
+cmake_minimum_required( VERSION 3.14 FATAL_ERROR )
+project( MyProject )
+
+# Standard CMake file: sets prefix path for libraries, includes, etc ...
+include( GNUInstallDirs )
+
+# Find Marlin. Imports all needed targets
+find_package( Marlin CONFIG COMPONENTS LCIOPlugins DD4hepPlugins REQUIRED )
+
+# Find LCIO library. LCIO is not part of any Marlin imported targets
+# and has to be found manually
+find_package( LCIO REQUIRED )
+
+# MODULE libraries are shared libraries, designed to be loaded 
+# at runtime, not to be linked against
+add_library( MyPlugins MODULE source/plugins/MyProcessor.cc )
+
+# This will link your processor library against the MarlinCore library...
+# but not only
+# It will add the include directories of Marlin::Core to the target 
+# include directories automatically (and definitions, etc ...) 
+target_link_libraries( MyPlugins PUBLIC Marlin::Core )
+
+# LCIO specific linking, includes ...
+target_link_libraries( MyPlugins PUBLIC ${LCIO_LIBRARIES} )
+# SYSTEM means &quot;ignore warnings from LCIO includes&quot; as they are not from 
+# your project. No need to show them...
+target_include_directories( MyPlugins SYSTEM PUBLIC ${LCIO_INCLUDE_DIRS} )
+
+# Install your library. CMAKE_INSTALL_LIBDIR is defined in GNUInstallDirs
+install( TARGETS MyPlugins LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )</code></pre>
+
+
+<h3 id="project-with-a-toolkit-library-and-a-plugin-library">Project with a toolkit library and a plugin library</h3>
+<p>We assume the following working tree:</p>
+<pre class="codehilite"><code class="language-shell">$ ls -R
+CMakeLists.txt
+source/plugins/MyProcessor.cc
+source/include/Tools.h
+source/src/Tools.cc</code></pre>
+
+
+<p>with <code>MyProcessor.cc</code> implementing a single processor plugin and <code>Tools.h/.cc</code> implementing tools for your project.</p>
+<p>To compile your project with CMake, use: </p>
+<pre class="codehilite"><code class="language-cmake"># Top-level CMakeLists.txt file
+cmake_minimum_required( VERSION 3.14 FATAL_ERROR )
+project( MyProject )
+
+# Standard CMake file: sets prefix path for libraries, includes, etc ...
+include( GNUInstallDirs )
+
+# Find Marlin. Imports all needed targets
+find_package( Marlin CONFIG REQUIRED )
+
+# Compile your tools first in a library
+add_library( MyTools SHARED source/Tools.cc )
+
+# Include directories for compiling your library
+# Also specify that you want to install your includes 
+target_include_directories( MyTools PUBLIC
+  $&lt;BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/source/include&gt;
+  $&lt;INSTALL_INTERFACE:include&gt;
+)
+
+# Your plugin library
+add_library( MyPlugins MODULE source/plugins/MyProcessor.cc )
+
+# This will link your processor library against the MarlinCore and library...
+# but not only
+# It will add the include directories of the targets
+# automatically (and definitions, etc ...) 
+target_link_libraries( MyPlugins PUBLIC Marlin::Core MyTools )
+
+# Install your libraries. CMAKE_INSTALL_LIBDIR is defined in GNUInstallDirs
+install( TARGETS MyPlugins MyTools LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"search": 83, "next": 78, "help": 191, "previous": 80};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,6 @@
+var structmarlinmt_1_1book_1_1HistConverter_3_01RExp_1_1RHist_3_01DIMS_00_01PRECISION_00_01STAT_8_8_5df8cc8bb34d128a14da8aaa20f4311c =
+[
+    [ "Input", "structmarlinmt_1_1book_1_1HistConverter_3_01RExp_1_1RHist_3_01DIMS_00_01PRECISION_00_01STAT_8_8_5df8cc8bb34d128a14da8aaa20f4311c.html#a46946dbfc812709beba22a533abc4fa1", null ],
+    [ "Output", "structmarlinmt_1_1book_1_1HistConverter_3_01RExp_1_1RHist_3_01DIMS_00_01PRECISION_00_01STAT_8_8_5df8cc8bb34d128a14da8aaa20f4311c.html#aa01314d3af4d37d5bf98aef529157506", null ],
+    [ "convert", "structmarlinmt_1_1book_1_1HistConverter_3_01RExp_1_1RHist_3_01DIMS_00_01PRECISION_00_01STAT_8_8_5df8cc8bb34d128a14da8aaa20f4311c.html#a92780eb1eb7737a995bea8f799f6bdbb", null ]
+];

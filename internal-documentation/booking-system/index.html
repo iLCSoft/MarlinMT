@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Booking system - MarlinMT</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <!-- Expander button -->
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="../..">MarlinMT</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li >
+                                <a href="../..">Home</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">About <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="../../about/license/">License</a>
+</li>
+                                    
+<li >
+    <a href="../../about/contribute/">Contribute</a>
+</li>
+                                    
+<li >
+    <a href="../../about/citing/">Citing MarlinMT</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">User manual <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li >
+    <a href="../../user-manual/introduction/">Introduction</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/installation/">Installation</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/getting-started/">Getting started</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/cmake/">Compiling your project with CMake</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/bookstore/">Use Histograms</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/geometry/">Geometry</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/data-source/">Data source</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/xml-parser/">XML parser</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/processor-api/">Processor API</a>
+</li>
+                                    
+<li >
+    <a href="../../user-manual/marlin-mt/">Multi-threading with MarlinMT</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Internal Documentation <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li class="active">
+    <a href="./">Booking system</a>
+</li>
+                                </ul>
+                            </li>
+                            <li >
+                                <a href="../../doxygen/index.html">Reference manual</a>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li >
+                                <a rel="next" href="../../user-manual/marlin-mt/">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="disabled">
+                                <a rel="prev" >
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#entry-types">Entry Types</a></li>
+        <li class="main "><a href="#creating-new-objects">Creating new objects</a></li>
+        <li class="main "><a href="#writing-to-an-object">Writing to an object</a></li>
+            <li><a href="#creating-a-handle">creating a handle</a></li>
+            <li><a href="#use-the-object-specific-modification-functions">use the object specific modification functions.</a></li>
+        <li class="main "><a href="#reading-final-version-of-object">reading final version of object</a></li>
+        <li class="main "><a href="#access-created-objects">Access created objects</a></li>
+            <li><a href="#selection">selection</a></li>
+            <li><a href="#condition">Condition</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<p>The <code>BookStore</code> is an Object which managed Histograms for later universal access.</p>
+<style>
+img[alt="dependency diagram"] {
+    width: 450px;
+}
+</style>
+
+<p>See <a href="/diagrams/BookStore-Data.html">dependency diagram</a> for further information.
+<a href="/diagrams/BookStore-Data.html"><img alt="dependency diagram" src="/diagrams/BookStore-Data.svg" /></a></p>
+<h2 id="entry-types">Entry Types</h2>
+<p>Depending on the use case, the BookStore can provide your object in different ways.</p>
+<ul>
+<li>
+<p><strong>Single</strong></p>
+<blockquote>
+<p>For usage in sequential code, minimal management overhead.</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Multi</strong> <br />
+     usage for may modifying the object in parallel.</p>
+<ul>
+<li>
+<p><strong>MultiCopy</strong>
+     instantiate object mutable times to avoid synchronisation.
+     Memory overhead.<br />
+     The number of instances must be passed to construct time.</p>
+<blockquote>
+<p><strong>use case:</strong> high frequent writing operation.</p>
+</blockquote>
+</li>
+<li>
+<p><strong>MultiShared</strong>
+    creates object accessible with writer, to keep object valid locks are used.
+    Many synchronisation points.   </p>
+<blockquote>
+<p><strong>use case:</strong> much computing and only low frequent writing.  </p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="creating-new-objects">Creating new objects</h2>
+<ol>
+<li>Construct <code>EntryData</code> (blueprint) for the object to book</li>
+<li>Book object with <code>book(absolute-path, name, entry-data)</code></li>
+</ol>
+<p><strong>examples</strong></p>
+<ul>
+<li><strong>for a single <code>Hist1F</code></strong></li>
+</ul>
+<pre class="codehilite"><code class="language-cpp">    EntryData entry-data = EntryData&lt;Hist1F&gt;(&quot;title&quot;, {&quot;axis title&quot;, bins, min, max});
+    auto entry = store.book(&quot;/path/to/object/&quot;, &quot;name&quot;, entry-data.single());</code></pre>
+
+
+<ul>
+<li><strong>for a multi copy, with 4 instances, <code>Hist1F</code></strong></li>
+</ul>
+<pre class="codehilite"><code class="language-cpp">    auto entry = store.book(&quot;/path/&quot;, &quot;name&quot;, EntryData&lt;Hist1F&gt;(axis).multiCopy(4));</code></pre>
+
+
+<ul>
+<li><strong>for a single <code>Hist2F</code></strong></li>
+</ul>
+<pre class="codehilite"><code class="language-cpp">    auto entry = store.book(&quot;/path/&quot;, &quot;name&quot;, EntryData&lt;Hist2F&gt;(axis1, axis2).single());</code></pre>
+
+
+<h2 id="writing-to-an-object">Writing to an object</h2>
+<h3 id="creating-a-handle">creating a handle</h3>
+<p><code>entry.handle()</code> will produce a new handle.<br />
+For EntryMultiCopy you need to pass the id of the instance you want to access <code>entry.handle(id)</code>.</p>
+<p><strong>example <code>Hist1F</code></strong></p>
+<pre class="codehilite"><code class="language-cpp">    // single
+    Handle&lt;Hist1F&gt; entrySingle.handle();
+
+    // multi copy
+    Handle&lt;Hist1F&gt; entryMultiCopy.handle(0);
+
+    //multi shared
+    Handle&lt;Hist1F&gt; entryMultiShared.handle();</code></pre>
+
+
+<h3 id="use-the-object-specific-modification-functions">use the object specific modification functions.</h3>
+<ul>
+<li>Histogram<ul>
+<li><code>fill(position, weight)</code><br />
+    add one datum to the histogram, position array based type which fields equal to the number of dimensions from the histogram.  <br />
+    e.g 1D <code>fill({x}, w)</code>, 2D <code>fill({x,y},w)</code>, etc.</li>
+<li><code>fillN(containerType positions, containerType  weights)</code><br />
+     add mutable dates to the histogram.</li>
+</ul>
+</li>
+</ul>
+<p><strong>example <code>Hist1F</code></strong></p>
+<pre class="codehilite"><code class="language-cpp">    handle.fill({1}, 1);
+
+    std::vector&lt;typename Hist1F::Point_t&gt; points = {…};
+    std::vector&lt;typename Hist1F::Weight_t&gt; weights = {…};
+    handle.fillN(points, weights);</code></pre>
+
+
+<h2 id="reading-final-version-of-object">reading final version of object</h2>
+<p><code>entry.merged()</code> returns a const reference to the final object.</p>
+<p><strong>example <code>Hist1F</code></strong></p>
+<pre class="codehilite"><code class="language-cpp">    const Hist1F&amp; hist = entry.merged();
+    // now you can read the histogram normally
+    std::cout &lt;&lt; hist.GetBinContent({0}) &lt;&lt; '\n';</code></pre>
+
+
+<h2 id="access-created-objects">Access created objects</h2>
+<h3 id="selection">selection</h3>
+<p>Set of entries which full fill a condition. Can created from a BookStore
+or an other Selection.</p>
+<p><strong>features</strong>
+* iterate able<br />
+* manually removing from elements
+* access entries</p>
+<h3 id="condition">Condition</h3>
+<p>A Condition for filtering entries. Constructed with <code>ConditionBuilder</code>.</p>
+<p><strong>attributes to filter</strong></p>
+<ul>
+<li>name: perfect match or regex</li>
+<li>path: perfect match or regex</li>
+<li>type: perfect match</li>
+</ul>
+<p><strong>example</strong></p>
+<pre class="codehilite"><code class="language-cpp">    Condition condition = ConditionBuilder()
+        .setName(&quot;name&quot;) // perfect match to name required
+        .setPath(std::regex(&quot;^p[^/]*h&quot;)); // path must match regex</code></pre>
+
+
+<p><strong>example</strong> get a handle from every <code>Hist1F</code> in <code>/path/to/dir</code></p>
+<pre class="codehilite"><code class="language-cpp">    Selection selection = store.find(
+        ConditionBuilder().setPath(&quot;/path/to/dir/&quot;)
+    );
+
+    try {
+        for(const entry&amp; : selection) {
+            handles&lt;Hist1F&gt;.push_back(entry.handle&lt;Hist1F&gt;());
+        }
+    } catch (const marlin::BookStoreException&amp;){}</code></pre></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"search": 83, "next": 78, "help": 191, "previous": 80};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

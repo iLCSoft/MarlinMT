@@ -1,0 +1,25 @@
+var classmarlinmt_1_1EventStore =
+[
+    [ "EventStore", "classmarlinmt_1_1EventStore.html#ac526d67c4977181c45aad19a55269e84", null ],
+    [ "~EventStore", "classmarlinmt_1_1EventStore.html#a0aa9ba31a7c05f0560ef5df546319b1e", null ],
+    [ "EventStore", "classmarlinmt_1_1EventStore.html#a94eb73e7224d6e51f60894b1d9033df1", null ],
+    [ "EventStore", "classmarlinmt_1_1EventStore.html#ac82369facb2f56ff28d9aeabbd27b04b", null ],
+    [ "allocate", "classmarlinmt_1_1EventStore.html#aebbd17e700b1c0e36315da4870efec1a", null ],
+    [ "event", "classmarlinmt_1_1EventStore.html#ad27f1227f2817bccad32d30e588b58b3", null ],
+    [ "extensions", "classmarlinmt_1_1EventStore.html#a135b420f51c149a8acbd6cc032b4d8e7", null ],
+    [ "extensions", "classmarlinmt_1_1EventStore.html#a04c4546039a3992c21ee28db9aab6656", null ],
+    [ "isType", "classmarlinmt_1_1EventStore.html#a4cb2fbbb69eed7a90111227bbff9974c", null ],
+    [ "operator=", "classmarlinmt_1_1EventStore.html#ad2fb07d6187870d36ba531bd465afb6b", null ],
+    [ "operator=", "classmarlinmt_1_1EventStore.html#a042ba9fad07f8a42ee81fc24f9cd1511", null ],
+    [ "reset", "classmarlinmt_1_1EventStore.html#af0e6741d5167e37921ca338c3073f003", null ],
+    [ "setBareEvent", "classmarlinmt_1_1EventStore.html#a30c5daba8914eb75a993ab8b1df2559a", null ],
+    [ "setEvent", "classmarlinmt_1_1EventStore.html#a511cf122fcf70388f79ade210da292db", null ],
+    [ "setUID", "classmarlinmt_1_1EventStore.html#ac5b564aef161b796c3560a0405f59d4e", null ],
+    [ "takeEvent", "classmarlinmt_1_1EventStore.html#a5221faabb3245eb92b70b91d9fb1fb61", null ],
+    [ "type", "classmarlinmt_1_1EventStore.html#ab98398ec7b376aa2051c561b1fab88dc", null ],
+    [ "uid", "classmarlinmt_1_1EventStore.html#a19ee7cbc5ff97966925390b919298ffa", null ],
+    [ "_event", "classmarlinmt_1_1EventStore.html#a4569977d1a8e2453c5385a0c4877ea0c", null ],
+    [ "_eventType", "classmarlinmt_1_1EventStore.html#ac6770e83fb733fd99f9e59f697358b7b", null ],
+    [ "_extensions", "classmarlinmt_1_1EventStore.html#a67c3e34ac9f6bb310a68ed1fc011683b", null ],
+    [ "_uid", "classmarlinmt_1_1EventStore.html#ad6558ecac9b82964f996c654de39d13e", null ]
+];
